@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import ProjectTable from "@libs/app/components/admin/projects/ProjectTable";
-import CreateProjectModal from "@libs/app/components/projects/modals/createProjectModal";
+import CreateProjectModal from "@libs/app/components/projects/modals/project/createProjectModal";
 import SearchFilters from "@libs/app/components/admin/common/SearchFilters";
 import { IProject } from "@libs/types/project";
 import { useListUser } from "@libs/hooks/apis/useUser";

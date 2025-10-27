@@ -78,7 +78,7 @@ const TeamDropdown = ({
               </div>
             ),
             onClick: () => {
-              handleChangeTeam("");
+              handleChangeTeam("NULL");
             },
           })
       }

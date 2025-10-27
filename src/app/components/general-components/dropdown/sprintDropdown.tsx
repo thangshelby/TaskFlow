@@ -64,7 +64,7 @@ const SprintDropdown = ({
             </div>
           ),
           onClick: () => {
-            handleChangeSprint("");
+            handleChangeSprint("NULL");
           },
         })}
       currentItem={

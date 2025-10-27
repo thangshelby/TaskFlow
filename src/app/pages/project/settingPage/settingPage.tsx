@@ -9,7 +9,7 @@ import {
 import { useEffect } from "react";
 const ProjectSettings = () => {
   const settingsMenuItems = [
-    { id: "general", name: "General", icon: Settings, enabled: false },
+    { id: "details", name: "General", icon: Settings, enabled: true },
     { id: "teams", name: "Teams", icon: Users, enabled: true },
     { id: "permissions", name: "Permissions", icon: Shield, enabled: false },
     { id: "workflows", name: "Workflows", icon: Workflow, enabled: false },
@@ -19,19 +19,19 @@ const ProjectSettings = () => {
   const location = useLocation();
   const { projectId } = useParams<{ projectId: string }>();
 
-  // Redirect base settings route to the default tab (teams)
+  // Redirect base settings route to the default tab (details)
   useEffect(() => {
     if (
       projectId &&
       location.pathname.endsWith(`/projects/${projectId}/settings`)
     ) {
-      navigate(`/projects/${projectId}/settings/teams`, { replace: true });
+      navigate(`/projects/${projectId}/settings/details`, { replace: true });
     }
   }, [location.pathname, navigate, projectId]);
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="h-full w-full">
       {/* Main Content */}
-      <div className="mx-auto flex flex-col gap-8 px-4 py-8 sm:px-6 lg:px-8">
+      <div className="mx-auto flex flex-col gap-8">
         <div className="space-y-2">
           <div>
             <h2 className="text-2xl font-bold text-gray-900">

@@ -12,7 +12,7 @@ import { useParams } from "react-router-dom";
 import { useProjectTeamById } from "@libs/hooks/apis/useTeam";
 import UserAvatar from "@libs/app/components/general-components/user/userAvatar";
 import { useUpdateTeam } from "@libs/hooks/apis/useTeam";
-import AddProjectTeamMemberModal from "@libs/app/components/projects/modals/addProjectTeamMemberModal";
+import AddProjectTeamMemberModal from "@libs/app/components/projects/modals/project/addProjectTeamMemberModal";
 
 import { PERMISSIONS_CONFIG } from "@libs/config/permissons.config";
 import PermissionButton from "@libs/app/components/general-components/pemissionButton";
@@ -71,7 +71,7 @@ const TeamDetailPage: React.FC = () => {
 
   return (
     <>
-      <div className="min-h-screen bg-gray-50 px-16">
+      <div className="min-h-screen px-8">
         <div className="mx-auto flex w-full flex-col gap-6">
           {/* Green Banner */}
           <div className="group relative flex h-52 cursor-pointer items-center justify-center rounded-lg bg-gradient-to-r from-teal-400 via-blue-200 to-indigo-100">
@@ -185,24 +185,27 @@ const TeamDetailPage: React.FC = () => {
                     <h3 className="mb-2 text-sm font-medium text-gray-700">
                       Members
                     </h3>
-                    <div className="flex flex-col gap-3">
-                      <div className="flex -space-x-2 overflow-hidden">
-                        {memberIds.slice(0, 8).map((uid) => (
-                          <div key={uid} className="inline-block">
+                    <div className="flex flex-col gap-2">
+                      {memberIds.length === 0 && (
+                        <span className="text-sm text-gray-500">
+                          No members
+                        </span>
+                      )}
+                      {memberIds.map((uid) => (
+                        <div
+                          key={uid}
+                          className="flex items-center justify-between rounded-md border border-gray-100 px-2 py-1.5 hover:bg-gray-50"
+                        >
+                          <div className="flex items-center gap-3">
                             <UserAvatar
                               userId={uid}
-                              size={32}
-                              isDisplayName={false}
+                              size={28}
+                              isDisplayName={true}
                             />
                           </div>
-                        ))}
-                        {memberIds.length > 8 && (
-                          <div className="inline-flex h-8 w-8 items-center justify-center rounded-full bg-gray-200 text-xs font-medium text-gray-700">
-                            +{memberIds.length - 8}
-                          </div>
-                        )}
-                      </div>
-                      <span className="text-sm text-gray-600">
+                        </div>
+                      ))}
+                      <span className="mt-1 text-sm text-gray-600">
                         {memberIds.length} members
                       </span>
                     </div>

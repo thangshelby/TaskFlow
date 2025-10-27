@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Link, useParams, useLocation } from "react-router-dom";
 import {
-  FaChartBar,
   FaListAlt,
   FaTh,
   FaCalendarAlt,
@@ -30,7 +29,7 @@ import {
 import { CSS } from "@dnd-kit/utilities";
 import type { CSSProperties } from "react";
 import { useProject } from "../../../hooks/apis/useProject";
-import AddProjectMemberModal from "./modals/addProjectMemberModal";
+import AddProjectMemberModal from "./modals/project/addProjectMemberModal";
 import { useIssueStore } from "@libs/store/useIssueStore";
 import { PERMISSIONS_CONFIG } from "@libs/config/permissons.config";
 import PermissionButton from "@libs/app/components/general-components/pemissionButton";
@@ -156,12 +155,7 @@ const ProjectNavbar: React.FC<ProjectNavbarProps> = ({
       icon: <FaCalendarAlt />,
       route: `/projects/${currentProjectId}/roadmap`,
     },
-    {
-      id: "sprints",
-      label: "Sprints",
-      icon: <FaChartBar />,
-      route: `/projects/${currentProjectId}/sprints`,
-    },
+
     {
       id: "settings",
       label: "Settings",

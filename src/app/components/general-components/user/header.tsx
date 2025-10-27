@@ -15,7 +15,7 @@ const ProjectInvitationsPopover = lazy(
   () => import("../../projects/projectInvitationsPopover"),
 );
 const CreateIssueModal = lazy(
-  () => import("../../projects/modals/createIssueModal"),
+  () => import("../../projects/modals/issue/createIssueModal"),
 );
 
 // 👇 Lazy load ProjectDropdown (fetch sẽ chỉ chạy khi mount)

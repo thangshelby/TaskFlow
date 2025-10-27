@@ -13,7 +13,6 @@ export default function SearchHeader() {
       <Popover
         content={<ElasticSearch searchQuery={debouncedSearch} />}
         trigger="click"
-        defaultOpen={true}
       >
         <div className="relative">
           <input

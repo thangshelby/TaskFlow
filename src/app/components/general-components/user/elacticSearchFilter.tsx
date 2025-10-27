@@ -192,6 +192,7 @@ const ElacticSearchFilter = ({
           <div className="space-y-2">
             {assignees
               .slice(0, isShowMoreFilter.assignees ? assignees.length : 4)
+              .concat()
               .map((assignee) => (
                 <div key={assignee.user_id} className="flex items-center gap-2">
                   <CheckboxItem
@@ -251,21 +252,6 @@ const ElacticSearchFilter = ({
           </div>
         </FilterSection>
       )}
-      <FilterSection
-        title="FILTER BY REPORTER"
-        section="reporters"
-        toggleSection={toggleSection}
-      >
-        <div className="space-y-2">
-          <CheckboxItem
-            label="Reported by me"
-            checked={isChecked("reporters", "me")}
-            onChange={(checked) =>
-              handleCheckboxChange("reporters", "me", checked)
-            }
-          />
-        </div>
-      </FilterSection>
     </div>
   );
 };

@@ -1,14 +1,34 @@
 import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
 
-const elacicSearchApi = axios.create({
+const elasticSearchApi = axios.create({
   baseURL: "http://localhost:3001/",
   headers: {
     "Content-Type": "application/json",
   },
 });
 
-export default elacicSearchApi;
+// Request interceptor
+elasticSearchApi.interceptors.request.use(
+  (config) => {
+    return config;
+  },
+  (error) => Promise.reject(error),
+);
+
+// Response interceptor
+elasticSearchApi.interceptors.response.use(
+  (response) => response,
+  async (error) => {
+    if (error.response?.status === 401) {
+      localStorage.removeItem("token");
+      // window.location.href = "/login";
+    }
+    return Promise.reject(error);
+  },
+);
+
+export default elasticSearchApi;
 
 interface SearchRequest {
   q?: string;
@@ -44,11 +64,12 @@ interface SearchRequest {
   severity?: "low" | "medium" | "high";
   category?: "bug" | "feature" | "task";
   limit?: number;
+  userId: string;
 }
 
 export const elasticSearch = {
   search: (request: SearchRequest) => {
-    return elacicSearchApi.post("/search_issues", request);
+    return elasticSearchApi.post("/search_issues", request);
   },
 };
 

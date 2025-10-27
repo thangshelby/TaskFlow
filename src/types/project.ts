@@ -3,12 +3,18 @@ import { IProjectMember } from "@libs/types/projectMember";
 export interface IProject {
   id: string;
   name: string;
+  description?: string;
   key: string;
   access: string;
   type: "Kanban" | "Scrum";
   owner_id: string;
   created_at: string;
   updated_at: string;
+  issues_count?: number;
+  members_count?: number;
+  due_date_from?: string;
+  due_date_to?: string;
+  backgound_image?: string;
   project_members: IProjectMember[];
 }
 export interface IColumn {

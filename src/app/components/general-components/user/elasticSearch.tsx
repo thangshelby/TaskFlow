@@ -12,6 +12,7 @@ import { ClipLoader } from "react-spinners";
 import { IIssue } from "@libs/types/issue";
 import StatusBadge from "../badge/statusBadge";
 import { useNavigate, useParams } from "react-router-dom";
+import { useAuthStore } from "@libs/store/useAuthStore";
 
 const filterFormSchema = z.object({
   lastUpdated: z.string().optional(),
@@ -36,7 +37,9 @@ const ElasticSearch = ({ searchQuery }: { searchQuery: string }) => {
       labels: "",
     },
   });
+  const { user } = useAuthStore();
   const { issues, isLoading } = useElasticSearch({
+    userId: user?.id || "",
     q: searchQuery,
     last_updated: watch("lastUpdated") || "any_time",
     project_ids: watch("projects") || [],

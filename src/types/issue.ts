@@ -52,7 +52,7 @@ export interface GetIssuesParams {
 
 export interface CreateIssueParams {
   // Required fields from proto definition
-  title: string;
+  title?: string;
   summary: string; // Required per proto
   type: IssueType;
   column_id: string;
@@ -68,6 +68,7 @@ export interface CreateIssueParams {
   story_point?: number;
   attachments?: string[];
   due_date_to?: string;
+  team_id?: string;
 }
 
 export interface GetActivitiesParams {

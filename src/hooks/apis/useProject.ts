@@ -145,6 +145,7 @@ export function useDeleteProject({ onClose }: { onClose?: () => void }) {
     error,
   };
 }
+
 export function useProject(projectId: string) {
   const queryClient = useQueryClient();
   const { user, setUser } = useAuthStore();

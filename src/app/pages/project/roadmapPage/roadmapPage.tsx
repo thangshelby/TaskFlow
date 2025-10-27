@@ -36,7 +36,7 @@ const RoadmapPage: React.FC = () => {
   } = useRoadmapPage({ projectId: projectId || "" });
 
   return (
-    <div className="flex h-full w-full flex-col gap-6 bg-white pb-32">
+    <div className="flex h-full w-full flex-col gap-6 bg-white">
       <Helmet>
         <title>Roadmap - Task Flow</title>
       </Helmet>

@@ -14,7 +14,7 @@ import { useTableColumns } from "./listTable/tableColumns";
 import TableFooter from "./listTable/tableFooter";
 
 const CreateIssueModal = lazy(
-  () => import("@libs/app/components/projects/modals/createIssueModal"),
+  () => import("@libs/app/components/projects/modals/issue/createIssueModal"),
 );
 
 interface ListTableProps {

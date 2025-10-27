@@ -2,8 +2,8 @@ import {
   horizontalListSortingStrategy,
   SortableContext,
 } from "@dnd-kit/sortable";
-import DeleteColumnModal from "@libs/app/components/projects/modals/deleteColumnModal";
-import RenameColumnModal from "@libs/app/components/projects/modals/renameColumnModal";
+import DeleteColumnModal from "@libs/app/components/projects/modals/column/deleteColumnModal";
+import RenameColumnModal from "@libs/app/components/projects/modals/column/renameColumnModal";
 import {
   useDeleteColumn,
   useUpdateColumn,
@@ -32,7 +32,7 @@ export const KanbanColumn = ({
   isDragging: boolean;
 }) => {
   const { setNodeRef, isOver } = useDroppable({
-    id: column.id,
+    id: column?.id,
     data: {
       type: "Column",
       column,
@@ -46,7 +46,7 @@ export const KanbanColumn = ({
   const { deleteColumn } = useDeleteColumn((deletedColumnId) => {
     // Xử lý sau khi xóa thành công
     const newColumns = columns
-      .filter((col) => col.id !== deletedColumnId)
+      .filter((col) => col?.id !== deletedColumnId)
       .map((col, index) => ({
         ...col,
         order: index,
@@ -55,35 +55,41 @@ export const KanbanColumn = ({
     setColumns(newColumns);
   });
   const { overItemId } = useOverItem();
-  const handleMove = useCallback((direction: "left" | "right") => {
-    const currentIndex = columns.findIndex((c) => c.id === column.id);
-    const targetIndex =
-      direction === "left" ? currentIndex - 1 : currentIndex + 1;
+  const handleMove = useCallback(
+    (direction: "left" | "right") => {
+      const currentIndex = columns.findIndex((c) => c?.id === column?.id);
+      const targetIndex =
+        direction === "left" ? currentIndex - 1 : currentIndex + 1;
 
-    if (targetIndex < 0 || targetIndex >= columns.length) return;
+      if (targetIndex < 0 || targetIndex >= columns.length) return;
 
-    const newColumns = [...columns];
-    [newColumns[currentIndex], newColumns[targetIndex]] = [
-      newColumns[targetIndex],
-      newColumns[currentIndex],
-    ];
+      const newColumns = [...columns];
+      [newColumns[currentIndex], newColumns[targetIndex]] = [
+        newColumns[targetIndex],
+        newColumns[currentIndex],
+      ];
 
-    const reordered = newColumns.map((col, index) => ({
-      ...col,
-      order: index,
-    }));
+      const reordered = newColumns.map((col, index) => ({
+        ...col,
+        order: index,
+      }));
 
-    setColumns(reordered);
+      setColumns(reordered);
 
-    updateOrderColumn({
-      projectId: projectId || "",
-      columns: reordered.map((col) => ({ id: col.id, order: col.order + 1 })),
-    });
-    setPopoverOpen(false);
-  }, []);
+      updateOrderColumn({
+        projectId: projectId || "",
+        columns: reordered.map((col) => ({
+          id: col?.id,
+          order: col?.order + 1,
+        })),
+      });
+      setPopoverOpen(false);
+    },
+    [columns, column?.id, projectId, updateOrderColumn],
+  );
   const handleRenameColumn = useCallback((newName: string) => {
     const newColumns = columns.map((col) => {
-      if (col.id === column.id) {
+      if (col?.id === column?.id) {
         return { ...col, name: newName };
       }
       return col;
@@ -92,7 +98,7 @@ export const KanbanColumn = ({
     setShowRenameColumnModal(false);
     if (projectId) {
       updateColumn({
-        column_id: column.id,
+        column_id: column?.id,
         name: newName,
         projectId: projectId,
       });
@@ -103,7 +109,7 @@ export const KanbanColumn = ({
     setShowDeleteColumnModal(false);
 
     if (projectId) {
-      deleteColumn({ column_id: column.id });
+      deleteColumn({ column_id: column?.id });
     }
   };
   const content: ReactNode = (
@@ -144,12 +150,12 @@ export const KanbanColumn = ({
     <div ref={setNodeRef} className="mx-1 w-80 rounded bg-gray-100 py-2">
       <div className="flex items-center justify-between p-2">
         <div className="flex items-center gap-1">
-          <h2 className="text-sm font-medium text-gray-500">{column.name}</h2>
+          <h2 className="text-sm font-medium text-gray-500">{column?.name}</h2>
           <span className="rounded-sm bg-gray-300 px-2 text-xs font-medium text-gray-500">
-            {column.issues.length}
+            {column?.issues.length}
           </span>
 
-          {column.name === "DONE" && (
+          {column?.name === "DONE" && (
             <Check className="ml-2 text-emerald-500" size={20} />
           )}
         </div>
@@ -167,19 +173,19 @@ export const KanbanColumn = ({
       </div>
       <SortableContext
         strategy={horizontalListSortingStrategy}
-        items={column.issues.map((issue) => issue.id)}
+        items={column?.issues?.map((issue) => issue?.id) || []}
       >
         <div className="flex h-full flex-col overflow-auto p-2 px-3 pb-32">
-          {column.issues.map((issue) => {
+          {column?.issues?.map((issue) => {
             const newColumn: IColumn = { ...column };
             delete (newColumn as any).issues;
             const newIssue: IIssue = { ...issue, column: newColumn };
 
             return (
-              <div key={issue.id} className="group relative">
+              <div key={issue?.id} className="group relative">
                 <div
                   style={{
-                    opacity: isDragging && issue.id === overItemId ? 1 : 0,
+                    opacity: isDragging && issue?.id === overItemId ? 1 : 0,
                   }}
                   className="absolute top-[-2px] left-0 z-50 flex w-full flex-row items-center"
                 >
@@ -188,11 +194,11 @@ export const KanbanColumn = ({
 
                 <div
                   style={{
-                    opacity: isDragging && issue.id === overItemId ? 1 : 0,
+                    opacity: isDragging && issue?.id === overItemId ? 1 : 0,
                   }}
                   className="absolute top-[-6px] left-[-10px] z-50 flex w-full flex-row items-center"
                 >
-                  <div className="z-50 rounded-[100%] border-1 border-emerald-500 p-1" />
+                  <div className="z-50 rounded-[100%] border border-emerald-500 p-1" />
                 </div>
 
                 <IssueCard issue={newIssue} />
@@ -216,7 +222,7 @@ export const KanbanColumn = ({
               }}
               className="absolute top-[-6px] left-[-10px] z-50 flex w-full flex-row items-center"
             >
-              <div className="z-50 rounded-[100%] border-1 border-emerald-500 p-1" />
+              <div className="z-50 rounded-[100%] border border-emerald-500 p-1" />
             </div>
           </div>
         </div>

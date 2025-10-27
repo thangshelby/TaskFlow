@@ -5,7 +5,7 @@ import SearchFilters from "@libs/app/components/admin/common/SearchFilters";
 import UserTable from "@libs/app/components/admin/users/UserTable";
 import UserModal from "@libs/app/components/admin/users/UserModal";
 import ProjectTable from "@libs/app/components/admin/projects/ProjectTable";
-import CreateProjectModal from "@libs/app/components/projects/modals/createProjectModal";
+import CreateProjectModal from "@libs/app/components/projects/modals/project/createProjectModal";
 import { useListUser } from "@libs/hooks/apis/useUser";
 import { useProjects } from "@libs/hooks/apis/useProject";
 import { IUser } from "@libs/types/user";

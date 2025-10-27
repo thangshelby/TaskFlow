@@ -1,7 +1,7 @@
 import React from "react";
 import { FaUserPlus } from "react-icons/fa";
 import { Popover } from "antd";
-import ProjectMemberInvitations from "./modals/projectMemberInvitations";
+import ProjectMemberInvitations from "./modals/project/projectMemberInvitations";
 import { useUserMemberships } from "@libs/hooks/apis/useProjectMember";
 
 interface ProjectInvitationsPopoverProps {
