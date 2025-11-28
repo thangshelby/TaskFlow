@@ -4,7 +4,6 @@ import { Helmet } from "react-helmet-async";
 import {
   Card,
   Input,
-  Badge,
   Dropdown,
   Progress,
   Space,
@@ -19,7 +18,6 @@ import type { MenuProps } from "antd";
 import {
   Search,
   Plus,
-  Bell,
   Settings,
   User,
   ChevronDown,
@@ -33,131 +31,36 @@ import {
 } from "lucide-react";
 import { useUserProjects } from "@libs/hooks/apis/useProject";
 const { Title, Text, Paragraph } = Typography;
-
-const projects = [
-  {
-    id: 1,
-    name: "BlueSky",
-    key: "BS",
-    description: "E-commerce platform redesign",
-    type: "Software",
-    status: "active",
-    progress: 68,
-    members: 8,
-    issues: 24,
-    dueDate: "2025-11-15",
-    color: "#3b82f6",
-  },
-  {
-    id: 2,
-    name: "Task Flow",
-    key: "TF",
-    description: "Project management tool",
-    type: "Software",
-    status: "active",
-    progress: 45,
-    members: 5,
-    issues: 49,
-    dueDate: "2025-12-01",
-    color: "#10b981",
-  },
-  {
-    id: 3,
-    name: "Mobile App",
-    key: "MA",
-    description: "iOS and Android application",
-    type: "Mobile",
-    status: "active",
-    progress: 82,
-    members: 6,
-    issues: 12,
-    dueDate: "2025-10-20",
-    color: "#a855f7",
-  },
-  {
-    id: 4,
-    name: "Dashboard Analytics",
-    key: "DA",
-    description: "Real-time analytics dashboard",
-    type: "Software",
-    status: "active",
-    progress: 34,
-    members: 4,
-    issues: 31,
-    dueDate: "2025-11-30",
-    color: "#f97316",
-  },
-  {
-    id: 5,
-    name: "Marketing Site",
-    key: "MS",
-    description: "Company website redesign",
-    type: "Web",
-    status: "completed",
-    progress: 100,
-    members: 3,
-    issues: 0,
-    dueDate: "2025-09-15",
-    color: "#22c55e",
-  },
-  {
-    id: 6,
-    name: "API Gateway",
-    key: "AG",
-    description: "Microservices API gateway",
-    type: "Backend",
-    status: "active",
-    progress: 56,
-    members: 7,
-    issues: 18,
-    dueDate: "2025-12-15",
-    color: "#06b6d4",
-  },
-];
-
-const upcomingDeadlines = [
-  {
-    project: "E-commerce Platform",
-    dueIn: "2 days",
-    color: "#10b981",
-  },
-  {
-    project: "Mobile App Redesign",
-    dueIn: "5 days",
-    color: "#f97316",
-  },
-  {
-    project: "Dashboard Analytics",
-    dueIn: "1 week",
-    color: "#3b82f6",
-  },
-];
-const filterOptions = [
-  { value: "newest", label: "Newest" },
-  { value: "oldest", label: "Oldest" },
-];
-
+import { useNavigate } from "react-router-dom";
+import CreateProjectModal from "@libs/app/components/projects/modals/project/createProjectModal";
 export default function ProjectPage() {
   const [searchQuery, setSearchQuery] = useState("");
-  const [showCreateProjectModal, setShowCreateProjectModal] = useState(false);
-  const [option, setOption] = useState(filterOptions[0]);
-
-  const { projects: userProjects, isLoading: isLoadingUserProjects } =
-    useUserProjects();
+  const navigate = useNavigate();
+  const { projects } = useUserProjects();
   const [sortBy, setSortBy] = useState("newest");
-
-  const activeProjects = projects.filter((p) => p.status === "active").length;
-  const completedProjects = projects.filter(
-    (p) => p.status === "completed",
+  const [isCreateProjectModalOpen, setIsCreateProjectModalOpen] =
+    useState(false);
+  const activeProjects = projects.filter(
+    (p) =>
+      p.due_date_from &&
+      p.due_date_to &&
+      new Date(p.due_date_from).getTime() < new Date().getTime() &&
+      new Date(p.due_date_to).getTime() > new Date().getTime(),
   ).length;
-  const upcomingProjects = projects.filter((p) => {
-    const dueDate = new Date(p.dueDate);
-    const today = new Date();
-    const daysUntilDue = Math.ceil(
-      (dueDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24),
-    );
-    return daysUntilDue <= 7 && daysUntilDue > 0;
-  }).length;
+  const completedProjects = projects.filter(
+    (p) =>
+      p.due_date_from &&
+      p.due_date_to &&
+      new Date(p.due_date_from).getTime() > new Date().getTime() &&
+      new Date(p.due_date_to).getTime() < new Date().getTime(),
+  ).length;
+  const upcomingProjects = projects.filter(
+    (p) =>
+      p.due_date_from &&
+      p.due_date_to &&
+      new Date(p.due_date_from).getTime() > new Date().getTime() &&
+      new Date(p.due_date_to).getTime() > new Date().getTime(),
+  ).length;
 
   const sortMenuItems: MenuProps["items"] = [
     { key: "newest", label: "Newest" },
@@ -207,31 +110,60 @@ export default function ProjectPage() {
                   onClick: ({ key }) => setSortBy(key),
                 }}
               >
-                <Button>
-                  {sortBy === "newest"
-                    ? "Newest"
-                    : sortBy === "oldest"
-                      ? "Oldest"
-                      : "Name"}{" "}
-                  <ChevronDown />
-                </Button>
+                <div>
+                  <Button>
+                    {sortBy === "newest"
+                      ? "Newest"
+                      : sortBy === "oldest"
+                        ? "Oldest"
+                        : "Name"}{" "}
+                    <ChevronDown size={16} />
+                  </Button>
+                </div>
               </Dropdown>
             </Space>
 
             <Row gutter={[24, 24]}>
-              {userProjects.map((project) => (
-                <Col xs={24} md={12} lg={8} key={project.id}>
+              {projects.map((project) => (
+                <Col
+                  onClick={() => navigate(`/projects/${project.id}/summary`)}
+                  xs={24}
+                  md={12}
+                  lg={8}
+                  key={project.id}
+                >
                   <Card
                     hoverable
                     style={{ height: "100%" }}
                     styles={{ body: { padding: 24 } }}
                     extra={
-                      <Dropdown menu={{ items: projectActionItems }}>
-                        <ButtonAntd
-                          type="text"
-                          icon={<MoreHorizontal size={16} />}
-                        />
-                      </Dropdown>
+                      <div className="flex w-full items-center justify-between">
+                        <div className="flex items-center gap-1">
+                          <span className="text-sm font-bold">
+                            {project.due_date_from
+                              ? new Date(
+                                  project.due_date_from,
+                                ).toLocaleDateString()
+                              : "No due date"}
+                          </span>
+                          -
+                          <span className="text-sm font-bold">
+                            {project.due_date_to
+                              ? new Date(
+                                  project.due_date_to,
+                                ).toLocaleDateString()
+                              : "No due date"}
+                          </span>
+                        </div>
+
+                        <Dropdown menu={{ items: projectActionItems }}>
+                          <ButtonAntd
+                            onClick={(e) => e.stopPropagation()}
+                            type="text"
+                            icon={<MoreHorizontal size={16} />}
+                          />
+                        </Dropdown>
+                      </div>
                     }
                   >
                     {/* Project Header */}
@@ -240,8 +172,8 @@ export default function ProjectPage() {
                         style={{
                           width: 48,
                           height: 48,
-                          background: project.backgound_image
-                            ? `url(${project.backgound_image})`
+                          background: project.background_img
+                            ? `url(${project.background_img})`
                             : "#10b981",
                           borderRadius: 8,
                           display: "flex",
@@ -292,7 +224,7 @@ export default function ProjectPage() {
                       <Progress
                         percent={project.issues_count}
                         strokeColor={
-                          project.backgound_image ? "#10b981" : "#10b981"
+                          project.background_img ? "#10b981" : "#10b981"
                         }
                         showInfo={false}
                       />
@@ -436,7 +368,7 @@ export default function ProjectPage() {
                   size="middle"
                   style={{ width: "100%" }}
                 >
-                  {userProjects
+                  {projects
                     .sort(
                       (a, b) =>
                         new Date(b.updated_at).getTime() -
@@ -456,8 +388,8 @@ export default function ProjectPage() {
                                 width: 4,
                                 height: 4,
                                 borderRadius: "50%",
-                                background: project.backgound_image
-                                  ? `url(${project.backgound_image})`
+                                background: project.background_img
+                                  ? `url(${project.background_img})`
                                   : "#10b981",
                               }}
                             />
@@ -493,6 +425,9 @@ export default function ProjectPage() {
                     block
                     icon={<Plus size={16} />}
                     style={{ textAlign: "left" }}
+                    onClick={() => {
+                      setIsCreateProjectModalOpen(true);
+                    }}
                   >
                     Create New Project
                   </ButtonAntd>
@@ -516,6 +451,11 @@ export default function ProjectPage() {
           </aside>
         </div>
       </div>
+
+      <CreateProjectModal
+        isOpen={isCreateProjectModalOpen}
+        onClose={() => setIsCreateProjectModalOpen(false)}
+      />
     </div>
   );
 }

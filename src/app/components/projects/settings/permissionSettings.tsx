@@ -14,8 +14,14 @@ import {
   ChevronDown,
   LoaderCircle,
 } from "lucide-react";
-import { usePermissions } from "@libs/hooks/apis/useProject";
+import { usePermissions, useProject } from "@libs/hooks/apis/useProject";
 import { AnimatePresence, motion } from "motion/react";
+import { useRowPermission } from "@libs/app/context/permission.context";
+import { useAuthStore } from "@libs/store/useAuthStore";
+import { PERMISSIONS_CONFIG } from "@libs/config/permissons.config";
+import { usePermission } from "@libs/hooks/common/usePermission";
+import { useUserTeams } from "@libs/hooks/apis/useTeam";
+import { useParams } from "react-router-dom";
 
 // Map resource -> display info
 const RESOURCE_CONFIG: Record<string, { name: string; icon: any }> = {
@@ -79,6 +85,20 @@ const PermissionsSettings = ({
     Record<string, string>
   >({});
 
+  const { projectId } = useParams<{ projectId: string }>();
+  const { project } = useProject(projectId!);
+  const { user } = useAuthStore();
+  const { userTeams } = useUserTeams(projectId!, user?.id!);
+
+  // const permissionResult = usePermission({
+  //   user: user!,
+  //   action: PERMISSIONS_CONFIG.project.update,
+  //   resource: {
+  //     issue: {
+  //       teams: userTeams!,
+  //     },
+  //   },
+  // });
   useEffect(() => {
     if (rawPermissions) {
       setPERMISSIONS_DATA(normalizePermissions(rawPermissions));

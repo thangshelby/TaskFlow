@@ -19,7 +19,7 @@ export default function StickyHeader({ isShow }: { isShow: boolean }) {
                 <div className="flex items-center gap-2">
                   <ClipboardCheck className="h-8 w-8 text-emerald-600" />
                   <span className="text-xl font-semibold text-gray-800">
-                    My-Task
+                    Taskflow
                   </span>
                 </div>
                 <div className="flex items-center gap-8">

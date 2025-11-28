@@ -49,6 +49,8 @@ const BackLogPageContent: React.FC = () => {
     setIsCreateSprintModalOpen,
     selectedIssueId,
     sensors,
+    isLoadingSprints,
+    isLoadingIssues,
   } = useBackLogPage(projectId);
 
   return (
@@ -81,7 +83,7 @@ const BackLogPageContent: React.FC = () => {
           setFilters(filter as GetIssuesParams);
         }}
       />
-      {!sprintIssues.length ? (
+      {isLoadingSprints || isLoadingIssues ? (
         <BacklogSkeleton />
       ) : (
         <DndContext

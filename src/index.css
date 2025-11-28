@@ -62,6 +62,10 @@
 }
 
 
+.ant-card-extra {
+  width: 100% !important;
+  margin-left: 0 !important;
+}
 
 .crop-container {
   position: relative;

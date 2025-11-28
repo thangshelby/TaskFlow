@@ -14,7 +14,7 @@ export interface IProject {
   members_count?: number;
   due_date_from?: string;
   due_date_to?: string;
-  backgound_image?: string;
+  background_img?: string;
   project_members: IProjectMember[];
 }
 export interface IColumn {

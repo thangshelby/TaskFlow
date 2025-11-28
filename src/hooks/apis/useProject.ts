@@ -25,7 +25,7 @@ export function useUserProjects(options?: { enabled?: boolean }) {
 
   // Filter out pending memberships and map to project info
   const validMemberships = memberships.filter(
-    (membership) => !membership.is_pending,
+    (membership) => !membership.is_pending && membership.project,
   );
 
   const projects = validMemberships.map((membership) => membership.project);

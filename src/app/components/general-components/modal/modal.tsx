@@ -126,7 +126,7 @@ export default function Modal({
           <div
             ref={modalRef}
             onScroll={handleScroll}
-            className={`max-h-[65vh] overflow-auto border-y-[1px] px-6 ${
+            className={`max-h-[65vh] overflow-auto px-6 ${
               canScroll
                 ? hasScrolled
                   ? "border-gray-200 shadow-sm"
