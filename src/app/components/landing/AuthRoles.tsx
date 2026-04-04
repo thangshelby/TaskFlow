@@ -38,7 +38,7 @@ export default function AuthRoles() {
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: "-100px" }}
       transition={{ duration: 0.6 }}
-      className="h-[800px] bg-gradient-to-br from-[#6b9bd8] via-[#5ba3a3] to-emerald-500 px-6 py-16"
+      className="h-[800px] bg-linear-to-br from-[#6b9bd8] via-[#5ba3a3] to-emerald-500 px-6 py-16"
     >
       <div className="mx-auto max-w-7xl py-20">
         {/* Title */}

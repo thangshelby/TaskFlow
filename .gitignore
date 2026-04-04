@@ -40,3 +40,6 @@ Thumbs.db
 **/coverage/
 **/.cache/
 **/tmp/
+
+# Cursor
+.cursor/

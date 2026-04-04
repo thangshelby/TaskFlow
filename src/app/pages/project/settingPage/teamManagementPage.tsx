@@ -1,4 +1,4 @@
-import React, { useState, lazy, startTransition } from "react";
+import React, { useState, lazy, startTransition, Suspense } from "react";
 import { Search, Users, Plus } from "lucide-react";
 import { useProjectTeams } from "@libs/hooks/apis/useTeam";
 import { useNavigate, useParams } from "react-router-dom";
@@ -46,21 +46,19 @@ const TeamManagementPage: React.FC = () => {
         <nav className="-mb-px flex space-x-8">
           <button
             onClick={() => setActiveTab("all")}
-            className={`cursor-pointer border-b-2 px-1 py-2 text-sm font-medium ${
-              activeTab === "all"
-                ? "border-emerald-500 text-emerald-600"
-                : "border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700"
-            }`}
+            className={`cursor-pointer border-b-2 px-1 py-2 text-sm font-medium ${activeTab === "all"
+              ? "border-emerald-500 text-emerald-600"
+              : "border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700"
+              }`}
           >
             Tất cả các đội ngũ
           </button>
           <button
             onClick={() => setActiveTab("yours")}
-            className={`cursor-pointer border-b-2 px-1 py-2 text-sm font-medium ${
-              activeTab === "yours"
-                ? "border-emerald-500 text-emerald-600"
-                : "border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700"
-            }`}
+            className={`cursor-pointer border-b-2 px-1 py-2 text-sm font-medium ${activeTab === "yours"
+              ? "border-emerald-500 text-emerald-600"
+              : "border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700"
+              }`}
           >
             Nhóm của bạn
           </button>
@@ -153,11 +151,12 @@ const TeamManagementPage: React.FC = () => {
           </p>
         </div>
       )}
-
-      <CreateProjectTeamModal
-        isOpen={showAddTeamModal}
-        onClose={() => setShowAddTeamModal(false)}
-      />
+      <Suspense fallback={null}>
+        <CreateProjectTeamModal
+          isOpen={showAddTeamModal}
+          onClose={() => setShowAddTeamModal(false)}
+        />
+      </Suspense>
     </div>
   );
 };
