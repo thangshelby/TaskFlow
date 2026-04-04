@@ -152,7 +152,7 @@ export const KanbanColumn = ({
         <div className="flex items-center gap-1">
           <h2 className="text-sm font-medium text-gray-500">{column?.name}</h2>
           <span className="rounded-sm bg-gray-300 px-2 text-xs font-medium text-gray-500">
-            {column?.issues.length}
+            {column?.issues?.length ?? 0}
           </span>
 
           {column?.name === "DONE" && (

@@ -1,4 +1,4 @@
-import { UseFormRegister } from "react-hook-form";
+import { UseFormRegister, RegisterOptions, FieldValues } from "react-hook-form";
 import { FaChevronDown } from "react-icons/fa6";
 import { Calendar } from "lucide-react";
 
@@ -9,6 +9,7 @@ const InputField = ({
   type = "text",
   error,
   register,
+  registerOptions,
   isShowIcon = false,
   customRender,
 }: {
@@ -18,6 +19,7 @@ const InputField = ({
   type?: "text" | "textarea" | "file" | "date" | "number" | "select";
   error?: string;
   register?: UseFormRegister<any>;
+  registerOptions?: RegisterOptions<FieldValues, string>;
   isShowIcon?: boolean;
   customRender?: React.ReactNode;
 }) => {
@@ -27,7 +29,7 @@ const InputField = ({
       <div className="input-effect group relative col-3 flex w-full items-center justify-between rounded-xs border border-gray-300 pr-2">
         {type === "textarea" && (
           <textarea
-            {...register?.(field)}
+            {...(register ? register(field, registerOptions) : {})}
             className={`${sharedClasses} ${error ? "error" : ""}`}
             placeholder={helperText}
             rows={4}
@@ -36,7 +38,7 @@ const InputField = ({
 
         {type === "text" && (
           <input
-            {...register?.(field)}
+            {...(register ? register(field, registerOptions) : {})}
             className={`${sharedClasses} ${error ? "error" : ""}`}
             placeholder={helperText}
             type={type}
@@ -45,14 +47,16 @@ const InputField = ({
 
         {type === "select" && (
           <input
-            className={`${sharedClasses} ${error ? "error" : ""}`}
-            type={type}
+            readOnly={true}
+            tabIndex={-1}
+            className={`${sharedClasses}  ${error ? "error" : ""}`}
+            type="text"
           />
         )}
 
         {(type === "date" || type === "number") && (
           <input
-            {...register?.(field)}
+            {...(register ? register(field, registerOptions) : {})}
             className={`${sharedClasses} ${error ? "error" : ""}`}
             placeholder={helperText}
             type={type}

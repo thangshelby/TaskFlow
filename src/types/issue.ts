@@ -68,6 +68,7 @@ export interface CreateIssueParams {
   story_point?: number;
   attachments?: string[];
   due_date_to?: string;
+  start_date?: string;
   team_id?: string;
 }
 

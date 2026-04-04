@@ -93,7 +93,6 @@ const CreateIssueModal: React.FC<CreateIssueModalProps> = ({
   );
   const { user } = useAuthStore();
   const { projects } = useUserProjects();
-  const { project } = useProject(projectId || "");
   const { columns } = useProjectColumns({ project_id: selectedProjectId });
   const { sprints } = useProjectSprints(selectedProjectId);
   const { teams } = useProjectTeams(selectedProjectId);
@@ -234,13 +233,14 @@ const CreateIssueModal: React.FC<CreateIssueModalProps> = ({
       attachments: attachmentPaths,
       parent_id: data.parent_id,
       due_date_to: data.due_date_to,
+      start_date: data.start_date,
       story_point: data.story_point,
       team_id: data.team_id,
     };
 
     if (isEditing && initialIssue) {
       try {
-        await updateIssue({ id: initialIssue.id, data: issueData });
+        updateIssue({ id: initialIssue.id, data: issueData });
         toast.success("Issue updated successfully!");
       } catch (error) {
         toast.error(
@@ -516,6 +516,7 @@ const CreateIssueModal: React.FC<CreateIssueModalProps> = ({
             helperText="Deadline for completing this issue"
             field="due_date_to"
             type="date"
+            register={register}
             error={errors.due_date_to?.message}
           />
 
@@ -552,6 +553,7 @@ const CreateIssueModal: React.FC<CreateIssueModalProps> = ({
             helperText="Allows the planned start date for a piece of work to be set."
             field="start_date"
             type="date"
+            register={register}
             error={errors.start_date?.message}
           />
 
@@ -561,6 +563,8 @@ const CreateIssueModal: React.FC<CreateIssueModalProps> = ({
             helperText="Estimated effort required for this issue"
             field="story_point"
             type="number"
+            register={register}
+            registerOptions={{ valueAsNumber: true }}
             error={errors.story_point?.message}
           />
 
