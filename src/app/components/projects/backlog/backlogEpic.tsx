@@ -119,7 +119,7 @@ const EpicIssueCard = ({
             />
             <div className="h-3 w-3 rounded-sm bg-purple-500"></div>
             <span
-              className="truncate text-sm font-medium text-gray-900"
+              className="line-clamp-1 truncate text-sm font-medium text-gray-900"
               title={epicIssue.summary}
             >
               {epicIssue.summary}

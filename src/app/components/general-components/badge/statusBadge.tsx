@@ -1,5 +1,5 @@
 import { useMemo } from "react";
-
+import { useProjectColumns } from "@libs/hooks/apis/useProject";
 export const statusColors = [
   {
     order: 1,
@@ -76,24 +76,38 @@ export const statusColors = [
 
 const StatusBadge = ({
   column,
+  columnId,
+  projectId,
   // size = "small",
   className,
 }: {
-  column: {
+  column?: {
     name: string;
     order: number;
   };
+  projectId?: string;
+  columnId?: string;
   size?: "small" | "medium" | "large";
   className?: string;
 }) => {
+  const { columns } = useProjectColumns({ project_id: projectId || "" });
+  const selectedColumn = columns.find((c) => c.id === columnId);
+
   const index = useMemo(() => {
-    if (!column) return -1;
-    if (column.name === "DONE") return 2;
-    if (column.name === "IN PROGRESS") return 1;
-    if (column.name === "TODO") return 0;
+    if (!column && !selectedColumn) return -1;
+    if (column ? column.name === "DONE" : selectedColumn?.name === "DONE")
+      return 2;
+    if (
+      column
+        ? column.name === "IN PROGRESS"
+        : selectedColumn?.name === "IN PROGRESS"
+    )
+      return 1;
+    if (column ? column.name === "TODO" : selectedColumn?.name === "TODO")
+      return 0;
     return 1;
-  }, [column]);
-  if (!column) return <></>;
+  }, [column, selectedColumn]);
+  if (!selectedColumn && !column) return <></>;
   return (
     <div
       className={`inline-block rounded-sm border ${className} px-1 py-0.5 ${statusColors[index].bgColor} ${statusColors[index].dotColor}`}
@@ -101,7 +115,9 @@ const StatusBadge = ({
       <p
         className={`truncate text-xs font-semibold ${statusColors[index].textColor} `}
       >
-        {column.name ? column.name.toUpperCase() : ""}
+        {column
+          ? column.name.toUpperCase()
+          : selectedColumn?.name.toUpperCase() || ""}
       </p>
     </div>
   );

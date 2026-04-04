@@ -15,7 +15,7 @@ const BacklogEpic = lazy(
 import IssueDetail from "@libs/app/components/issues/IssueDetail";
 import IssueDetailSkeleton from "@libs/app/components/skeleton/issueDetailSkeleton";
 const CreateSprintModal = lazy(
-  () => import("@libs/app/components/projects/modals/createSprintModal"),
+  () => import("@libs/app/components/projects/modals/sprint/createSprintModal"),
 );
 import TypeBadge from "@libs/app/components/general-components/badge/typeBadge";
 import { useBackLogPage } from "@libs/hooks/pages/useBacklogPage";
@@ -49,6 +49,8 @@ const BackLogPageContent: React.FC = () => {
     setIsCreateSprintModalOpen,
     selectedIssueId,
     sensors,
+    isLoadingSprints,
+    isLoadingIssues,
   } = useBackLogPage(projectId);
 
   return (
@@ -81,7 +83,7 @@ const BackLogPageContent: React.FC = () => {
           setFilters(filter as GetIssuesParams);
         }}
       />
-      {!sprintIssues.length ? (
+      {isLoadingSprints || isLoadingIssues ? (
         <BacklogSkeleton />
       ) : (
         <DndContext

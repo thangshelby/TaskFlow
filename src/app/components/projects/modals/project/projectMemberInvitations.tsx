@@ -53,17 +53,19 @@ const ProjectMemberInvitations: React.FC<ProjectMemberInvitationsProps> = ({
   }
 
   return (
-    <div className="space-y-4">
-      <h3 className="text-lg font-medium">Project Invitations</h3>
-      <div className="space-y-2">
+    <div className="pt-2">
+      <h3 className="text-md p-2 font-semibold text-gray-700">
+        Project Invitations
+      </h3>
+      <div className="">
         {pendingMemberships.map((member: IProjectMember) => (
           <div
             key={member.id}
             className="flex items-center justify-between rounded-lg bg-gray-50 p-3"
           >
             <div>
-              <p className="font-medium">{member.project.name}</p>
-              <p className="text-sm text-gray-500">Role: {member.role}</p>
+              <p className="font-sm">{member.project.name}</p>
+              <p className="text-xs text-gray-500">Role: {member.role}</p>
             </div>
             <div className="flex gap-2">
               <button
@@ -74,7 +76,7 @@ const ProjectMemberInvitations: React.FC<ProjectMemberInvitationsProps> = ({
                   })
                 }
                 disabled={acceptInvitationMutation.isPending}
-                className="rounded-full p-2 text-green-600 hover:bg-green-50"
+                className="cursor-pointer rounded-full p-2 text-green-600 hover:scale-105 hover:bg-green-100"
                 title="Accept Invitation"
               >
                 <FaCheck />
@@ -87,7 +89,7 @@ const ProjectMemberInvitations: React.FC<ProjectMemberInvitationsProps> = ({
                   })
                 }
                 disabled={rejectInvitationMutation.isPending}
-                className="rounded-full p-2 text-red-600 hover:bg-red-50"
+                className="cursor-pointer rounded-full p-2 text-red-600 hover:scale-105 hover:bg-red-50"
                 title="Reject Invitation"
               >
                 <FaTimes />

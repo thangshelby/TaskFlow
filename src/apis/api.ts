@@ -1,9 +1,13 @@
 import axios from "axios";
+
+const url = "http://localhost:8081";
+// const url = "http://54.255.204.168:8081";
 const api = axios.create({
-  baseURL: import.meta.env.VITE_API_URL || "http://localhost:8081/api/v1/",
+  baseURL: import.meta.env.VITE_API_URL || `${url}/api/v1/`,
   headers: {
     "Content-Type": "application/json",
   },
+  withCredentials: true,
 });
 
 // Request interceptor
@@ -17,7 +21,7 @@ api.interceptors.request.use(
 // Response interceptor
 api.interceptors.response.use(
   (response) => response,
-  async (error) => {  
+  async (error) => {
     if (error.response?.status === 401) {
       localStorage.removeItem("token");
       // window.location.href = "/login";

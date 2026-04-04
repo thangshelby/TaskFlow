@@ -7,6 +7,7 @@ type Props = {
   userId?: string;
   size?: number;
   isDisplayName?: boolean;
+  className?: string;
 };
 
 function buildCloudinaryUrl(url: string, size: number) {
@@ -19,7 +20,7 @@ function buildCloudinaryUrl(url: string, size: number) {
 }
 
 const UserAvatar = memo(
-  ({ userId, size = 28, isDisplayName = true }: Props) => {
+  ({ userId, size = 28, isDisplayName = true, className }: Props) => {
     const { user } = useUserById(userId || "");
 
     if (!userId) {
@@ -40,7 +41,7 @@ const UserAvatar = memo(
     const avatarUrl = user?.avatar ? buildCloudinaryUrl(user.avatar, size) : "";
 
     return (
-      <div className="flex flex-row items-center gap-2">
+      <div className={`flex flex-row items-center gap-2 ${className}`}>
         <Avatar
           size={size}
           src={

@@ -1,5 +1,5 @@
 import Button from "@libs/app/components/general-components/button";
-import { ReactNode } from "react";
+import { ReactNode, useRef, useState, useEffect } from "react";
 import { LuX } from "react-icons/lu";
 import { motion, AnimatePresence } from "motion/react";
 import { CheckCircle, AlertTriangle, Info } from "lucide-react";
@@ -10,8 +10,7 @@ interface BaseModalProps {
   isLoadingButton?: boolean;
   isSubmitDisabled?: boolean;
   onClose: () => void;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  onSubmit: any;
+  onSubmit: () => void;
   children: ReactNode;
   className?: string;
   style?: {
@@ -33,11 +32,9 @@ export default function Modal({
   style,
   variant = "default",
 }: BaseModalProps) {
-  const handleBackdropClick = (e: React.MouseEvent<HTMLDivElement>) => {
-    if (e.target === e.currentTarget) {
-      onClose();
-    }
-  };
+  const modalRef = useRef<HTMLDivElement>(null);
+  const [hasScrolled, setHasScrolled] = useState(false);
+  const [canScroll, setCanScroll] = useState(false);
 
   const getVariantStyles = () => {
     switch (variant) {
@@ -70,22 +67,37 @@ export default function Modal({
 
   const variantStyles = getVariantStyles();
 
+  const handleScroll = () => {
+    if (!modalRef.current) return;
+    const { scrollTop } = modalRef.current;
+    setHasScrolled(scrollTop > 0);
+  };
+
+  useEffect(() => {
+    const el = modalRef.current;
+    if (el) {
+      setCanScroll(el.scrollHeight > el.clientHeight);
+    }
+  }, [children]);
+
   return (
     <div
       id="modal"
-      onMouseDown={handleBackdropClick}
+      onMouseDown={(e) => e.target === e.currentTarget && onClose()}
       className="bg-opacity-50 fixed inset-0 z-50 flex items-center justify-center bg-black/40"
     >
       <AnimatePresence>
         <motion.div
-          initial={{ x: 0, y: 20, opacity: 0.8 }}
+          initial={{ y: 20, opacity: 0.8 }}
+          animate={{ y: 0, opacity: 1 }}
+          exit={{ y: 50, opacity: 0 }}
           transition={{ type: "tween", duration: 0.2, ease: "easeOut" }}
-          animate={{ x: 0, y: 0, opacity: 1 }}
-          exit={{ x: 0, y: 50, opacity: 0 }}
-          className={`animate-fade-in min-w-[500px] rounded-lg bg-white p-6 shadow-xl ${className}`}
+          className={`animate-fade-in max-h-[80vh] min-w-[500px] rounded-lg bg-white py-6 shadow-xl ${className}`}
         >
           {/* Title Bar */}
-          <div className="mb-5 flex items-center justify-between">
+          <div
+            className={`mb-4 flex items-center justify-between px-6 transition-all`}
+          >
             <div className="flex items-center gap-2">
               {variantStyles.icon && (
                 <span
@@ -110,11 +122,23 @@ export default function Modal({
             </button>
           </div>
 
-          {/* Children content */}
-          {children}
+          {/* Scrollable content */}
+          <div
+            ref={modalRef}
+            onScroll={handleScroll}
+            className={`max-h-[65vh] overflow-auto px-6 ${
+              canScroll
+                ? hasScrolled
+                  ? "border-gray-200 shadow-sm"
+                  : "border-transparent"
+                : ""
+            } `}
+          >
+            {children}
+          </div>
 
-          {/* Footer buttons */}
-          <div className="mt-6 flex justify-end space-x-3">
+          {/* Footer */}
+          <div className="mt-6 flex justify-end space-x-3 px-6">
             <button
               type="button"
               onClick={onClose}
@@ -124,9 +148,7 @@ export default function Modal({
             </button>
             <Button
               isLoading={isLoadingButton}
-              onClick={() => {
-                if (onSubmit) onSubmit();
-              }}
+              onClick={onSubmit}
               disabled={isSubmitDisabled}
               className={`cursor-pointer rounded-md bg-green-600 px-4 py-2 text-sm font-medium text-white hover:bg-green-700 focus:ring-2 focus:ring-green-500 focus:outline-none disabled:cursor-not-allowed disabled:opacity-50 ${style?.confirmButtonColor}`}
             >

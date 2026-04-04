@@ -6,6 +6,7 @@ interface Option {
   label: string;
   value: string;
   icon?: ReactNode;
+  customRender?: ReactNode;
 }
 interface DropDownProps {
   options: Option[];
@@ -30,6 +31,7 @@ interface DropDownProps {
     | "leftBottom"
     | "rightTop"
     | "rightBottom";
+  isShowIcon?: boolean;
 }
 export default function DropdownAntd({
   options,
@@ -42,6 +44,7 @@ export default function DropdownAntd({
   placement = "bottomRight",
   open: controlledOpen,
   onOpenChange,
+  isShowIcon = true,
 }: DropDownProps) {
   const [uncontrolledOpen, setUncontrolledOpen] = useState(false);
   const isControlled = controlledOpen !== undefined;
@@ -60,7 +63,7 @@ export default function DropdownAntd({
               if (onClickItem) onClickItem(option);
             }}
             key={idx}
-            className={`flex cursor-pointer items-center gap-2 rounded-md px-2 py-1 transition-all hover:bg-gray-200 ${rowClassName}`}
+            className={`flex cursor-pointer items-center gap-2 rounded-sm px-2 py-1 transition-all hover:bg-gray-200 ${rowClassName}`}
           >
             {option?.icon && (
               <div className="flex min-w-[20px] items-center justify-center">
@@ -70,7 +73,9 @@ export default function DropdownAntd({
             {value && value.value === option.value && (
               <FaCheck className="h-5 w-5" />
             )}
-            <div className="">{option.label}</div>
+            <div className="">
+              {option.customRender ? option.customRender : option.label}
+            </div>
           </div>
         ))}
       </div>
@@ -82,6 +87,7 @@ export default function DropdownAntd({
         content={() => dropDownOpt()}
         trigger="click"
         arrow={false}
+        className="w-full"
         placement={placement}
         open={open}
         onOpenChange={(bool) => {
@@ -93,10 +99,12 @@ export default function DropdownAntd({
         }}
       >
         <div
-          className={`flex cursor-pointer items-center justify-between gap-2 rounded-md border-[1px] border-gray-300 px-3 py-[6px] ${className}`}
+          className={`flex w-full cursor-pointer items-center justify-between gap-2 rounded-md ${isShowIcon && "border border-gray-300 px-3 py-2"} ${className}`}
         >
-          <div className="font-semibold text-gray-700">{parent}</div>
-          <FaChevronDown className="text-gray-500" />
+          <div className="w-full text-sm font-semibold text-[#333]">
+            {parent}
+          </div>
+          {isShowIcon && <FaChevronDown className="text-gray-500" />}
         </div>
       </Popover>
     </div>

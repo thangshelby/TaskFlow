@@ -20,9 +20,7 @@ const ProjectPage = lazy(
 const SettingsPage = lazy(
   () => import("@libs/app/pages/settings/settingsPage"),
 );
-const SprintDetail = lazy(
-  () => import("@libs/app/components/sprints/SprintDetail"),
-);
+
 const AdminLoginPage = lazy(
   () => import("@libs/app/pages/admin/login/AdminLoginPage"),
 );
@@ -35,6 +33,9 @@ const TeamManagementPage = lazy(
 );
 const TeamDetailPage = lazy(
   () => import("@libs/app/pages/project/settingPage/teamDetail"),
+);
+const ProjectDetailPage = lazy(
+  () => import("@libs/app/pages/project/settingPage/projectDetail"),
 );
 
 const AdminLayout = lazy(() => import("@libs/app/layouts/adminLayout"));
@@ -53,13 +54,6 @@ const ProjectBoard = lazy(
 );
 const Roadmap = lazy(
   () => import("@libs/app/pages/project/roadmapPage/roadmapPage"),
-);
-const ActiveSprints = lazy(() =>
-  Promise.resolve({
-    default: () => (
-      <div className="p-8 text-center text-gray-600">Active Sprints</div>
-    ),
-  }),
 );
 
 const VerifyPage = lazy(
@@ -129,11 +123,10 @@ const Router = (): React.ReactElement => {
               <Route path="backlog/:selectedIssue" element={<BacklogPage />} />
               <Route path="list" element={<ListPage />} />
               <Route path="roadmap" element={<Roadmap />} />
-              <Route path="sprints" element={<ActiveSprints />} />
-              <Route path="sprints/:sprintId" element={<SprintDetail />} />
               <Route path="settings" element={<ProjectSettingsPage />}>
                 <Route path="teams" element={<TeamManagementPage />} />
                 <Route path="teams/:teamId" element={<TeamDetailPage />} />
+                <Route path="details" element={<ProjectDetailPage />} />
               </Route>
             </Route>
           </Route>

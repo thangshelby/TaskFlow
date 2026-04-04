@@ -11,7 +11,6 @@ const ReportPage: React.FC = () => {
   const projectId = params?.projectId as string;
 
   const { stats } = useGetUserStats(projectId, false);
-  console.log("stats", stats);
   const haveStats = stats?.data;
   return (
     <div className="mb-32 w-full space-y-4 px-56">

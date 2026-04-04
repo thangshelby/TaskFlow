@@ -4,14 +4,14 @@ import { useProjectColumns } from "@libs/hooks/apis/useProject";
 import Button from "@libs/app/components/general-components/button";
 import { formatSprintDate } from "../../../../utils/date";
 import { FaChevronDown, FaChevronRight } from "react-icons/fa";
-import { ISprint } from "@libs/types/index";
+import { ISprint } from "@libs/types/sprint";
 import IssueCard from "./issueCard";
 import { statusOptions } from "@libs/constants/list";
 import { MenuProps, Dropdown } from "antd";
 import { BsThreeDots } from "react-icons/bs";
 import { FaPlus } from "react-icons/fa6";
 import ConfirmDeleteModal from "@libs/app/components/general-components/modal/modalDeleteConfirm";
-import CreateIssueModal from "@libs/app/components/projects/modals/createIssueModal";
+import CreateIssueModal from "@libs/app/components/projects/modals/issue/createIssueModal";
 import {
   SortableContext,
   horizontalListSortingStrategy,
@@ -22,7 +22,8 @@ import { useDroppable } from "@dnd-kit/core";
 import { useOverItem } from "@libs/app/context/backlog.context";
 
 const CompleteSprintModal = lazy(
-  () => import("@libs/app/components/projects/modals/completeSprintModal"),
+  () =>
+    import("@libs/app/components/projects/modals/sprint/completeSprintModal"),
 );
 interface ISprintIssues extends ISprint {
   issues: IIssue[];

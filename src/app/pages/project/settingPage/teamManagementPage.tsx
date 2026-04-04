@@ -1,9 +1,14 @@
-import React, { useState } from "react";
-import { Search, Users } from "lucide-react";
-import AddProjectTeamModal from "../../../components/projects/modals/createProjectTeamModal";
+import React, { useState, lazy, startTransition } from "react";
+import { Search, Users, Plus } from "lucide-react";
 import { useProjectTeams } from "@libs/hooks/apis/useTeam";
 import { useNavigate, useParams } from "react-router-dom";
 import UserAvatar from "@libs/app/components/general-components/user/userAvatar";
+const CreateProjectTeamModal = lazy(
+  () =>
+    import(
+      "@libs/app/components/projects/modals/project/createProjectTeamModal"
+    ),
+);
 
 const TeamManagementPage: React.FC = () => {
   const { projectId } = useParams<{ projectId: string }>();
@@ -21,12 +26,12 @@ const TeamManagementPage: React.FC = () => {
   );
 
   const getTeamIconColor = (index: number) => {
-    const colors = ["text-purple-600", "text-red-600", "text-blue-600"];
+    const colors = ["text-purple-600", "text-red-600", "text-emerald-600"];
     return colors[index % colors.length];
   };
 
   const getTeamIconBg = (index: number) => {
-    const colors = ["bg-purple-50", "bg-red-50", "bg-blue-50"];
+    const colors = ["bg-purple-50", "bg-red-50", "bg-emerald-50"];
     return colors[index % colors.length];
   };
 
@@ -41,9 +46,9 @@ const TeamManagementPage: React.FC = () => {
         <nav className="-mb-px flex space-x-8">
           <button
             onClick={() => setActiveTab("all")}
-            className={`border-b-2 px-1 py-2 text-sm font-medium ${
+            className={`cursor-pointer border-b-2 px-1 py-2 text-sm font-medium ${
               activeTab === "all"
-                ? "border-blue-500 text-blue-600"
+                ? "border-emerald-500 text-emerald-600"
                 : "border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700"
             }`}
           >
@@ -51,9 +56,9 @@ const TeamManagementPage: React.FC = () => {
           </button>
           <button
             onClick={() => setActiveTab("yours")}
-            className={`border-b-2 px-1 py-2 text-sm font-medium ${
+            className={`cursor-pointer border-b-2 px-1 py-2 text-sm font-medium ${
               activeTab === "yours"
-                ? "border-blue-500 text-blue-600"
+                ? "border-emerald-500 text-emerald-600"
                 : "border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700"
             }`}
           >
@@ -62,16 +67,30 @@ const TeamManagementPage: React.FC = () => {
         </nav>
       </div>
 
-      {/* Search Bar */}
-      <div className="relative">
-        <Search className="absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 transform text-gray-400" />
-        <input
-          type="text"
-          placeholder="Tìm kiếm đội ngũ"
-          value={searchQuery}
-          onChange={(e) => onSearchChange(e.target.value)}
-          className="w-full rounded-lg border border-gray-300 py-3 pr-4 pl-10 focus:ring-2 focus:ring-blue-500 focus:outline-none"
-        />
+      {/* Search Bar + Create Button */}
+      <div className="flex items-center gap-3">
+        <div className="relative flex-1">
+          <Search className="absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 transform text-gray-400" />
+          <input
+            type="text"
+            placeholder="Tìm kiếm đội ngũ"
+            value={searchQuery}
+            onChange={(e) => onSearchChange(e.target.value)}
+            className="w-full rounded-lg border border-gray-300 py-2 pr-4 pl-10 focus:ring-2 focus:ring-emerald-500 focus:outline-none"
+          />
+        </div>
+        <button
+          type="button"
+          onClick={() => {
+            startTransition(() => {
+              setShowAddTeamModal(true);
+            });
+          }}
+          className="inline-flex h-full cursor-pointer items-center gap-2 rounded-sm bg-emerald-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-emerald-700 focus:ring-2 focus:ring-emerald-500 focus:outline-none"
+        >
+          <Plus className="h-4 w-4" />
+          Tạo đội
+        </button>
       </div>
 
       {/* Team Cards Grid */}
@@ -135,7 +154,7 @@ const TeamManagementPage: React.FC = () => {
         </div>
       )}
 
-      <AddProjectTeamModal
+      <CreateProjectTeamModal
         isOpen={showAddTeamModal}
         onClose={() => setShowAddTeamModal(false)}
       />

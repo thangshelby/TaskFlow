@@ -6,7 +6,7 @@ import { useNavigate } from "react-router-dom";
 import { IProject } from "@libs/types/project";
 import { LuEllipsisVertical } from "react-icons/lu";
 import ConfirmDeleteModal from "@libs/app/components/general-components/modal/modalDeleteConfirm";
-import CreateProjectModal from "@libs/app/components/projects/modals/createProjectModal";
+import CreateProjectModal from "@libs/app/components/projects/modals/project/createProjectModal";
 import ModalPortal from "@libs/app/components/general-components/modal/modalPortal";
 
 const columns: TableColumnsType<IProject> = [

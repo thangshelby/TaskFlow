@@ -1,9 +1,9 @@
 import React, { Suspense } from "react";
-const IssueDetail = React.lazy(() => import("../../issues/IssueDetail"));
+const IssueDetail = React.lazy(() => import("../../../issues/IssueDetail"));
 import { useIssueStore } from "@libs/store/useIssueStore";
-import ModalPortal from "../../general-components/modal/modalPortal";
+import ModalPortal from "../../../general-components/modal/modalPortal";
 import { motion, AnimatePresence } from "motion/react";
-import IssueDetailSkeleton from "../../skeleton/issueDetailSkeleton";
+import IssueDetailSkeleton from "../../../skeleton/issueDetailSkeleton";
 
 const IssueDetailModal = () => {
   const { closeIssueDetail } = useIssueStore();
@@ -30,7 +30,7 @@ const IssueDetailModal = () => {
                 opacity: 0.8,
               }}
               transition={{
-                type: "tween", 
+                type: "tween",
                 duration: 0.01,
                 ease: "easeOut",
               }}

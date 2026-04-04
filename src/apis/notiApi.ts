@@ -2,10 +2,11 @@ import { io, Socket } from "socket.io-client";
 import axios from "axios";
 
 const NOTIFICATION_URL_API =
-  import.meta.env.VITE_NOTISERVICE_API_URL || "http://localhost:8082/api/v1/";
+  import.meta.env.VITE_NOTISERVICE_API_URL || "http://localhost:5002/api/v1/";
+
 const NOTIFICATION_URL_WEBSOCKET =
   import.meta.env.VITE_NOTISERVICE_API_URL?.replace("/api/v1/", "") ||
-  "http://localhost:8082";
+  "http://localhost:5002";
 
 const notiApi = axios.create({
   baseURL: NOTIFICATION_URL_API,

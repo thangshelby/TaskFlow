@@ -184,7 +184,10 @@ const ListDetail = ({
                     onClick={() => setSelectedIssueId(issue.id)}
                     className="cursor-pointer"
                   >
-                    <IssueCard issue={issue} />
+                    <IssueCard
+                      issue={issue}
+                      isActive={selectedIssueId === issue.id}
+                    />
                   </div>
                 ))}
               </div>

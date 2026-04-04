@@ -1,7 +1,7 @@
 import Button from "@libs/app/components/general-components/button";
 import { ClipboardCheck } from "lucide-react";
 import { motion } from "motion/react";
-
+import dashbaord from "@libs/assets/images/background.png";
 export default function Hero({ showTopNav }: { showTopNav: boolean }) {
   return (
     <motion.section
@@ -14,7 +14,9 @@ export default function Hero({ showTopNav }: { showTopNav: boolean }) {
         <div className="mx-auto flex max-w-7xl items-center justify-between">
           <div className="flex items-center gap-2">
             <ClipboardCheck className="h-8 w-8 text-emerald-600" />
-            <span className="text-xl font-semibold text-gray-800">My-Task</span>
+            <span className="text-xl font-semibold text-gray-800">
+              Taskflow
+            </span>
           </div>
           <div className="flex items-center gap-8">
             <a
@@ -60,7 +62,7 @@ export default function Hero({ showTopNav }: { showTopNav: boolean }) {
       <div className="mx-auto mt-12 grid max-w-7xl items-center gap-12 md:grid-cols-2">
         <div className="text-white">
           <h1 className="mb-6 text-5xl leading-tight font-bold text-balance">
-            My-Task Hr & Project Management System
+            Task & Project Management System
           </h1>
           <p className="mb-8 text-lg leading-relaxed text-white/90">
             This is a solution for everyone. Although it is at the heart of
@@ -131,7 +133,7 @@ export default function Hero({ showTopNav }: { showTopNav: boolean }) {
 
         <div className="relative">
           <img
-            src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/image-n2yhnsTLlRywGln8p27R4rrcUBtUit.png"
+            src={dashbaord}
             alt="My-Task Dashboard Preview"
             className="w-full rounded-lg shadow-2xl"
           />

@@ -5,7 +5,7 @@ import viteCompression from "vite-plugin-compression";
 export default defineConfig({
   plugins: [
     viteCompression({
-      algorithm: "brotliCompress", 
+      algorithm: "brotliCompress",
     }),
     tailwindcss(),
     vitePluginImp({
@@ -18,7 +18,7 @@ export default defineConfig({
     }),
   ],
   build: {
-    sourcemap: true, 
+    sourcemap: true,
   },
   resolve: {
     alias: [{ find: "@libs", replacement: "/src" }],

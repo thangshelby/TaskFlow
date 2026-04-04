@@ -25,7 +25,7 @@ export function useUserProjects(options?: { enabled?: boolean }) {
 
   // Filter out pending memberships and map to project info
   const validMemberships = memberships.filter(
-    (membership) => !membership.is_pending,
+    (membership) => !membership.is_pending && membership.project,
   );
 
   const projects = validMemberships.map((membership) => membership.project);
@@ -145,6 +145,7 @@ export function useDeleteProject({ onClose }: { onClose?: () => void }) {
     error,
   };
 }
+
 export function useProject(projectId: string) {
   const queryClient = useQueryClient();
   const { user, setUser } = useAuthStore();

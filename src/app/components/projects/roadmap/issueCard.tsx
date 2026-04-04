@@ -27,10 +27,18 @@ const IssueCardWrapper = ({
   );
 };
 
-const IssueCard = ({ issue }: { issue: IIssue }) => {
+const IssueCard = ({
+  issue,
+  isActive,
+}: {
+  issue: IIssue;
+  isActive?: boolean;
+}) => {
   return (
     <IssueCardWrapper issue={issue}>
-      <div className="flex flex-col gap-2 rounded-xs bg-white px-3 py-2">
+      <div
+        className={`flex flex-col gap-2 rounded-xs px-3 py-2 ${isActive ? "rounded-sm bg-green-100" : "bg-white"} `}
+      >
         <p className="text-xs font-normal text-gray-800">{issue.summary}</p>
         <div className="flex items-center justify-between">
           <div className="flex items-center">

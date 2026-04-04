@@ -1,4 +1,4 @@
-import React, { Suspense, useState } from "react";
+import React, { Suspense, useEffect, useState } from "react";
 import { Outlet } from "react-router-dom";
 import ProjectNavbar from "@libs/app/components/projects/projectNavBar";
 import { ClockLoader } from "react-spinners";
@@ -19,7 +19,12 @@ const ProjectLayout = (): React.ReactElement => {
 
   useUserTeams(projectId || "", user?.id || "", !isLoadingMembers);
 
-  const [isCollapsed, setIsCollapsed] = useState(true);
+  const [isCollapsed, setIsCollapsed] = useState(
+    localStorage.getItem("isCollapsed") === "true",
+  );
+  useEffect(() => {
+    localStorage.setItem("isCollapsed", isCollapsed.toString());
+  }, [isCollapsed]);
   return (
     <div className="flex w-full flex-1 flex-row overflow-hidden">
       <div

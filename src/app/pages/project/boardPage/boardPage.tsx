@@ -22,7 +22,7 @@ const ViewSettingsTooltip = lazy(
 import { useParams } from "react-router-dom";
 
 const IssueDetailModal = lazy(
-  () => import("@libs/app/components/projects/modals/issueDetailModal"),
+  () => import("@libs/app/components/projects/modals/issue/issueDetailModal"),
 );
 const BoardPage: React.FC = () => {
   const { projectId } = useParams();
