@@ -109,7 +109,7 @@ export const Header = () => {
                         try {
                           setIsUserDropdownOpen(false);
                           await logout();
-                          navigate("/login", { replace: true });
+                          navigate("/auth/login", { replace: true });
                         } catch (error) {
                           console.error("Logout failed:", error);
                         }
@@ -128,7 +128,7 @@ export const Header = () => {
           <div className="flex min-w-1/4 items-center justify-center">
             <Button
               className="w-[100px]"
-              onClick={() => navigate("/login")}
+              onClick={() => navigate("/auth/login")}
               variant="outline"
             >
               <span className="text-base font-semibold">Login</span>
