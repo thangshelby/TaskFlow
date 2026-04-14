@@ -21,6 +21,7 @@ import TypeBadge from "@libs/app/components/general-components/badge/typeBadge";
 import { useBackLogPage } from "@libs/hooks/pages/useBacklogPage";
 import ScrumSprint from "@libs/app/components/projects/backlog/scrumSprint";
 import { ISprint } from "@libs/types/sprint";
+import { Layers } from "lucide-react";
 
 interface ISprintIssues extends ISprint {
   issues: IIssue[];
@@ -34,6 +35,7 @@ const BackLogPageContent: React.FC = () => {
     limit: 100,
     is_fetch: false,
   });
+  const [isEpicVisible, setIsEpicVisible] = useState(false);
 
   const [_, startTransition] = useTransition();
 
@@ -61,20 +63,30 @@ const BackLogPageContent: React.FC = () => {
       <div className="flex items-center justify-between">
         <h1 className="p-2 text-2xl font-bold text-gray-700">Backlog Page</h1>
 
-        <Button
-          onClick={() => {
-            startTransition(() => {
-              setIsCreateSprintModalOpen({
-                isOpen: true,
-                sprint: null,
+        <div className="flex items-center gap-2">
+          <Button
+            variant="secondary"
+            className={`flex items-center gap-2 font-semibold ${isEpicVisible ? "bg-emerald-100 text-emerald-800" : ""}`}
+            onClick={() => setIsEpicVisible(!isEpicVisible)}
+          >
+            <Layers className="h-4 w-4" />
+            Epics
+          </Button>
+          <Button
+            onClick={() => {
+              startTransition(() => {
+                setIsCreateSprintModalOpen({
+                  isOpen: true,
+                  sprint: null,
+                });
               });
-            });
-          }}
-          variant="primary"
-          className="font-semibold"
-        >
-          Create Sprint
-        </Button>
+            }}
+            variant="primary"
+            className="font-semibold"
+          >
+            Create Sprint
+          </Button>
+        </div>
       </div>
 
       <PageFilter
@@ -103,9 +115,11 @@ const BackLogPageContent: React.FC = () => {
                 )
                 .concat("no-epic")}
             >
-              <div className="w-[20%]">
-                <BacklogEpic issues={issues} />
-              </div>
+              {isEpicVisible && (
+                <div className="w-[20%] min-w-[200px]">
+                  <BacklogEpic issues={issues} />
+                </div>
+              )}
 
               <PanelGroup
                 className="flex w-full flex-1"

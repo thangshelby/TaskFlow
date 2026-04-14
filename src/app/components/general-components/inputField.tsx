@@ -47,6 +47,10 @@ const InputField = ({
           <input
             className={`${sharedClasses} ${error ? "error" : ""}`}
             type={type}
+            style={{
+              maxWidth: "1px",
+            }}
+            disabled={true}
           />
         )}
 
@@ -62,8 +66,8 @@ const InputField = ({
           {customRender && customRender}
         </div>
 
-        <label className="text-xs font-medium">{label}</label>
-        {isShowIcon && <FaChevronDown className="text-gray-500" />}
+        <label className="text-lg font-medium">{label}</label>
+        {isShowIcon && <FaChevronDown className="text-gray-500 absolute top-2 right-2" />}
         {type === "date" && !isShowIcon && (
           <Calendar className="text-gray-400" size={16} />
         )}
