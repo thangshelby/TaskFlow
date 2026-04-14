@@ -45,7 +45,8 @@ export function useAuth() {
     },
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     onError: (error: any) => {
-      setError(error.response.data.message);
+      const message = error.response?.data?.message || "Registration failed. Please try again.";
+      setError(message);
     },
   });
 
@@ -58,7 +59,7 @@ export function useAuth() {
     },
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     onError: (error: any) => {
-      setError(error.response.data.message);
+      setError(error.response?.data?.message || "Verification failed. Please try again.");
     },
   });
 
@@ -66,7 +67,7 @@ export function useAuth() {
     mutationFn: auth.resend,
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     onError: (error: any) => {
-      setError(error.response.data.message);
+      setError(error.response?.data?.message || "Could not resend OTP. Please try again.");
     },
   });
 

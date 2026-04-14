@@ -2,9 +2,7 @@ import React, { useState, useEffect, useRef } from "react";
 import { Link, useLocation } from "react-router-dom";
 import Button from "@libs/app/components/general-components/button";
 import { useAuth } from "@libs/hooks/apis/useAuth";
-import { useDispatch, useSelector } from "react-redux";
-import { RootState } from "@libs/store";
-import { setError } from "@libs/store/slices/authSlice";
+import { useAuthStore } from "@libs/store/useAuthStore";
 import { AuthScaffold } from "@libs/app/components/auth/auth-scaffold";
 import { CheckCircle2, KeyRound, XCircle } from "lucide-react";
 
@@ -14,7 +12,7 @@ const emptyCells = (): string[] => Array.from({ length: OTP_LENGTH }, () => "");
 
 const VerifyPage: React.FC = () => {
   const [cells, setCells] = useState<string[]>(emptyCells);
-  const [countdown, setCountdown] = useState(60);
+  const [countdown, setCountdown] = useState(10);
   const [canResend, setCanResend] = useState(false);
   const [localError, setLocalError] = useState<string | null>(null);
   const [resendBanner, setResendBanner] = useState(false);
@@ -25,8 +23,12 @@ const VerifyPage: React.FC = () => {
   const { verifyOtp, resendOtp } = useAuth();
   const isLoading = verifyOtp.isPending;
   const isResending = resendOtp.isPending;
-  const dispatch = useDispatch();
-  const { error } = useSelector((state: RootState) => state.auth);
+  const { error, setError: setStoreError } = useAuthStore();
+
+  useEffect(() => {
+    // Clear any stale errors from previous pages on mount
+    setStoreError(null);
+  }, [setStoreError]);
 
   useEffect(() => {
     if (countdown > 0) {
@@ -43,7 +45,7 @@ const VerifyPage: React.FC = () => {
 
   const setDigitAt = (index: number, raw: string) => {
     setLocalError(null);
-    dispatch(setError(null));
+    setStoreError(null);
     setResendBanner(false);
 
     setCells((prev) => {
@@ -86,7 +88,7 @@ const VerifyPage: React.FC = () => {
   const handlePaste = (e: React.ClipboardEvent) => {
     e.preventDefault();
     setLocalError(null);
-    dispatch(setError(null));
+    setStoreError(null);
     const pasted = e.clipboardData.getData("text").replace(/\D/g, "").slice(0, OTP_LENGTH);
     setCells(() => {
       const next = emptyCells();
@@ -108,23 +110,24 @@ const VerifyPage: React.FC = () => {
     if (!email) return;
 
     setLocalError(null);
-    dispatch(setError(null));
+    setStoreError(null);
     verifyOtp.mutate({ otp: code, email });
   };
 
   const handleResendOtp = async () => {
     if (!canResend || !email) return;
     setResendBanner(false);
-    dispatch(setError(null));
+    setStoreError(null);
+    setLocalError(null);
+
     try {
       await resendOtp.mutateAsync({ email });
-      setCountdown(60);
+      setCountdown(10); // Consistent with the user's updated initial state
       setCanResend(false);
       setCells(emptyCells());
       setResendBanner(true);
     } catch {
-      // Hook / API may set Redux error; keep a fallback
-      setLocalError("Could not resend OTP. Please try again.");
+      // Error is handled by useAuth hook updating useAuthStore
     }
   };
 

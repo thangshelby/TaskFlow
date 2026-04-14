@@ -5,9 +5,7 @@ import { z } from "zod";
 import { Link } from "react-router-dom";
 import Button from "@libs/app/components/general-components/button";
 import { useAuth } from "@libs/hooks/apis/useAuth";
-import { useDispatch, useSelector } from "react-redux";
-import { RootState } from "@libs/store";
-import { setError } from "@libs/store/slices/authSlice";
+import { useAuthStore } from "@libs/store/useAuthStore";
 import { CheckCircle2, Lock, Mail, User, XCircle } from "lucide-react";
 import { AuthScaffold } from "@libs/app/components/auth/auth-scaffold";
 
@@ -46,12 +44,17 @@ const RegisterPage: React.FC = () => {
   const { register: registerMut } = useAuth();
   const isLoading = registerMut.isPending;
   const isSuccess = registerMut.isSuccess;
-  const dispatch = useDispatch();
-  const { error } = useSelector((state: RootState) => state.auth);
+  const { error, setError: setStoreError } = useAuthStore();
+  
+  React.useEffect(() => {
+    // Clear any stale errors from previous pages on mount
+    setStoreError(null);
+  }, [setStoreError]);
 
   const {
     register,
     handleSubmit,
+    setError: setFormError,
     formState: { errors },
   } = useForm<RegisterFormData>({
     resolver: zodResolver(registerSchema),
@@ -65,8 +68,21 @@ const RegisterPage: React.FC = () => {
   });
 
   const onSubmit = async (data: RegisterFormData) => {
-    dispatch(setError(null));
-    registerMut.mutate(data);
+    setStoreError(null);
+    registerMut.mutate(data, {
+      onError: (error: any) => {
+        const message = error.response?.data?.message;
+        const code = error.response?.data?.code;
+        // Code 6 typically represents "Already Exists" in some systems (e.g. gRPC ALREADY_EXISTS)
+        // or we check the message content
+        if (code === 6 || (message && message.toLowerCase().includes("email already exists"))) {
+          setFormError("email", {
+            type: "manual",
+            message: message || "This email is already registered",
+          });
+        }
+      },
+    });
   };
 
   return (
