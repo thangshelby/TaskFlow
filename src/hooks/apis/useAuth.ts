@@ -41,7 +41,7 @@ export function useAuth() {
   const register = useMutation({
     mutationFn: auth.register,
     onSuccess: (_, variables) => {
-      navigate("/verify-otp", { state: { email: variables.email } });
+      navigate("/auth/verify-otp", { state: { email: variables.email } });
     },
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     onError: (error: any) => {
