@@ -1,4 +1,5 @@
-import React, { useCallback, useState } from "react";
+import React, { useState, useRef } from "react";
+import { uploadFileToCloudinary } from "@libs/utils/file";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -7,7 +8,6 @@ import Modal from "@libs/app/components/general-components/modal/modal";
 import DropdownAntd from "@libs/app/components/general-components/dropdown";
 import "./createIssueModal.css";
 import {
-  useProject,
   useProjectColumns,
   useUserProjects,
 } from "@libs/hooks/apis/useProject";
@@ -27,6 +27,9 @@ import PriorityBadge from "@libs/app/components/general-components/badge/priorit
 import TypeBadge from "@libs/app/components/general-components/badge/typeBadge";
 import StatusBadge from "@libs/app/components/general-components/badge/statusBadge";
 import UserAvatar from "@libs/app/components/general-components/user/userAvatar";
+import { MdCloudUpload } from "react-icons/md";
+import AttachmentCard from "@libs/app/components/issues/metadataSection/attachmentCard";
+import QuillEditorCreate from "@libs/app/components/issues/metadataSection/quillEditorCreate";
 
 interface CreateIssueModalProps {
   isOpen: boolean;
@@ -48,13 +51,11 @@ interface CreateIssueModalProps {
 
 interface IssueFormInputs {
   summary: string;
-  description?: string;
   priority: IssuePriority;
   type: IssueType;
   column_id: string;
   sprint_id?: string;
   assignee_id?: string;
-  attachments: File[];
   project_id: string;
   parent_id?: string;
   due_date_to?: string;
@@ -65,13 +66,11 @@ interface IssueFormInputs {
 
 const issueSchema = z.object({
   summary: z.string().min(1, "Summary is required"),
-  description: z.string().optional(),
   column_id: z.string().min(1),
   priority: z.enum(["Low", "Medium", "High", "Lowest", "Highest"] as const),
   type: z.enum(["Bug", "Task", "Story", "Epic"] as const),
   sprint_id: z.string().optional(),
   assignee_id: z.string().optional(),
-  attachments: z.array(z.instanceof(File)).min(0),
   project_id: z.string().min(1, "Project is required"),
   parent_id: z.string().optional(),
   due_date_to: z.string().optional(),
@@ -125,15 +124,18 @@ const CreateIssueModal: React.FC<CreateIssueModalProps> = ({
     project_id: selectedProjectId,
   });
 
+  // Attachments stored as JSON strings (same format as metadataSection)
+  const [attachments, setAttachments] = useState<string[]>([]);
+  // Description managed via Quill editor (already stringified as { plainText, delta })
+  const [descriptionValue, setDescriptionValue] = useState<string>("");
+
   const defaultValues: IssueFormInputs = {
     summary: "",
-    description: "",
     column_id: "",
     priority: "Medium",
     type: "Task",
     project_id: projectId || "",
     sprint_id: sprintId || "",
-    attachments: [],
     parent_id: "",
     due_date_to: "",
     start_date: "",
@@ -158,7 +160,6 @@ const CreateIssueModal: React.FC<CreateIssueModalProps> = ({
       reset({
         ...defaultValues,
         summary: initialIssue.summary || "",
-        description: initialIssue.description || "",
         column_id: initialIssue.column_id,
         priority: initialIssue.priority as IssuePriority,
         type: initialIssue.type,
@@ -174,63 +175,35 @@ const CreateIssueModal: React.FC<CreateIssueModalProps> = ({
   }, [isEditing, initialIssue, reset]);
 
   const column_id = watch("column_id");
-  const files = watch("attachments");
 
   React.useEffect(() => {
     if (columns?.length > 0 && !column_id) {
       setValue("column_id", columns[0].id);
     }
   }, [columns, setValue, column_id]);
-  const handleDragOver = (e: React.DragEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-  };
-
-  const handleDrop = useCallback(
-    (e: React.DragEvent) => {
-      e.preventDefault();
-      e.stopPropagation();
-      const droppedFiles = Array.from(e.dataTransfer.files);
-      setValue("attachments", droppedFiles);
-    },
-    [setValue],
-  );
-
-  const handleFileChange = useCallback(
-    (e: React.ChangeEvent<HTMLInputElement>) => {
-      const selectedFiles = Array.from(e.target.files || []);
-      setValue("attachments", selectedFiles);
-    },
-    [setValue],
-  );
 
   const onSubmit = handleSubmit(async (data: IssueFormInputs) => {
     if (!user?.id) {
-      console.error("No user found");
+      toast.error("You must be logged in to create an issue.");
       return;
     }
 
-    // Convert File objects to string paths (in real app, you'd upload files first)
-    const attachmentPaths = data.attachments.map((file: File) =>
-      URL.createObjectURL(file),
-    );
-
     if (!selectedProjectId) {
-      console.error("No project selected");
+      toast.error("Please select a project first.");
       return;
     }
 
     const issueData: CreateIssueParams = {
       project_id: selectedProjectId,
       summary: data.summary,
-      description: data.description,
+      description: descriptionValue,
       column_id: data.column_id,
       priority: data.priority,
       type: data.type as IssueType,
       sprint_id: data.sprint_id || "",
       reporter_id: user.id,
       assignee_id: data.assignee_id,
-      attachments: attachmentPaths,
+      attachments,
       parent_id: data.parent_id,
       due_date_to: data.due_date_to,
       start_date: data.start_date,
@@ -251,6 +224,39 @@ const CreateIssueModal: React.FC<CreateIssueModalProps> = ({
       createIssue(issueData);
     }
   });
+
+  // Safe JSON parse — never throws, returns null on invalid input
+  const safeParseAttachment = (raw: string) => {
+    try { return JSON.parse(raw) as { url: string; type: string; uploadFrom: string; created_at: string }; }
+    catch { return null; }
+  };
+
+  // Upload file to Cloudinary and store as JSON string (same as metadataSection)
+  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    try {
+      const url = await uploadFileToCloudinary(undefined, file);
+      const newAttachment = JSON.stringify({
+        url,
+        type: file.type,
+        uploadFrom: "attachment",
+        created_at: new Date().toISOString(),
+      });
+      setAttachments((prev) => [...prev, newAttachment]);
+    } catch {
+      toast.error("Failed to upload file. Please try again.");
+    }
+  };
+
+  const handleDeleteAttachment = (url: string) => {
+    setAttachments((prev) =>
+      prev.filter((a) => safeParseAttachment(a)?.url !== url)
+    );
+  };
+
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
 
   if (!isOpen) return null;
   return (
@@ -474,14 +480,16 @@ const CreateIssueModal: React.FC<CreateIssueModalProps> = ({
             error={errors.summary?.message}
           />
 
-          <InputField
-            label="Description"
-            helperText="Detailed description of the issue"
-            type="textarea"
-            field="description"
-            register={register}
-            error={errors.description?.message}
-          />
+          {/* Description — Quill editor (same format as updateIssue) */}
+          <div className="flex w-full flex-col gap-1">
+            <p className="text-sm font-bold text-gray-600">Description</p>
+            <div className="rounded border border-gray-300 focus-within:border-emerald-500">
+              <QuillEditorCreate
+                onChange={setDescriptionValue}
+                placeholder="Add a description..."
+              />
+            </div>
+          </div>
 
           {/* Parent Field */}
           <DropdownAntd
@@ -649,39 +657,81 @@ const CreateIssueModal: React.FC<CreateIssueModalProps> = ({
             onClickItem={(option) => setValue("assignee_id", option.value)}
           />
 
-          <div>
-            <label className="mb-1 block text-sm font-medium text-gray-700">
-              Attachments
-            </label>
-            <div
-              className={`cursor-pointer rounded-md border-2 border-dashed p-4 text-center transition-colors ${files.length ? "border-green-500 bg-green-50" : "hover:border-green-500 hover:bg-green-50"}`}
-              onDragOver={handleDragOver}
-              onDrop={handleDrop}
-              onClick={() => document.getElementById("file-input")?.click()}
-            >
-              <input
-                id="file-input"
-                type="file"
-                multiple
-                onChange={handleFileChange}
-                className="hidden"
-                accept="image/*,.pdf,.doc,.docx"
-              />
-              <p>
-                {files.length
-                  ? "Drop files here or click to replace"
-                  : "Drag & drop files here, or click to select files"}
-              </p>
+          {/* Attachments — same flow as metadataSection */}
+          <div className="flex w-full flex-col gap-2">
+            <div className="flex flex-row items-center gap-1">
+              <p className="text-sm font-bold text-gray-600">Attachments</p>
+              {attachments.length > 0 && (
+                <div className="rounded bg-gray-300 px-2 text-sm font-medium text-gray-600">
+                  {attachments.length}
+                </div>
+              )}
             </div>
-            {files.length > 0 && (
-              <div className="mt-2">
-                <ul className="list-disc pl-5">
-                  {files.map((file, index) => (
-                    <li key={index} className="text-sm text-gray-600">
-                      {file.name} ({(file.size / 1024).toFixed(1)} KB)
-                    </li>
-                  ))}
-                </ul>
+
+            {/* Drop zone */}
+            <div
+              className={`flex w-full cursor-pointer items-center justify-center gap-3 rounded-md border-2 border-dashed py-4 transition-colors ${
+                attachments.length
+                  ? "border-emerald-400 bg-emerald-50"
+                  : "border-gray-300 hover:border-emerald-400 hover:bg-emerald-50"
+              }`}
+              onDragOver={(e) => { e.preventDefault(); e.stopPropagation(); }}
+              onDrop={async (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                const file = e.dataTransfer.files?.[0];
+                if (!file) return;
+                try {
+                  const url = await uploadFileToCloudinary(undefined, file);
+                  setAttachments((prev) => [...prev, JSON.stringify({
+                    url,
+                    type: file.type,
+                    uploadFrom: "attachment",
+                    created_at: new Date().toISOString(),
+                  })]);
+                } catch {
+                  toast.error("Failed to upload attachment. Please try again.");
+                }
+              }}
+              onClick={() => fileInputRef?.current?.click()}
+            >
+              <MdCloudUpload className="text-2xl text-gray-400" />
+              <span className="text-sm text-gray-500">
+                Drop files to attach or
+              </span>
+              <button
+                type="button"
+                className="rounded border border-gray-300 bg-white px-3 py-1 text-sm font-medium text-gray-700 hover:bg-gray-50"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  fileInputRef?.current?.click();
+                }}
+              >
+                Browse
+              </button>
+              <input
+                type="file"
+                onChange={handleFileUpload}
+                style={{ display: "none" }}
+                ref={fileInputRef}
+              />
+            </div>
+
+            {/* Attachment previews */}
+            {attachments.length > 0 && (
+              <div className="flex w-full flex-row gap-1 overflow-x-auto">
+                {(attachments
+                  .map(safeParseAttachment)
+                  .filter(
+                    (p): p is NonNullable<ReturnType<typeof safeParseAttachment>> => p !== null
+                  )
+                  .map((parsed) => (
+                    <AttachmentCard
+                      key={parsed.url}
+                      attachment={parsed}
+                      handleDeleteAttachment={handleDeleteAttachment}
+                    />
+                  )))}
               </div>
             )}
           </div>
