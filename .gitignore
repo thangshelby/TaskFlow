@@ -1,6 +1,7 @@
 # Node.js dependencies
 **/node_modules/
 **/package-lock.json
+**/pnpm-lock.yml
 
 # TypeScript build outputs
 **/dist/
@@ -40,6 +41,9 @@ Thumbs.db
 **/coverage/
 **/.cache/
 **/tmp/
+
+# Cursor
+.cursor/
 
 # Cursor
 .cursor/
