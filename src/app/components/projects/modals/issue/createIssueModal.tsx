@@ -1,4 +1,4 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useCallback } from "react";
 import { uploadFileToCloudinary } from "@libs/utils/file";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
@@ -28,8 +28,12 @@ import TypeBadge from "@libs/app/components/general-components/badge/typeBadge";
 import StatusBadge from "@libs/app/components/general-components/badge/statusBadge";
 import UserAvatar from "@libs/app/components/general-components/user/userAvatar";
 import { MdCloudUpload } from "react-icons/md";
+import { FaMicrophone, FaStop } from "react-icons/fa";
 import AttachmentCard from "@libs/app/components/issues/metadataSection/attachmentCard";
-import QuillEditorCreate from "@libs/app/components/issues/metadataSection/quillEditorCreate";
+import QuillEditorCreate, {
+  type QuillEditorCreateRef,
+} from "@libs/app/components/issues/metadataSection/quillEditorCreate";
+import { useSpeechToText } from "@libs/hooks/common/useSpeechToText";
 
 interface CreateIssueModalProps {
   isOpen: boolean;
@@ -128,6 +132,7 @@ const CreateIssueModal: React.FC<CreateIssueModalProps> = ({
   const [attachments, setAttachments] = useState<string[]>([]);
   // Description managed via Quill editor (already stringified as { plainText, delta })
   const [descriptionValue, setDescriptionValue] = useState<string>("");
+  const [showConfirmClose, setShowConfirmClose] = useState(false);
 
   const defaultValues: IssueFormInputs = {
     summary: "",
@@ -149,11 +154,27 @@ const CreateIssueModal: React.FC<CreateIssueModalProps> = ({
     reset,
     setValue,
     watch,
-    formState: { errors },
+    formState: { errors, isDirty },
   } = useForm<IssueFormInputs>({
     resolver: zodResolver(issueSchema),
     defaultValues,
   });
+
+  const summaryValue = watch("summary");
+
+  const handleClose = useCallback(() => {
+    const hasSummary = summaryValue && summaryValue.trim().length > 0;
+    const hasDescription = descriptionValue && descriptionValue !== "" && descriptionValue.length > 20;
+    const hasAttachments = attachments.length > 0;
+    const isFormDirty = isDirty || hasDescription || hasAttachments || hasSummary;
+
+    if (isFormDirty) {
+      setShowConfirmClose(true);
+    } else {
+      onClose();
+      reset();
+    }
+  }, [isDirty, summaryValue, descriptionValue, attachments, onClose, reset]);
 
   React.useEffect(() => {
     if (isEditing && initialIssue) {
@@ -256,13 +277,31 @@ const CreateIssueModal: React.FC<CreateIssueModalProps> = ({
   };
 
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const quillEditorRef = useRef<QuillEditorCreateRef>(null);
+
+  // Speech-to-text for description
+  const handleSpeechResult = useCallback((finalText: string) => {
+    quillEditorRef.current?.insertText(finalText);
+  }, []);
+
+  const {
+    isListening,
+    interimText,
+    isSupported: isSpeechSupported,
+    toggleListening,
+  } = useSpeechToText({
+    lang: "en-US",
+    continuous: true,
+    interimResults: true,
+    onResult: handleSpeechResult,
+  });
 
 
   if (!isOpen) return null;
   return (
     <Modal
       title={isEditing ? "Update Issue" : "Create Issue"}
-      onClose={onClose}
+      onClose={handleClose}
       buttonContent={
         isLoading || isColumnsLoading
           ? "Loading..."
@@ -356,13 +395,13 @@ const CreateIssueModal: React.FC<CreateIssueModalProps> = ({
                       </span>
                     </div>
                   </div>
-                ) : (
+                ) : sprints?.length > 0 ? (
                   <DropdownAntd
                     options={
-                      sprints?.map((sprint) => ({
+                      sprints.map((sprint) => ({
                         value: sprint.id,
                         label: sprint.name,
-                      })) || []
+                      }))
                     }
                     placement="bottom"
                     rowClassName="font-semibold text-gray-700"
@@ -378,7 +417,7 @@ const CreateIssueModal: React.FC<CreateIssueModalProps> = ({
                         customRender={
                           <div className="w-full">
                             {
-                              sprints?.find((s) => s.id === watch("sprint_id"))
+                              sprints.find((s) => s.id === watch("sprint_id"))
                                 ?.name
                             }
                           </div>
@@ -390,6 +429,17 @@ const CreateIssueModal: React.FC<CreateIssueModalProps> = ({
                       setValue("sprint_id", option.value as string)
                     }
                   />
+                ) : (
+                  <div>
+                    <label className="mb-1 block text-sm font-medium text-gray-700">
+                      Sprint
+                    </label>
+                    <div className="rounded-md bg-gray-50 border border-gray-300 px-3 py-2">
+                      <span className="text-gray-500 text-sm">
+                        No active sprints available
+                      </span>
+                    </div>
+                  </div>
                 )}
               </div>
             )}
@@ -480,15 +530,54 @@ const CreateIssueModal: React.FC<CreateIssueModalProps> = ({
             error={errors.summary?.message}
           />
 
-          {/* Description — Quill editor (same format as updateIssue) */}
+          {/* Description — Quill editor with speech-to-text */}
           <div className="flex w-full flex-col gap-1">
-            <p className="text-sm font-bold text-gray-600">Description</p>
-            <div className="rounded border border-gray-300 focus-within:border-emerald-500">
+            <div className="flex items-center gap-2">
+              <p className="text-sm font-bold text-gray-600">Description</p>
+              {isSpeechSupported && (
+                <button
+                  type="button"
+                  onClick={toggleListening}
+                  className={`stt-mic-btn cursor-pointer ${isListening ? "stt-mic-btn--active" : ""
+                    }`}
+                  title={isListening ? "Stop dictation" : "Start dictation"}
+                >
+                  {isListening ? (
+                    <FaStop className="stt-mic-icon" />
+                  ) : (
+                    <FaMicrophone className="stt-mic-icon" />
+                  )}
+                </button>
+              )}
+              {isListening && (
+                <span className="stt-status-badge">
+                  <span className="stt-pulse" />
+                  Listening...
+                </span>
+              )}
+            </div>
+            <div
+              className={`rounded border transition-colors ${isListening
+                  ? "border-red-400 shadow-[0_0_0_2px_rgba(248,113,113,0.2)]"
+                  : "border-gray-300 focus-within:border-emerald-500"
+                }`}
+            >
               <QuillEditorCreate
+                ref={quillEditorRef}
                 onChange={setDescriptionValue}
-                placeholder="Add a description..."
+                placeholder={
+                  isListening
+                    ? "🎤 Speak now… your words will appear here"
+                    : "Add a description..."
+                }
               />
             </div>
+            {/* Interim (live) transcript preview */}
+            {isListening && interimText && (
+              <div className="stt-interim-preview">
+                <span className="stt-interim-text">{interimText}</span>
+              </div>
+            )}
           </div>
 
           {/* Parent Field */}
@@ -670,11 +759,10 @@ const CreateIssueModal: React.FC<CreateIssueModalProps> = ({
 
             {/* Drop zone */}
             <div
-              className={`flex w-full cursor-pointer items-center justify-center gap-3 rounded-md border-2 border-dashed py-4 transition-colors ${
-                attachments.length
+              className={`flex w-full cursor-pointer items-center justify-center gap-3 rounded-md border-2 border-dashed py-4 transition-colors ${attachments.length
                   ? "border-emerald-400 bg-emerald-50"
                   : "border-gray-300 hover:border-emerald-400 hover:bg-emerald-50"
-              }`}
+                }`}
               onDragOver={(e) => { e.preventDefault(); e.stopPropagation(); }}
               onDrop={async (e) => {
                 e.preventDefault();
@@ -720,7 +808,7 @@ const CreateIssueModal: React.FC<CreateIssueModalProps> = ({
             {/* Attachment previews */}
             {attachments.length > 0 && (
               <div className="flex w-full flex-row gap-1 overflow-x-auto">
-                {(attachments
+                {attachments
                   .map(safeParseAttachment)
                   .filter(
                     (p): p is NonNullable<ReturnType<typeof safeParseAttachment>> => p !== null
@@ -731,12 +819,32 @@ const CreateIssueModal: React.FC<CreateIssueModalProps> = ({
                       attachment={parsed}
                       handleDeleteAttachment={handleDeleteAttachment}
                     />
-                  )))}
+                  ))}
               </div>
             )}
           </div>
         </form>
       </div>
+
+      {showConfirmClose && (
+        <Modal
+          title="Discard changes?"
+          variant="warning"
+          onClose={() => setShowConfirmClose(false)}
+          onSubmit={() => {
+            setShowConfirmClose(false);
+            onClose();
+            reset();
+          }}
+          buttonContent="Discard"
+          style={{ confirmButtonColor: "bg-red-600 hover:bg-red-700 focus:ring-red-500", textColor: "text-red-700" }}
+          className="w-[450px]"
+        >
+          <div className="text-gray-600">
+            You have unsaved changes in this issue. Are you sure you want to discard them? This action cannot be undone.
+          </div>
+        </Modal>
+      )}
     </Modal>
   );
 };
