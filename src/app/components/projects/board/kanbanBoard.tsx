@@ -35,6 +35,7 @@ export default function KanbanBoard({
   const [activeIssue, setActiveIssue] = useState<IIssue | null>(null);
   const [activeColumn, setActiveColumn] = useState<string | null>(null);
   const [newColumnText, setNewColumnText] = useState("");
+  const [isAddingColumn, setIsAddingColumn] = useState(false);
   const { setOverItemId } = useOverItem();
   const { updateIssue } = useUpdateIssue({
     projectId: projectId || "",
@@ -254,32 +255,72 @@ export default function KanbanBoard({
               isDragging={activeIssue !== null}
             />
           ))}
-          <div className="relative h-[200px] w-80 rounded-lg bg-gray-100 p-4">
-            <input
-              id="new-stage-name"
-              autoComplete="off"
-              onChange={(e) => {
-                setNewColumnText(e.target.value);
-              }}
-              placeholder="New Stage"
-              className={`relative block w-full appearance-none rounded-md border border-gray-300 px-3 py-2 text-gray-900 placeholder-gray-500 focus:border-green-500 focus:ring-green-500 focus:outline-none sm:text-sm`}
-            />
-            <div className="absolute top-[60%] left-[50%] flex translate-x-[-50%] translate-y-[-50%] items-center justify-center">
-              <LuCirclePlus
-                className="cursor-pointer text-4xl text-gray-600"
-                onClick={() => {
-                  if (!newColumnText || !projectId) {
-                    return;
-                  }
-                  createColumn({
-                    name: newColumnText,
-                    projectId: projectId,
-                  });
-                  setNewColumnText("");
-                }}
-              />
+          {/* Add Stage Section */}
+          {!isAddingColumn ? (
+            <div className="flex h-fit w-80 min-w-80 px-4">
+              <button
+                onClick={() => setIsAddingColumn(true)}
+                className="flex w-full items-center gap-2 rounded-lg bg-gray-100/50 p-4 font-semibold text-gray-600 transition-all hover:bg-gray-200/70"
+              >
+                <LuCirclePlus size={20} />
+                <span>Add Stage</span>
+              </button>
             </div>
-          </div>
+          ) : (
+            <div className="flex h-fit w-80 min-w-80 flex-col gap-2 px-4">
+              <div className="flex flex-col gap-2 rounded-lg bg-gray-100 p-3 shadow-sm animate-in fade-in zoom-in-95 duration-200">
+                <input
+                  id="new-stage-name"
+                  autoFocus
+                  autoComplete="off"
+                  value={newColumnText}
+                  onChange={(e) => {
+                    setNewColumnText(e.target.value);
+                  }}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter" && newColumnText && projectId) {
+                      createColumn({
+                        name: newColumnText,
+                        projectId: projectId,
+                      });
+                      setNewColumnText("");
+                      setIsAddingColumn(false);
+                    } else if (e.key === "Escape") {
+                      setIsAddingColumn(false);
+                      setNewColumnText("");
+                    }
+                  }}
+                  placeholder="Name this stage"
+                  className="w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 placeholder-gray-400 focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 focus:outline-none"
+                />
+                <div className="flex items-center gap-2">
+                  <button
+                    onClick={() => {
+                      if (!newColumnText || !projectId) return;
+                      createColumn({
+                        name: newColumnText,
+                        projectId: projectId,
+                      });
+                      setNewColumnText("");
+                      setIsAddingColumn(false);
+                    }}
+                    className="rounded-md bg-emerald-600 px-3 py-1.5 text-xs font-bold text-white transition-colors hover:bg-emerald-700"
+                  >
+                    Add Stage
+                  </button>
+                  <button
+                    onClick={() => {
+                      setIsAddingColumn(false);
+                      setNewColumnText("");
+                    }}
+                    className="rounded-md bg-transparent px-3 py-1.5 text-xs font-bold text-gray-500 transition-colors hover:bg-gray-200"
+                  >
+                    Cancel
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
         </SortableContext>
         <DragOverlay>
           {activeIssue && <IssueCard issue={activeIssue} isDragging={false} />}

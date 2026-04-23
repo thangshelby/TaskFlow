@@ -16,7 +16,10 @@ import {
 
 export const useRoadmapPage = ({ projectId }: { projectId: string }) => {
   const [currentDate, setCurrentDate] = useState(new Date());
-  const [isOpenUnscheduledWork, setIsOpenUnscheduledWork] = useState(true);
+  const [isOpenUnscheduledWork, setIsOpenUnscheduledWork] = useState(() => {
+    const saved = localStorage.getItem("roadmap-unscheduled-work-open");
+    return saved !== null ? JSON.parse(saved) : false;
+  });
   const [activeIssue, setActiveIssue] = useState<IIssue | null>(null);
   const [overDate, setIsoverDate] = useState("");
   const [filters, setFilters] = useState<GetIssuesParams>({
@@ -25,6 +28,13 @@ export const useRoadmapPage = ({ projectId }: { projectId: string }) => {
     limit: 100,
   });
   const { updateIssue } = useUpdateIssue({ projectId: projectId || "" });
+
+  useEffect(() => {
+    localStorage.setItem(
+      "roadmap-unscheduled-work-open",
+      JSON.stringify(isOpenUnscheduledWork),
+    );
+  }, [isOpenUnscheduledWork]);
 
   const [, startTransition] = useTransition();
 
