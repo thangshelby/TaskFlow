@@ -1,4 +1,4 @@
-import React, { Suspense } from "react";
+import React, { Suspense, useEffect } from "react";
 const IssueDetail = React.lazy(() => import("../../../issues/IssueDetail"));
 import { useIssueStore } from "@libs/store/useIssueStore";
 import ModalPortal from "../../../general-components/modal/modalPortal";
@@ -15,6 +15,23 @@ const IssueDetailModal = () => {
       closeIssueDetail();
     }
   };
+
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        closeIssueDetail();
+      }
+    };
+
+    document.addEventListener("keydown", handleKeyDown);
+    const originalOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+
+    return () => {
+      document.removeEventListener("keydown", handleKeyDown);
+      document.body.style.overflow = originalOverflow;
+    };
+  }, []);
   return (
     <ModalPortal>
       {selectedIssueId ? (

@@ -80,6 +80,23 @@ export default function Modal({
     }
   }, [children]);
 
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        onClose();
+      }
+    };
+
+    document.addEventListener("keydown", handleKeyDown);
+    const originalOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+
+    return () => {
+      document.removeEventListener("keydown", handleKeyDown);
+      document.body.style.overflow = originalOverflow;
+    };
+  }, []);
+
   return (
     <div
       id="modal"
@@ -92,7 +109,7 @@ export default function Modal({
           animate={{ y: 0, opacity: 1 }}
           exit={{ y: 50, opacity: 0 }}
           transition={{ type: "tween", duration: 0.2, ease: "easeOut" }}
-          className={`animate-fade-in max-h-[80vh] min-w-[500px] rounded-lg bg-white py-6 shadow-xl ${className}`}
+          className={`animate-fade-in flex flex-col max-h-[90vh] min-w-[500px] rounded-lg bg-white py-6 shadow-xl ${className}`}
         >
           {/* Title Bar */}
           <div
@@ -107,9 +124,8 @@ export default function Modal({
                 </span>
               )}
               <h2
-                className={`text-xl font-bold tracking-tight ${
-                  style?.textColor || variantStyles.text
-                }`}
+                className={`text-xl font-bold tracking-tight ${style?.textColor || variantStyles.text
+                  }`}
               >
                 {title}
               </h2>
@@ -126,13 +142,12 @@ export default function Modal({
           <div
             ref={modalRef}
             onScroll={handleScroll}
-            className={`max-h-[65vh] overflow-auto px-6 ${
-              canScroll
-                ? hasScrolled
-                  ? "border-gray-200 shadow-sm"
-                  : "border-transparent"
-                : ""
-            } `}
+            className={`flex-1 overflow-y-auto overscroll-contain px-6 ${canScroll
+              ? hasScrolled
+                ? "border-gray-200 shadow-sm"
+                : "border-transparent"
+              : ""
+              } `}
           >
             {children}
           </div>
