@@ -18,6 +18,7 @@ import { usePermission } from "@libs/hooks/common/usePermission";
 import { useAuthStore } from "@libs/store/useAuthStore";
 import { useUserTeams } from "@libs/hooks/apis/useTeam";
 import { PermissionContext } from "@libs/app/context/permission.context";
+import { useEditingIssue } from "@libs/app/context/backlog.context";
 
 const DragableWrapper = memo(
   ({ issueId, children }: { issueId: string; children: React.ReactNode }) => {
@@ -60,6 +61,7 @@ const IssueCard = memo(
     const { updateIssueAsync } = useUpdateIssue({ projectId });
     const { columns } = useProjectColumns({ project_id: projectId });
     const [issueSummary, setIssueSummary] = useState(issue?.summary);
+    const { editingIssueId, setEditingIssueId } = useEditingIssue();
 
     const stopPropagation = useCallback((e: React.PointerEvent) => {
       e.stopPropagation();
@@ -101,9 +103,9 @@ const IssueCard = memo(
               className="flex cursor-pointer items-center gap-4"
             >
               {/* IssueCardLeft */}
-              <div className="group inline-block w-full flex-1">
-                <div className="flex items-center gap-4">
-                  <div className="flex flex-row items-center">
+              <div className="group w-full min-w-0 flex-1">
+                <div className="flex w-full min-w-0 items-center justify-start gap-4">
+                  <div className="flex shrink-0 flex-row items-center">
                     <TypeBadge type={issue.type} isShowLabel={false} />
 
                     <span
@@ -121,7 +123,7 @@ const IssueCard = memo(
                   </div>
                   {/* ISSUE SUMMARY */}
                   <div
-                    className="group relative w-auto min-w-0"
+                    className="group relative min-w-0 flex-1 w-full"
                     onClick={(e) => {
                       e.stopPropagation();
                     }}
@@ -133,6 +135,9 @@ const IssueCard = memo(
                       handleUpdateIssue={handleChangeIssueValue}
                       containerClassName="flex items-center justify-center bg-transparent! flex  text-clip hover:text-underline! inline-block"
                       contentClassName="block text-sm truncate px-1  bg-transparent! text-gray-500 hover:text-underline!"
+                      isEditing={editingIssueId === `${issue.id}-summary` ? undefined : false}
+                      onEditStart={() => setEditingIssueId(`${issue.id}-summary`)}
+                      onEditCancel={() => setEditingIssueId(null)}
                     />
                   </div>
                 </div>
@@ -180,6 +185,9 @@ const IssueCard = memo(
                       containerClassName="flex items-center justify-center"
                       value={issue.story_point || "-"}
                       handleUpdateIssue={handleChangeIssueValue}
+                      isEditing={editingIssueId === `${issue.id}-story_point` ? undefined : false}
+                      onEditStart={() => setEditingIssueId(`${issue.id}-story_point`)}
+                      onEditCancel={() => setEditingIssueId(null)}
                     />
                   </div>
                 </div>
