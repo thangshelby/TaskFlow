@@ -5,13 +5,7 @@ import { z } from "zod";
 import { Link } from "react-router-dom";
 import Button from "@libs/app/components/general-components/button";
 import { useAuth } from "@libs/hooks/apis/useAuth";
-<<<<<<< HEAD
 import { useAuthStore } from "@libs/store/useAuthStore";
-=======
-import { useDispatch, useSelector } from "react-redux";
-import { RootState } from "@libs/store";
-import { setError } from "@libs/store/slices/authSlice";
->>>>>>> 717df0177674e966e843784eb5dc1e00ed9ee479
 import { CheckCircle2, Lock, Mail, User, XCircle } from "lucide-react";
 import { AuthScaffold } from "@libs/app/components/auth/auth-scaffold";
 
@@ -51,7 +45,7 @@ const RegisterPage: React.FC = () => {
   const isLoading = registerMut.isPending;
   const isSuccess = registerMut.isSuccess;
   const { error, setError: setStoreError } = useAuthStore();
-  
+
   React.useEffect(() => {
     // Clear any stale errors from previous pages on mount
     setStoreError(null);
