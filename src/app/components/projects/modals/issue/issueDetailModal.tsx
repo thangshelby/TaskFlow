@@ -53,7 +53,7 @@ const IssueDetailModal = () => {
               }}
               animate={{ x: 0, y: 0, opacity: 1 }}
               exit={{ x: 0, y: 50, opacity: 0 }}
-              className="flex h-[80%] min-h-[400px] w-[70%] min-w-[600px] items-center justify-center overflow-hidden rounded-md transition-all duration-300"
+              className="flex h-[80%] min-h-[400px] w-[70%] min-w-[600px] items-center justify-center overflow-auto rounded-md transition-all duration-300"
             >
               <Suspense fallback={<IssueDetailSkeleton />}>
                 <IssueDetail selectedIssueId={selectedIssueId} />
