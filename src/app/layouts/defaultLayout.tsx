@@ -6,7 +6,7 @@ const DefaultLayout = () => {
   return (
     <div className="flex h-screen flex-col">
       <Header />
-      <Suspense fallback={<div>Loading.ddd..</div>}>
+      <Suspense fallback={<div>Loading...</div>}>
         <Outlet />
       </Suspense>
     </div>

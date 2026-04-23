@@ -107,7 +107,14 @@ const IssueCard = memo(
                     <TypeBadge type={issue.type} isShowLabel={false} />
 
                     <span
-                      className={`block text-xs font-light text-gray-500 ${issue?.column?.name === "DONE" ? "line-through" : "underline"}`}
+                      className={`block cursor-pointer text-xs font-medium text-blue-600 hover:underline ${issue?.column?.name === "DONE" ? "line-through" : ""}`}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        openIssueDetail(issue.id);
+                        navigate(
+                          `/projects/${projectId}/backlog?selectedIssue=${issue.id}`,
+                        );
+                      }}
                     >
                       {issue?.key}
                     </span>

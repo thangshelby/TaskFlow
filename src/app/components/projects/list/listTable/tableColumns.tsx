@@ -40,7 +40,11 @@ const FallBack = () => {
   );
 };
 
-export const useTableColumns = (issues: IIssue[], projectId: string) => {
+export const useTableColumns = (
+  issues: IIssue[],
+  projectId: string,
+  onIssueClick?: (issueId: string) => void,
+) => {
   const tableColumns: TableColumnType<IIssue>[] = useMemo(
     () => [
       // Type
@@ -65,10 +69,13 @@ export const useTableColumns = (issues: IIssue[], projectId: string) => {
       TableColumn(
         "key",
         "Key",
-        (_, { key }) => (
+        (_, { id, key }) => (
           <Suspense fallback={<FallBack />}>
-            <div className="p-2">
-              <p className="text-xs font-semibold text-gray-700">{key}</p>
+            <div
+              className="cursor-pointer p-2 text-blue-600 hover:underline"
+              onClick={() => onIssueClick?.(id)}
+            >
+              <p className="text-xs font-semibold">{key}</p>
             </div>
           </Suspense>
         ),

@@ -118,7 +118,8 @@ const StatusOverview = (props: { data: UserStats }) => {
       <SectionContainer
         title="Status overview"
         description="Get a snapshot of the status of your work items"
-        link="View all work items"
+        linkText="View all work items"
+        href="../list"
       >
         {" "}
         <div className="p-6">
@@ -282,7 +283,8 @@ const StatusOverview = (props: { data: UserStats }) => {
       <SectionContainer
         title="Recent activity"
         description="Stay up to date with what's happening across the space."
-        link="View all activity"
+        linkText="View all activity"
+        href="#"
       >
         <div className="max-h-80 overflow-scroll">
           <HistorySection projectId={projectId!} />

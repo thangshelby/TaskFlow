@@ -1,12 +1,16 @@
+import { Link } from "react-router-dom";
+
 const SectionContainer = ({
   title,
   description,
-  link,
+  linkText,
+  href = "#",
   children,
 }: {
   title: string;
   description: string;
-  link: string;
+  linkText?: string;
+  href?: string;
   children: React.ReactNode;
 }) => {
   return (
@@ -19,12 +23,14 @@ const SectionContainer = ({
             <h3 className="text-md font-semibold text-gray-900">{title}</h3>
             <p className="text-sm text-gray-600">
               {description}
-              <a
-                href={link}
-                className="ml-1 text-sm font-medium text-blue-600 hover:text-blue-800"
-              >
-                {link}
-              </a>
+              {linkText && (
+                <Link
+                  to={href}
+                  className="ml-1 text-sm font-medium text-blue-600 hover:text-blue-800"
+                >
+                  {linkText}
+                </Link>
+              )}
             </p>
           </div>
         </div>

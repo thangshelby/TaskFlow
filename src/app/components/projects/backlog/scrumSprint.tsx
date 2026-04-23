@@ -323,22 +323,24 @@ const ScrumSprint = memo(
             />
           </div>
 
-          <div className="flex h-full flex-row items-center">
-            <div className="flex flex-1 flex-row items-center justify-end gap-1">
-              <div className="flex h-full gap-2">
-                <span className="text-sm font-medium text-gray-600">
-                  {sprint.issues.length} work items
-                </span>
-                <span className="text-sm font-semibold text-gray-600">|</span>
-                <span className="text-sm font-medium text-gray-600">
-                  Estimate:{" "}
-                  <span className="text-sm font-bold text-gray-800">
-                    {estimate}
+          {isExpanded && (
+            <div className="flex h-full flex-row items-center">
+              <div className="flex flex-1 flex-row items-center justify-end gap-1">
+                <div className="flex h-full gap-2">
+                  <span className="text-sm font-medium text-gray-600">
+                    {sprint.issues.length} work items
                   </span>
-                </span>
+                  <span className="text-sm font-semibold text-gray-600">|</span>
+                  <span className="text-sm font-medium text-gray-600">
+                    Estimate:{" "}
+                    <span className="text-sm font-bold text-gray-800">
+                      {estimate}
+                    </span>
+                  </span>
+                </div>
               </div>
             </div>
-          </div>
+          )}
 
           <CompleteSprintModal
             isOpen={isCompleteSprintModalOpen}

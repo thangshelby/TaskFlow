@@ -256,8 +256,8 @@ export default function KanbanBoard({
           ))}
           <div className="relative h-[200px] w-80 rounded-lg bg-gray-100 p-4">
             <input
-              id="email-address"
-              autoComplete="email"
+              id="new-stage-name"
+              autoComplete="off"
               onChange={(e) => {
                 setNewColumnText(e.target.value);
               }}
