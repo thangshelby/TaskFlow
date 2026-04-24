@@ -3,6 +3,7 @@ import Modal from "@libs/app/components/general-components/modal/modal";
 import FindUser from "@libs/app/components/general-components/findUser";
 import { useCreateTeam } from "@libs/hooks/apis/useTeam";
 import { useParams } from "react-router-dom";
+import "@libs/app/components/projects/modals/modal.css";
 
 interface CreateProjectTeamModalProps {
   isOpen: boolean;
@@ -40,6 +41,7 @@ const CreateProjectTeamModal = ({
       buttonContent="Create"
       onSubmit={handleCreateTeam}
       isSubmitDisabled={!name.trim()}
+      className="rounded-xl border border-white/40 shadow-2xl glass-panel"
     >
       <div className="space-y-4" ref={wrapperRef}>
         {/* Name */}
