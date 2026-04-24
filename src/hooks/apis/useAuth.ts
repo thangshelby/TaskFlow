@@ -53,9 +53,9 @@ export function useAuth() {
   const verifyOtp = useMutation({
     mutationFn: auth.verify,
     onSuccess: ({ data }) => {
-      // dispatch(setUser(data.data));
+      setUser(data.data);
       queryClient.setQueryData(["currentUser"], data.data);
-      navigate("/");
+      navigate("/projects");
     },
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     onError: (error: any) => {

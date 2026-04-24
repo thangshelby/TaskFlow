@@ -10,11 +10,13 @@ import {
   YAxis,
   CartesianGrid,
   Tooltip,
+
 } from "recharts";
-import { UserStats } from "@libs/types/project";
+import { ProjectSummary } from "@libs/types/project";
 import HistorySection from "@libs/app/components/issues/activitySection/history";
 import { useParams } from "react-router-dom";
 import SectionContainer from "./sectionHeader";
+import UserAvatar from "@libs/app/components/general-components/user/userAvatar";
 interface StatusData {
   label: string;
   value: number;
@@ -33,14 +35,16 @@ const COLOR_PALETTE = [
   "#253858", // Jira Dark Blue
 ];
 
-const StatusOverview = (props: { data: UserStats }) => {
+const StatusOverview = (props: { data: ProjectSummary }) => {
   const { by_status } = props.data;
+  console.log(props.data)
   const [chartType, setChartType] = useState<"pie" | "bar">("pie");
   const { projectId } = useParams<{ projectId: string }>();
   const [activeIndex, setActiveIndex] = useState<number | null>(null);
   const statusData: StatusData[] = by_status.map((status, idx) => ({
     label: status.name,
     value: status.count,
+
     color: COLOR_PALETTE[idx] || "#94a3b8",
   }));
 
@@ -81,35 +85,8 @@ const StatusOverview = (props: { data: UserStats }) => {
     return null;
   };
 
-  // Custom label for pie chart
-  const renderCustomLabel = ({
-    cx,
-    cy,
-    midAngle,
-    innerRadius,
-    outerRadius,
-    percent,
-  }: any) => {
-    if (percent < 0.05) return null; // Hide labels for slices smaller than 5%
 
-    const RADIAN = Math.PI / 180;
-    const radius = innerRadius + (outerRadius - innerRadius) * 0.5;
-    const x = cx + radius * Math.cos(-midAngle * RADIAN);
-    const y = cy + radius * Math.sin(-midAngle * RADIAN);
 
-    return (
-      <text
-        x={x}
-        y={y}
-        fill="white"
-        textAnchor={x > cx ? "start" : "end"}
-        dominantBaseline="central"
-        className="text-xs font-medium"
-      >
-        {`${(percent * 100).toFixed(0)}%`}
-      </text>
-    );
-  };
 
   return (
     <div className="flex flex-col gap-6 lg:flex-row">
@@ -121,31 +98,26 @@ const StatusOverview = (props: { data: UserStats }) => {
         linkText="View all work items"
         href="../list"
       >
-        {" "}
         <div className="p-6">
           {/* Chart Type Selector - Jira Style */}
           <div className="flex items-center justify-between">
-            <h4 className="text-base font-medium text-gray-900">
-              Status Distribution
-            </h4>
+
             <div className="flex rounded-md border border-gray-300 bg-white p-1">
               <button
                 onClick={() => setChartType("pie")}
-                className={`cursor-pointer rounded-sm px-3 py-1.5 text-sm font-medium transition-colors ${
-                  chartType === "pie"
-                    ? "bg-blue-50 text-blue-700 shadow-sm"
-                    : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
-                }`}
+                className={`cursor-pointer rounded-sm px-3 py-1.5 text-sm font-medium transition-colors ${chartType === "pie"
+                  ? "bg-blue-50 text-blue-700 shadow-sm"
+                  : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
+                  }`}
               >
                 Pie
               </button>
               <button
                 onClick={() => setChartType("bar")}
-                className={`cursor-pointer rounded-sm px-3 py-1.5 text-sm font-medium transition-colors ${
-                  chartType === "bar"
-                    ? "bg-blue-50 text-blue-700 shadow-sm"
-                    : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
-                }`}
+                className={`cursor-pointer rounded-sm px-3 py-1.5 text-sm font-medium transition-colors ${chartType === "bar"
+                  ? "bg-blue-50 text-blue-700 shadow-sm"
+                  : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
+                  }`}
               >
                 Bar
               </button>
@@ -153,18 +125,21 @@ const StatusOverview = (props: { data: UserStats }) => {
           </div>
 
           {/* Chart Container - Jira Style */}
-          <div className="flex flex-row items-center justify-center">
-            <div className="flex-1">
+          <div className="flex flex-col items-center justify-center">
+            <div className="w-full">
               <ResponsiveContainer width="100%" height={260}>
                 {chartType === "pie" ? (
                   <PieChart>
                     <Pie
                       data={statusData}
                       cx="50%"
-                      cy="50%"
-                      innerRadius={70}
-                      outerRadius={100}
-                      paddingAngle={0.5}
+                      cy="90%"
+                      innerRadius={160}
+                      outerRadius={200}
+                      paddingAngle={1}
+                      cornerRadius={6}
+                      startAngle={180}
+                      endAngle={0}
                       dataKey="value"
                       isAnimationActive={true}
                       animationBegin={0}
@@ -202,22 +177,22 @@ const StatusOverview = (props: { data: UserStats }) => {
                     {/* Hiển thị tổng số ở giữa biểu đồ (Jira style) */}
                     <text
                       x="50%"
-                      y="45%"
+                      y="65%"
                       textAnchor="middle"
                       dominantBaseline="middle"
                       className="fill-gray-900 text-2xl font-semibold"
                     >
                       {activeIndex !== null
                         ? (
-                            (statusData[activeIndex].value / total) *
-                            100
-                          ).toFixed(1)
+                          (statusData[activeIndex].value / total) *
+                          100
+                        ).toFixed(1) + "%"
                         : total}
-                      %
+
                     </text>
                     <text
                       x="50%"
-                      y="55%"
+                      y="75%"
                       textAnchor="middle"
                       dominantBaseline="middle"
                       className="fill-gray-500 text-sm"
@@ -254,27 +229,95 @@ const StatusOverview = (props: { data: UserStats }) => {
               </ResponsiveContainer>
             </div>
 
-            <div className="flex w-auto flex-col gap-3">
+            <div className="mt-2 flex w-full flex-col gap-0 justify-end">
               {statusData.map((status, index) => (
                 <div
                   onMouseEnter={() => setActiveIndex(index)}
                   onMouseLeave={() => setActiveIndex(null)}
                   key={index}
-                  className={`flex cursor-pointer items-center space-x-2 p-2 ${
-                    activeIndex === index ? "bg-gray-100" : ""
-                  }`}
+                  className={`flex cursor-pointer items-center justify-between rounded-md p-1 px-2 transition-colors ${activeIndex === index ? "bg-gray-100" : "hover:bg-gray-50"
+                    }`}
                 >
-                  <div
-                    className="h-3 w-3 flex-shrink-0"
-                    style={{ backgroundColor: status.color }}
-                  />
-                  <span className="text-sm font-medium text-gray-700">
-                    {status.label.toUpperCase()}: {status.value}
-                  </span>
+                  <div className="flex min-w-0 items-center gap-2">
+                    <div
+                      className="h-2.5 w-2.5 shrink-0 rounded-full"
+                      style={{ backgroundColor: status.color }}
+                    />
+                    <span className="truncate text-sm font-medium text-gray-700">
+                      {status.label.toUpperCase()}
+                    </span>
+                  </div>
+                  <div className="shrink-0 text-right">
+                    <span className="text-sm font-semibold text-gray-900">
+                      {status.value}
+                    </span>
+                    <span className="ml-3 text-sm text-gray-500">
+                      {getPercentage(status.value)}%
+                    </span>
+                  </div>
                 </div>
               ))}
             </div>
           </div>
+        </div>
+      </SectionContainer>
+
+      {/* Activity Feed - Jira Style */}
+      {/* Header with Jira-style styling */}
+      <SectionContainer
+        title="Top Contributors (Resolved Tasks)"
+        description="Get a snapshot of the status of your work items"
+        linkText="View all activity"
+        href="#"
+      >
+        <div className="max-h-120 overflow-y-auto px-2">
+          <table className="w-full text-left">
+            <thead>
+              <tr className="border-b border-gray-100 text-[11px] font-bold tracking-wider text-gray-400">
+                <th className="pb-3 px-2 uppercase">Member</th>
+                <th className="pb-3 px-2 text-right uppercase">Resolved</th>
+                <th className="pb-3 px-2 text-right uppercase">% Contrib.</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-gray-50">
+              {props.data.top_contributors?.map((contributor) => (
+                <tr key={contributor.user_id} className="group hover:bg-gray-50/50 transition-colors">
+                  <td className="py-3 px-2">
+                    <div className="flex items-center gap-3">
+                      <div className="relative">
+                        <UserAvatar
+                          userId={contributor.user_id}
+                          size={32}
+                          isDisplayName={false}
+                          className="text-md"
+                        />
+                      </div>
+                      <span className="text-sm font-semibold text-gray-700 group-hover:text-blue-600 transition-colors">
+                        {contributor.display_name}
+                      </span>
+                    </div>
+                  </td>
+                  <td className="py-3 px-2 text-right">
+                    <span className="text-sm font-medium text-gray-600">
+                      {contributor.resolved_count}
+                    </span>
+                  </td>
+                  <td className="py-3 px-2 text-right">
+                    <span className="text-sm font-bold text-green-600">
+                      {contributor.contribution_percent.toFixed(0)}%
+                    </span>
+                  </td>
+                </tr>
+              ))}
+              {(!props.data.top_contributors || props.data.top_contributors.length === 0) && (
+                <tr>
+                  <td colSpan={3} className="py-8 text-center text-sm text-gray-400 italic">
+                    No contributors data available
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
         </div>
       </SectionContainer>
 
@@ -286,7 +329,7 @@ const StatusOverview = (props: { data: UserStats }) => {
         linkText="View all activity"
         href="#"
       >
-        <div className="max-h-80 overflow-scroll">
+        <div className="max-h-100 overflow-scroll">
           <HistorySection projectId={projectId!} />
         </div>
       </SectionContainer>
