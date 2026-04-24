@@ -47,8 +47,9 @@ const IssueAnalytics = ({ data }: { data: UserStats }) => {
 
       <SectionContainer
         title="Work Type Breakdown"
-        description="Issues categorized by work type text-gray-500"
-        link="View all issues"
+        description="Issues categorized by work type"
+        linkText="View all issues"
+        href="../list"
       >
         <div className="space-y-4">
           {typeData.map((item, index) => (
@@ -151,7 +152,8 @@ const PriorityChart = ({ data }: { data: UserStats }) => {
     <SectionContainer
       title="Priority breakdown"
       description="Get a holistic view of how work is being prioritized."
-      link="How to manage priorities for spaces"
+      linkText="How to manage priorities for spaces"
+      href="#"
     >
       <div className="h-64 w-full">
         <ResponsiveContainer width="100%" height="100%">

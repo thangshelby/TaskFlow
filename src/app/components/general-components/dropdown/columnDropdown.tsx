@@ -76,7 +76,7 @@ const ColumnDropdown = memo(
           onClick={(e) => {
             e.stopPropagation();
           }}
-          className={`flex items-center ${!permissionResult.isAllow ? "cursor-not-allowed" : ""}`}
+          className={`flex items-center ${!permissionResult.isAllow || disabled ? "cursor-not-allowed" : ""}`}
         >
           <Dropdown
             disabled={!permissionResult.isAllow || disabled}

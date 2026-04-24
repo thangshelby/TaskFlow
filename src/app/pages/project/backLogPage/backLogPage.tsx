@@ -115,26 +115,41 @@ const BackLogPageContent: React.FC = () => {
                 )
                 .concat("no-epic")}
             >
-              {isEpicVisible && (
-                <div className="w-[20%] min-w-[200px]">
-                  <BacklogEpic issues={issues} />
-                </div>
-              )}
-
               <PanelGroup
                 className="flex w-full flex-1"
                 autoSaveId="backlog-panel-group"
                 direction="horizontal"
               >
+                {isEpicVisible && (
+                  <>
+                    <Panel
+                      id="epic-panel"
+                      order={0}
+                      defaultSize={22}
+                      minSize={16}
+                      maxSize={35}
+                    >
+                      <div className="h-full overflow-y-auto">
+                        <Suspense fallback={<div className="p-4 text-sm text-gray-400">Loading Epics...</div>}>
+                          <BacklogEpic issues={issues} />
+                        </Suspense>
+                      </div>
+                    </Panel>
+                    <PanelResizeHandle
+                      className="relative w-[2px] cursor-col-resize bg-gray-200 hover:bg-emerald-400 transition-colors"
+                    />
+                  </>
+                )}
+
                 <Panel
                   id="backlog-panel"
                   order={1}
                   defaultSize={selectedIssueId ? 60 : 100}
-                  minSize={50}
+                  minSize={40}
                   maxSize={100}
                 >
                   <div className="h-full overflow-auto pr-4">
-                    <ul className="flex min-w-[550px] flex-col gap-2 overflow-x-auto">
+                    <ul className="flex min-w-[800px] flex-col gap-2">
                       {sprintIssues?.map((sprint: ISprintIssues) => (
                         <div key={sprint.id}>
                           <ScrumSprint
@@ -160,26 +175,28 @@ const BackLogPageContent: React.FC = () => {
                 </Panel>
 
                 {selectedIssueId && (
-                  <PanelResizeHandle
-                    style={{
-                      backgroundColor: "oklch(0.696 0.17 162.48)",
-                    }}
-                    className="backlog--panel-resize-handle relative w-[2px] cursor-col-resize bg-gray-300 pl-[2px] text-emerald-500 opacity-0 hover:opacity-100"
-                  />
+                  <>
+                    <PanelResizeHandle
+                      style={{
+                        backgroundColor: "oklch(0.696 0.17 162.48)",
+                      }}
+                      className="backlog--panel-resize-handle relative w-[2px] cursor-col-resize bg-gray-300 pl-[2px] text-emerald-500 opacity-0 hover:opacity-100"
+                    />
+                    <Panel
+                      id="issue-side-bar-panel"
+                      order={2}
+                      defaultSize={40}
+                      maxSize={50}
+                      minSize={30}
+                    >
+                      <div className="h-full overflow-y-auto pr-4">
+                        <Suspense fallback={<IssueDetailSkeleton />}>
+                          <IssueDetail selectedIssueId={selectedIssueId} />
+                        </Suspense>
+                      </div>
+                    </Panel>
+                  </>
                 )}
-                <Panel
-                  id="issue-side-bar-panel"
-                  order={2}
-                  defaultSize={selectedIssueId ? 40 : 0}
-                  maxSize={selectedIssueId ? 50 : 0}
-                  minSize={selectedIssueId ? 30 : 0}
-                >
-                  <div className="h-full overflow-y-auto pr-4">
-                    <Suspense fallback={<IssueDetailSkeleton />}>
-                      <IssueDetail selectedIssueId={selectedIssueId || ""} />
-                    </Suspense>
-                  </div>
-                </Panel>
               </PanelGroup>
             </SortableContext>
             <DragOverlay>

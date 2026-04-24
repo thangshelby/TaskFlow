@@ -11,12 +11,14 @@ const UserDropdown = ({
   selectedUserId,
   columnField,
   isDisplayname = true,
+  isEditable = true,
 }: {
   projectId: string;
   issueId: string;
   selectedUserId: string;
   columnField: string;
   isDisplayname?: boolean;
+  isEditable?: boolean;
 }) => {
   const [isOpenDropdown, setIsOpenDropdown] = useState(false);
 
@@ -104,6 +106,7 @@ const UserDropdown = ({
       setIsOpenDropdown={(isOpen) => {
         setIsOpenDropdown(isOpen);
       }}
+      disabled={!isEditable}
       items={items}
       children={
         <UserAvatar

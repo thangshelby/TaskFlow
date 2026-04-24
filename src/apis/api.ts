@@ -1,10 +1,7 @@
 import axios from "axios";
 
-// const url = "http://localhost:8081";
-// const url = "http://13.229.99.156:8081";
-// const url =
-// "http://taskflow-main-alb-1119461494.ap-southeast-1.elb.amazonaws.com";
-const url = "https://backend.taskkfloww.shop";
+const url = "http://localhost:8081";
+// const url = "http://54.255.204.168:8081";
 const api = axios.create({
   baseURL: import.meta.env.VITE_API_URL || `${url}/api/v1/`,
   headers: {

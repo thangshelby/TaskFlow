@@ -1,4 +1,4 @@
-import React, { Suspense } from "react";
+import React, { Suspense, useEffect } from "react";
 const IssueDetail = React.lazy(() => import("../../../issues/IssueDetail"));
 import { useIssueStore } from "@libs/store/useIssueStore";
 import ModalPortal from "../../../general-components/modal/modalPortal";
@@ -15,6 +15,23 @@ const IssueDetailModal = () => {
       closeIssueDetail();
     }
   };
+
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        closeIssueDetail();
+      }
+    };
+
+    document.addEventListener("keydown", handleKeyDown);
+    const originalOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+
+    return () => {
+      document.removeEventListener("keydown", handleKeyDown);
+      document.body.style.overflow = originalOverflow;
+    };
+  }, []);
   return (
     <ModalPortal>
       {selectedIssueId ? (
@@ -36,7 +53,7 @@ const IssueDetailModal = () => {
               }}
               animate={{ x: 0, y: 0, opacity: 1 }}
               exit={{ x: 0, y: 50, opacity: 0 }}
-              className="flex h-[80%] min-h-[400px] w-[70%] min-w-[600px] items-center justify-center overflow-hidden rounded-md transition-all duration-300"
+              className="flex h-[80%] min-h-[400px] w-[70%] min-w-[600px] items-center justify-center overflow-auto rounded-md transition-all duration-300"
             >
               <Suspense fallback={<IssueDetailSkeleton />}>
                 <IssueDetail selectedIssueId={selectedIssueId} />

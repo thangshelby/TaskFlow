@@ -12,9 +12,13 @@ import { useQueryClient } from "@tanstack/react-query";
 import { TableRowSelection } from "antd/es/table/interface";
 import { useTableColumns } from "./listTable/tableColumns";
 import TableFooter from "./listTable/tableFooter";
+import { useIssueStore } from "@libs/store/useIssueStore";
 
 const CreateIssueModal = lazy(
   () => import("@libs/app/components/projects/modals/issue/createIssueModal"),
+);
+const IssueDetailModal = lazy(
+  () => import("@libs/app/components/projects/modals/issue/issueDetailModal"),
 );
 
 interface ListTableProps {
@@ -39,6 +43,7 @@ const ListTable = ({
   const queryClient = useQueryClient();
   const [selectedRowKeys, setSelectedRowKeys] = React.useState<React.Key[]>([]);
   const [isCreateOpen, setIsCreateOpen] = React.useState(false);
+  const { openIssueDetail } = useIssueStore();
   const onSelectChange = (newSelectedRowKeys: React.Key[]) => {
     setSelectedRowKeys(newSelectedRowKeys);
   };
@@ -63,7 +68,9 @@ const ListTable = ({
     });
   }, [issues]);
 
-  const tableColumns = useTableColumns(issues, projectId);
+  const tableColumns = useTableColumns(issues, projectId, (id) =>
+    openIssueDetail(id),
+  );
 
   const handleGetEpicIssueChildren = async (issue: IIssue) => {
     const response = await issuesApi.list({
@@ -101,6 +108,7 @@ const ListTable = ({
             projectId={projectId}
           />
         )}
+        <IssueDetailModal />
       </Suspense>
       {isFetching || !user || !userTeams ? (
         //  TABLE SKELETON

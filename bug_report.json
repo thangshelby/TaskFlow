@@ -1,0 +1,604 @@
+{
+  "meta": {
+    "generated_at": "2026-04-22T23:28:00+07:00",
+    "app": "TaskFlow",
+    "env": "http://localhost:5173",
+    "pages_tested": [
+      "Backlog",
+      "List",
+      "Roadmap",
+      "Board"
+    ],
+    "tester": "QA/PM AI Agent",
+    "last_updated": "2026-04-22T23:28:00+07:00"
+  },
+  "bugs": [
+    {
+      "id": "BL-001",
+      "page": "Backlog",
+      "title": "Click vào issue row kích hoạt inline-edit Summary thay vì mở Issue Detail",
+      "severity": "High",
+      "status": "Open",
+      "category": "UX / Logic",
+      "description": "Khi người dùng click vào bất kỳ chỗ nào trên một row issue trong Backlog, CustomInput của Summary tự động vào chế độ edit (hiển thị text field + nút ✓/✗). Hành vi đúng phải là mở Issue Detail panel/modal.",
+      "steps_to_reproduce": [
+        "Truy cập trang Backlog",
+        "Click vào bất kỳ chỗ nào trên row của một issue (không phải Issue Key xanh)"
+      ],
+      "expected": "Mở Issue Detail panel bên phải hoặc modal",
+      "actual": "Bật inline edit mode cho field Summary",
+      "affected_file": "src/app/components/projects/backlog/issueCard.tsx",
+      "affected_lines": "98-130",
+      "root_cause": "CustomInput component tự bật edit mode khi nhận click, stopPropagation() trong div wrapper chỉ ngăn outer click nhưng không ngăn CustomInput tự handle click của nó.",
+      "fix_suggestion": "Thêm cờ isEditing ở component level. Chỉ trigger handleIssueCardClick khi click ra ngoài vùng CustomInput; ngược lại CustomInput chỉ vào edit khi user click chủ động vào pencil/edit icon."
+    },
+    {
+      "id": "BL-002",
+      "page": "Backlog",
+      "title": "Nhiều issue rows có thể đồng thời ở trạng thái inline-edit",
+      "severity": "High",
+      "status": "Open",
+      "category": "State Management",
+      "description": "Không có global tracking nào cho 'issue nào đang được edit'. Click lần lượt vào nhiều rows dẫn đến tất cả cùng hiển thị inline-edit text field đồng thời.",
+      "steps_to_reproduce": [
+        "Truy cập trang Backlog",
+        "Click vào row issue 1 → edit mode bật",
+        "Không đóng, click tiếp vào row issue 2"
+      ],
+      "expected": "Edit mode của issue 1 tự đóng khi mở issue 2",
+      "actual": "Issue 1 và issue 2 cùng hiển thị inline edit fields",
+      "affected_file": "src/app/components/projects/backlog/issueCard.tsx",
+      "affected_lines": "62-88",
+      "root_cause": "isEditing state là local trong mỗi IssueCard, không có shared context/store để enforce 'chỉ một issue được edit tại một thời điểm'.",
+      "fix_suggestion": "Tạo editingIssueId state trong ScrumSprint hoặc BacklogContext. Mỗi IssueCard nhận editingIssueId làm prop và tự reset khi ID không khớp."
+    },
+    {
+      "id": "BL-003",
+      "page": "Backlog",
+      "title": "Footer 'X work items | Estimate: 0' vẫn hiển thị khi Sprint bị collapse",
+      "severity": "Medium",
+      "status": "Fixed",
+      "category": "UI / Layout",
+      "description": "Footer hiển thị số work items và estimate không ẩn theo khi user collapse sprint section.",
+      "steps_to_reproduce": [
+        "Truy cập Backlog",
+        "Click nút Expand/Collapse Sprint"
+      ],
+      "expected": "Footer ẩn cùng với body khi sprint collapsed",
+      "actual": "Footer vẫn hiển thị dưới header khi sprint đã collapsed",
+      "affected_file": "src/app/components/projects/backlog/scrumSprint.tsx",
+      "affected_lines": "326-341",
+      "root_cause": "Footer div không được wrap trong {isExpanded && (...)} guard",
+      "fix_applied": "Wrapped footer trong {isExpanded && (...)} block",
+      "fix_date": "2026-04-22"
+    },
+    {
+      "id": "BL-004",
+      "page": "Backlog",
+      "title": "Mở Epic sidebar phá vỡ layout, cắt nội dung bảng Backlog",
+      "severity": "Medium",
+      "status": "Fixed",
+      "category": "Layout / Responsive",
+      "description": "Khi click 'Epics' để mở Epic sidebar, bảng Backlog bên phải bị co lại và nội dung Status badge, Due Date, Assignee bị ẩn/cắt do overflow.",
+      "steps_to_reproduce": [
+        "Truy cập Backlog",
+        "Click button 'Epics' ở góc phải"
+      ],
+      "expected": "Epic sidebar mở, Backlog table co lại nhưng vẫn hiển thị đầy đủ các cột với scrollbar nếu cần",
+      "actual": "Nội dung bảng Backlog bị cắt, Status/Date/User không hiển thị",
+      "affected_file": "src/app/pages/project/backLogPage/backLogPage.tsx",
+      "affected_lines": "118-122",
+      "root_cause": "BacklogEpic nằm ngoài PanelGroup trong cùng một flex row, gây ra tính toán width sai cho PanelGroup",
+      "fix_applied": "Di chuyển BacklogEpic vào trong PanelGroup như một Panel riêng (id='epic-panel', order=0) với PanelResizeHandle",
+      "fix_date": "2026-04-22"
+    },
+    {
+      "id": "BL-005",
+      "page": "Backlog",
+      "title": "Issue Key trong Backlog không clickable, không nhất quán với List page",
+      "severity": "Medium",
+      "status": "Fixed",
+      "category": "UX / Navigation",
+      "description": "Issue Key (TF_FE-1, TF_FE-2...) hiển thị là plain text màu xám, không có cursor pointer hay onClick để mở Issue Detail. List page đã có tính năng này.",
+      "steps_to_reproduce": [
+        "Truy cập Backlog",
+        "Hover/click vào text 'TF_FE-1'"
+      ],
+      "expected": "Issue Key có màu xanh, cursor pointer, click mở Issue Detail (như trên List page)",
+      "actual": "Issue Key là plain text màu xám, click gây bật inline-edit",
+      "affected_file": "src/app/components/projects/backlog/issueCard.tsx",
+      "affected_lines": "109-113",
+      "fix_applied": "Đổi styling sang text-blue-600 cursor-pointer hover:underline, thêm onClick với e.stopPropagation() để gọi openIssueDetail()",
+      "fix_date": "2026-04-22"
+    },
+    {
+      "id": "BL-006",
+      "page": "Backlog",
+      "title": "Backlog section hiển thị date range vô nghĩa '4/22 - 4/22'",
+      "severity": "Low",
+      "status": "Open",
+      "category": "Data Display",
+      "description": "Backlog section (không phải Sprint) hiển thị start date và end date giống nhau là ngày tạo. Điều này không có ý nghĩa với Backlog.",
+      "steps_to_reproduce": [
+        "Truy cập Backlog",
+        "Xem header của section 'Backlog'"
+      ],
+      "expected": "Không hiển thị date range với Backlog, hoặc hiển thị 'No sprint'",
+      "actual": "Hiển thị '4/22/2026 - 4/22/2026'",
+      "affected_file": "src/app/components/projects/backlog/scrumSprint.tsx",
+      "affected_lines": "154-157",
+      "fix_suggestion": "Kiểm tra sprint.name === 'Backlog' thì không render date range span"
+    },
+    {
+      "id": "BL-007",
+      "page": "Backlog",
+      "title": "Sprint status badges (3/2/0) không có label hoặc tooltip",
+      "severity": "Low",
+      "status": "Open",
+      "category": "UX / Accessibility",
+      "description": "Trong header của mỗi Sprint/Backlog section, có 3 số (ví dụ: 3, 2, 0) đại diện cho số issues theo status. Không có label hay tooltip giải thích ý nghĩa.",
+      "steps_to_reproduce": [
+        "Truy cập Backlog",
+        "Xem 3 số màu xám/xanh ở cuối header sprint"
+      ],
+      "expected": "Hover vào số hiển thị tooltip 'TODO: 3', 'INPROGRESS: 2', 'DONE: 0'",
+      "actual": "Chỉ hiển thị số thuần, không có context",
+      "affected_file": "src/app/components/projects/backlog/scrumSprint.tsx",
+      "affected_lines": "167-182",
+      "fix_suggestion": "Thêm title attribute hoặc Tooltip từ antd với tên status"
+    },
+    {
+      "id": "BL-008",
+      "page": "Backlog",
+      "title": "Console warning: Missing resize handle for PanelGroup",
+      "severity": "Low",
+      "status": "Open",
+      "category": "Technical / Console",
+      "description": "Console xuất hiện warning 'WARNING: Missing resize handle for PanelGroup' khi không có issue detail được chọn (chỉ có 1 Panel nhưng không có PanelResizeHandle).",
+      "steps_to_reproduce": [
+        "Mở DevTools Console",
+        "Truy cập Backlog khi không có issue nào được chọn"
+      ],
+      "expected": "Không có warning",
+      "actual": "[warn] WARNING: Missing resize handle for PanelGroup",
+      "affected_file": "src/app/pages/project/backLogPage/backLogPage.tsx",
+      "affected_lines": "124-198",
+      "fix_suggestion": "PanelGroup với 1 Panel không cần PanelResizeHandle. Cân nhắc dùng điều kiện hoặc nhóm các panel có resize handle một cách phù hợp."
+    },
+    {
+      "id": "LS-001",
+      "page": "List",
+      "title": "Story Point column trong List table có spinbutton với valuemax=0",
+      "severity": "High",
+      "status": "Open",
+      "category": "Functional / Data Entry",
+      "description": "Spinbutton của Story Point trong List table có aria-valuemax='0', nghĩa là không thể nhập giá trị nào lớn hơn 0. Mọi issue đều hiển thị Story Point = 0 và spinbutton bị hạn chế sai.",
+      "steps_to_reproduce": [
+        "Truy cập List page",
+        "Scroll phải đến cột 'Story Point'",
+        "Thử click spinbutton lên/xuống"
+      ],
+      "expected": "Có thể nhập story point từ 0 đến n (không giới hạn hoặc giới hạn cao)",
+      "actual": "valuemax=0, không thể tăng giá trị, mọi issue đều = 0",
+      "affected_file": "src/app/components/projects/list/listTable/tableColumns.tsx",
+      "fix_suggestion": "Xóa constraint valuemax='0' hoặc set sang giá trị lớn hơn (ví dụ 100 hoặc bỏ đi)"
+    },
+    {
+      "id": "LS-002",
+      "page": "List",
+      "title": "Issue Detail Modal không đóng được bằng phím Escape",
+      "severity": "Medium",
+      "status": "Fixed",
+      "category": "UX / Keyboard Navigation",
+      "description": "Khi mở Issue Detail Modal từ List page (click vào Issue Key), nhấn Escape không đóng modal. Phải tìm và click nút X để đóng.",
+      "steps_to_reproduce": [
+        "Truy cập List page",
+        "Click vào TF_FE-1 để mở modal",
+        "Nhấn Escape"
+      ],
+      "expected": "Modal đóng lại",
+      "actual": "Modal vẫn mở, không có phản ứng với Escape",
+      "affected_file": "src/app/components/general-components/modal/modal.tsx",
+      "fix_suggestion": "Thêm event listener cho keydown Escape trên modal wrapper, hoặc set keyboard={true} nếu dùng antd Modal",
+      "fix_applied": "Thêm event listener cho keydown Escape tại modal.tsx",
+      "fix_date": "2026-04-23"
+    },
+    {
+      "id": "LS-003",
+      "page": "List",
+      "title": "Click nút X trong Issue Detail Modal kích hoạt inline-edit title thay vì đóng modal",
+      "severity": "Medium",
+      "status": "Open",
+      "category": "UX / Click Target",
+      "description": "Trong Issue Detail Modal, khi click nút 'X' ở vùng tiêu đề issue, nó kích hoạt edit mode của title (highlight xanh + nút ✓/✗) thay vì đóng modal. Nút X thực sự (góc phải modal) bị cover bởi title input.",
+      "steps_to_reproduce": [
+        "Mở Issue Detail Modal",
+        "Click vào X gần đầu modal (không phải X ở góc phải ngoài cùng)"
+      ],
+      "expected": "Modal đóng lại",
+      "actual": "Title field vào edit mode, modal không đóng",
+      "affected_file": "src/app/components/issues/IssueDetail.tsx hoặc issueDetailModal.tsx",
+      "fix_suggestion": "Kiểm tra z-index và event propagation của các nút X; đảm bảo nút X của modal không bị overlap bởi title input clickable area"
+    },
+    {
+      "id": "LS-004",
+      "page": "List",
+      "title": "Issue Detail Modal không scroll được bằng mouse wheel",
+      "severity": "Medium",
+      "status": "Fixed",
+      "category": "UX / Scroll",
+      "description": "Khi Issue Detail Modal mở, nội dung dài (Details, Activity) cần scroll nhưng mouse wheel không scroll được trong modal. Phải dùng thanh scroll bar bên phải.",
+      "steps_to_reproduce": [
+        "Mở Issue Detail Modal",
+        "Thử scroll bằng mouse wheel"
+      ],
+      "expected": "Nội dung modal scroll lên/xuống với mouse wheel",
+      "actual": "Scroll trang sau (List table) bị ảnh hưởng hoặc không scroll được",
+      "affected_file": "src/app/components/general-components/modal/modal.tsx",
+      "fix_suggestion": "Đảm bảo modal container có overflow-y: auto và height/max-height giới hạn rõ ràng để nhận scroll events",
+      "fix_applied": "Chuyển parent sang class flex flex-col restrict bằng max height, sau đó phần content chính sử dụng overscroll-contain overflow-y-auto đồng thời block window background overflow",
+      "fix_date": "2026-04-23"
+    },
+    {
+      "id": "LS-005",
+      "page": "List",
+      "title": "List table bị horizontal overflow, Status column bị cắt",
+      "severity": "Medium",
+      "status": "Open",
+      "category": "UI / Layout",
+      "description": "Bảng có nhiều cột nhưng container không đủ rộng. Cột Status bị cắt hiển thị thành 'INPRO...' thay vì 'INPROGRESS'. tableWidth=2123 vs containerWidth=596.",
+      "steps_to_reproduce": [
+        "Truy cập List page",
+        "Xem cột Status"
+      ],
+      "expected": "Status hiển thị đầy đủ hoặc có ellipsis rõ ràng với horizontal scroll",
+      "actual": "Badge INPROGRESS bị cắt thành 'INPRO...'",
+      "affected_file": "src/app/components/projects/list/listTable.tsx",
+      "fix_suggestion": "Status badge dùng tên ngắn hơn hoặc min-width đủ, bật horizontal scroll cho table container"
+    },
+    {
+      "id": "LS-006",
+      "page": "List",
+      "title": "Story Point spinbutton không có aria-label",
+      "severity": "Low",
+      "status": "Open",
+      "category": "Accessibility",
+      "description": "Các spinbutton Story Point trong List table có aria-label rỗng, không có accessible name cho screen readers.",
+      "steps_to_reproduce": [
+        "Kiểm tra với DevTools accessibility audit"
+      ],
+      "expected": "aria-label='Story Point for TF_FE-X'",
+      "actual": "aria-label='' (empty)",
+      "affected_file": "src/app/components/projects/list/listTable/tableColumns.tsx",
+      "fix_suggestion": "Thêm aria-label='Story Point' hoặc aria-labelledby trỏ đến column header"
+    },
+    {
+      "id": "RM-001",
+      "page": "Roadmap",
+      "title": "Click vào issue trên Calendar không mở Issue Detail",
+      "severity": "High",
+      "status": "Open",
+      "category": "UX / Navigation",
+      "description": "Khi click vào một issue item đã được đặt trên Calendar (ô ngày 14/4 có TF_FE-1), không có action nào xảy ra. Không mở modal, không mở sidebar. Thay vào đó xuất hiện thêm một icon thứ 2 bên dưới icon cũ trong ô đó.",
+      "steps_to_reproduce": [
+        "Truy cập Roadmap page",
+        "Xem issue TF_FE-1 ở ô ngày 14/4",
+        "Click vào issue card"
+      ],
+      "expected": "Mở Issue Detail modal/sidebar cho TF_FE-1",
+      "actual": "Không có action. Xuất hiện thêm một icon duplicate trong ô ngày 14",
+      "affected_file": "src/app/pages/project/roadmapPage/ (calendar click handler)",
+      "fix_suggestion": "Thêm onClick handler cho calendar event items để gọi openIssueDetail(issueId). Xem xét cơ chế duplicate icon khi click."
+    },
+    {
+      "id": "RM-002",
+      "page": "Roadmap",
+      "title": "Issue TF_FE-4 có due date 4/25 nhưng không hiển thị trên Calendar",
+      "severity": "High",
+      "status": "Open",
+      "category": "Functional / Data Display",
+      "description": "TF_FE-4 có 'due date to' là 25/04/2026 (verified trong List page) nhưng không xuất hiện trong ô ngày 25/4 trên Calendar Roadmap. Chỉ TF_FE-1 (due 4/13) được hiển thị.",
+      "steps_to_reproduce": [
+        "Xác nhận TF_FE-4 có due date 4/25 trong List page",
+        "Truy cập Roadmap",
+        "Xem ô ngày 25/4"
+      ],
+      "expected": "TF_FE-4 hiển thị trong ô ngày 25/4 trên Calendar",
+      "actual": "Ô ngày 25/4 trống, TF_FE-4 không xuất hiện dù có due date",
+      "affected_file": "src/app/pages/project/roadmapPage/ (calendar data mapping)",
+      "fix_suggestion": "Kiểm tra logic lọc issues cho Calendar — có thể đang filter theo date field sai (startDate thay vì dueDateTo), hoặc field mapping không đúng"
+    },
+    {
+      "id": "RM-003",
+      "page": "Roadmap",
+      "title": "Hai nút view toggle (calendar icon, filter icon) không có tác dụng",
+      "severity": "Medium",
+      "status": "Open",
+      "category": "Functional / UI",
+      "description": "Góc phải header có 2 nút icon (calendar và slides icon). Click vào cả 2 không thay đổi bất kỳ gì trên giao diện. Không chuyển view mode, không mở panel.",
+      "steps_to_reproduce": [
+        "Truy cập Roadmap",
+        "Click vào icon calendar (nút thứ nhất)",
+        "Click vào icon slides (nút thứ hai)"
+      ],
+      "expected": "Chuyển đổi giữa các chế độ xem (Calendar, Gantt, List...)",
+      "actual": "Không có phản ứng nào từ UI",
+      "affected_file": "src/app/pages/project/roadmapPage/ (view toggle handlers)",
+      "fix_suggestion": "Implement view switching logic hoặc ẩn các nút chưa implement để tránh nhầm lẫn"
+    },
+    {
+      "id": "RM-004",
+      "page": "Roadmap",
+      "title": "Issue cards trên Calendar chỉ hiển thị icons nhỏ, không đọc được title",
+      "severity": "Medium",
+      "status": "Open",
+      "category": "UI / Information Density",
+      "description": "Issues được đặt trên Calendar hiển thị chỉ là 3 icons nhỏ (task icon + priority arrow + clock) trong một ô nhỏ. Title và key của issue không hiển thị, không thể nhận biết issue là gì khi nhìn vào calendar.",
+      "steps_to_reproduce": [
+        "Truy cập Roadmap",
+        "Xem ô ngày 14/4 có issues"
+      ],
+      "expected": "Issue card hiển thị ít nhất Issue Key và một phần title",
+      "actual": "Chỉ thấy 3 icon nhỏ (checkmark, arrow up, clock) không có text",
+      "affected_file": "src/app/pages/project/roadmapPage/ (CalendarEvent or IssueChip component)",
+      "fix_suggestion": "Mở rộng calendar event card để hiển thị issue key (TF_FE-1) và truncated title. Hover có thể hiện tooltip đầy đủ."
+    },
+    {
+      "id": "RM-005",
+      "page": "Roadmap",
+      "title": "Calendar chỉ hiển thị Thứ 2 đến Thứ 6, bỏ qua Thứ 7 và Chủ nhật",
+      "severity": "Medium",
+      "status": "Open",
+      "category": "UX / Design",
+      "description": "Calendar Roadmap chỉ render 5 ngày/tuần (Mon-Fri), gapping weekend. Issues có due date vào T7/CN không thể được xem trên Calendar này. Không có tùy chọn để hiển thị weekend.",
+      "steps_to_reproduce": [
+        "Truy cập Roadmap",
+        "Đếm số cột ngày trong 1 tuần"
+      ],
+      "expected": "7 ngày/tuần hoặc có option toggle weekend",
+      "actual": "Chỉ 5 ngày (Mon-Fri), verified qua DOM: days_shown=['Monday','Tuesday','Wednesday','Thursday','Friday']",
+      "affected_file": "src/app/pages/project/roadmapPage/",
+      "fix_suggestion": "Thêm option 'Show weekends' toggle. Nếu sử dụng thư viện calendar, bật thuộc tính weekends=true"
+    },
+    {
+      "id": "RM-006",
+      "page": "Roadmap",
+      "title": "Unscheduled work sidebar tự động mở khi vào trang thay vì đóng mặc định",
+      "severity": "Low",
+      "status": "Open",
+      "category": "UX / Default State",
+      "description": "Khi truy cập Roadmap page lần đầu, sidebar 'Unscheduled work' đã mở sẵn từ đầu, chiếm ~30% chiều ngang màn hình. User phải tự đóng nếu không cần.",
+      "steps_to_reproduce": [
+        "Truy cập trang Roadmap lần đầu (fresh load)"
+      ],
+      "expected": "Sidebar đóng mặc định, user click icon để mở khi cần",
+      "actual": "Sidebar đã mở sẵn ngay khi load trang",
+      "affected_file": "src/app/pages/project/roadmapPage/",
+      "fix_suggestion": "Set initial state của unscheduled sidebar là false/closed. Lưu preference vào localStorage."
+    },
+    {
+      "id": "BD-001",
+      "page": "Board",
+      "title": "Issue Detail Modal từ Board không hiển thị giá trị Status",
+      "severity": "High",
+      "status": "Open",
+      "category": "Functional / Data Display",
+      "description": "Khi click vào một card trên Kanban Board để mở Issue Detail Modal, trường 'Status' trong section Details hiển thị label 'Status' nhưng không có giá trị (TODO/INPROGRESS/DONE). Giá trị status trống.",
+      "steps_to_reproduce": [
+        "Truy cập Board page",
+        "Click vào card TF_FE-1 (ở cột TODO)",
+        "Xem section Details trong modal → trường Status"
+      ],
+      "expected": "Status hiển thị 'TODO'",
+      "actual": "Trường Status có label nhưng giá trị trống",
+      "affected_file": "src/app/components/issues/IssueDetail.tsx hoặc IssueDetailModal.tsx",
+      "fix_suggestion": "Kiểm tra prop passing của issueDetail — có thể status field không được pass đúng khi mở từ Board context. Đối chiếu với cách List page mở modal (nơi Status hiển thị đúng)."
+    },
+    {
+      "id": "BD-002",
+      "page": "Board",
+      "title": "Complete Sprint button không mở dialog xác nhận",
+      "severity": "High",
+      "status": "Open",
+      "category": "Functional / Missing Feature",
+      "description": "Click vào 'Complete Sprint' button chỉ hiển thị tooltip nhưng không mở dialog confirmation để user xác nhận/huỷ bỏ thao tác. Thao tác Complete Sprint là destructive và cần confirmation.",
+      "steps_to_reproduce": [
+        "Truy cập Board page",
+        "Click button 'Complete sprint'"
+      ],
+      "expected": "Dialog confirmation xuất hiện với tóm tắt sprint và các action: Complete / Cancel",
+      "actual": "Chỉ hiện tooltip, không có dialog",
+      "affected_file": "src/app/pages/project/boardPage/ (CompleteSprint handler)",
+      "fix_suggestion": "Implement Modal confirmation dialog với thống kê sprint (total issues, done vs remaining). Sau khi confirm mới gọi API complete sprint."
+    },
+    {
+      "id": "BD-003",
+      "page": "Board",
+      "title": "Sprint Detail button (chart icon) không có tác dụng",
+      "severity": "Medium",
+      "status": "Open",
+      "category": "Functional / Missing Feature",
+      "description": "Header Board có button 'Sprint Detail' (icon biểu đồ). Click vào không mở bất kỳ view nào — không có panel, modal, hay navigation nào xảy ra.",
+      "steps_to_reproduce": [
+        "Truy cập Board page",
+        "Click icon biểu đồ (Sprint Detail)"
+      ],
+      "expected": "Mở Sprint burndown chart, velocity chart hoặc sprint statistics",
+      "actual": "Không có action nào xảy ra",
+      "affected_file": "src/app/pages/project/boardPage/ (SprintDetail handler)",
+      "fix_suggestion": "Implement Sprint Detail view hoặc ẩn button nếu chưa implement để tránh confusion"
+    },
+    {
+      "id": "BD-004",
+      "page": "Board",
+      "title": "DONE column và Add Stage column bị cắt ở cạnh phải, không scroll được",
+      "severity": "Medium",
+      "status": "Open",
+      "category": "UI / Layout",
+      "description": "Board chỉ hiển thị 2.5 columns (TODO, INPROGRESS, một phần DONE). DONE column full body không hiển thị được. Column Add Stage (⊕) hoàn toàn bị che. Không có horizontal scroll.",
+      "steps_to_reproduce": [
+        "Truy cập Board page",
+        "Xem các cột từ trái sang phải"
+      ],
+      "expected": "Tất cả columns hiển thị với horizontal scroll nếu không đủ không gian",
+      "actual": "DONE column bị cắt, ⊕ Add Stage column không thấy được",
+      "affected_file": "src/app/pages/project/boardPage/boardPage.tsx",
+      "fix_suggestion": "Thêm overflow-x: auto cho board container. Đảm bảo mỗi column có min-width cố định (ví dụ 280px)."
+    },
+    {
+      "id": "BD-005",
+      "page": "Board",
+      "title": "Board cards thiếu Priority, Status, và Story Points",
+      "severity": "Medium",
+      "status": "Open",
+      "category": "UI / Information Density",
+      "description": "Kanban cards chỉ hiển thị: Issue key, truncated title, Assignee avatar, Created date. Thiếu các thông tin quan trọng: Priority badge (High/Medium/Low), Status (thừa vì đã biết từ cột), Story Points, Due date.",
+      "steps_to_reproduce": [
+        "Truy cập Board page",
+        "Xem một card bất kỳ"
+      ],
+      "expected": "Card hiển thị Priority badge, Story Points (nếu có), Due Date",
+      "actual": "Verified qua DOM: hasPriority=false, hasStoryPoint=false. Chỉ có title + assignee + date",
+      "affected_file": "src/app/components/projects/board/issueCard.tsx (or board card component)",
+      "fix_suggestion": "Thêm Priority badge (màu + icon) và Story Point chip vào card. Due date nếu gần hạn hiển thị màu đỏ."
+    },
+    {
+      "id": "BD-006",
+      "page": "Board",
+      "title": "New Stage textbox xuất hiện mặc định trên DONE column mà không cần user action",
+      "severity": "Low",
+      "status": "Open",
+      "category": "UX / Default State",
+      "description": "Trong DONE column, có một textbox 'New Stage' đang hiển thị sẵn mà user không click vào bất kỳ button add nào. Đây là inline form bị bỏ ngỏ.",
+      "steps_to_reproduce": [
+        "Truy cập Board page",
+        "Xem phần dưới DONE column"
+      ],
+      "expected": "DONE column chỉ có button/link '+ Add Stage' khi user muốn thêm",
+      "actual": "textbox 'New Stage' đang hiển thị sẵn trong DOM (verified: has_new_stage_input=true)",
+      "affected_file": "src/app/pages/project/boardPage/ (AddColumnForm or StageInput)",
+      "fix_suggestion": "Set initial state của add-stage form là hidden. Chỉ hiển thị khi user click '+ Add Stage' button."
+    },
+    {
+      "id": "SM-001",
+      "page": "Summary",
+      "title": "Layout bị thu hẹp ở giữa màn hình, lãng phí không gian",
+      "severity": "Medium",
+      "status": "Open",
+      "category": "UI / Layout",
+      "description": "Nội dung Project Summary bị bó hẹp thành một cột nhỏ ở chính giữa màn hình. Khi màn hình rộng, hai bên trống rất nhiều lãng phí không gian. Ngoài ra, 'Status overview' ở cuối trang bị đẩy xuống sâu và không render biểu đồ.",
+      "steps_to_reproduce": [
+        "Truy cập Summary page trên màn hình desktop",
+        "Quan sát column content"
+      ],
+      "expected": "Layout sử dụng grid dàn đều (ví dụ 2 hoặc 3 cột) cho các metric cards",
+      "actual": "Chỉ có 1 cột duy nhất ở trung tâm, chiều rộng khoảng 400px",
+      "affected_file": "src/app/pages/project/summaryPage/summaryPage.tsx",
+      "fix_suggestion": "Cập nhật CSS/Tailwind classes thành grid layout grid-cols-1 md:grid-cols-2 lg:grid-cols-4."
+    },
+    {
+      "id": "ST-001",
+      "page": "Settings",
+      "title": "Tabs Permissions và Workflows trong thẻ Settings không hoạt động",
+      "severity": "Low",
+      "status": "Open",
+      "category": "Functional / UX",
+      "description": "Trong Project Settings, hai tabs 'Permissions' và 'Workflows' chỉ là text, click vào không có action hay panel nào hiển thị, cũng không có tooltip báo 'Coming soon'.",
+      "steps_to_reproduce": [
+        "Truy cập Settings page",
+        "Click vào chữ Permissions hoặc Workflows ở tab menu"
+      ],
+      "expected": "Tab chuyển đổi hoặc hiển thị rõ ràng là disabled",
+      "actual": "Click không có phản hồi",
+      "affected_file": "src/app/pages/project/settingsPage/settingsLayout.tsx",
+      "fix_suggestion": "Đổi thành ant-tabs với disabled={true} và thêm tooltip 'Coming soon'."
+    },
+    {
+      "id": "ST-002",
+      "page": "Settings (Teams)",
+      "title": "Inconsistency ngôn ngữ: UI tiếng Anh nhưng content tiếng Việt",
+      "severity": "Low",
+      "status": "Open",
+      "category": "i18n",
+      "description": "Layout Settings (sidebar, page header) hiển thị tiếng Anh, nhưng nội dung tab Teams lại hiển thị tiếng Việt (Tất cả đội ngũ, Nhóm của bạn, Tạo đội, Tìm kiếm đội ngũ).",
+      "steps_to_reproduce": [
+        "Truy cập Settings > Teams"
+      ],
+      "expected": "Ngôn ngữ đồng nhất toàn bộ ứng dụng (ưu tiên EN theo project default)",
+      "actual": "Lẫn lộn EN-VI",
+      "affected_file": "src/app/pages/project/settingsPage/teams/teamsTabs.tsx",
+      "fix_suggestion": "Sử dụng i18next hoặc thay thế hardcode tiếng Việt thành tiếng Anh."
+    },
+    {
+      "id": "GL-001",
+      "page": "Global Header",
+      "title": "Global Search không trả về kết quả hoặc không hoạt động",
+      "severity": "Medium",
+      "status": "Open",
+      "category": "Functional",
+      "description": "Nhập từ khóa hợp lệ vào thanh tìm kiếm trên Header (ví dụ 'TF_FE') không mở dropdown kết quả, không redirect đi đâu, không có sự kiện nào xảy ra.",
+      "steps_to_reproduce": [
+        "Click vào Search bar ở Top Header",
+        "Nhập 'TF_FE'",
+        "Đợi hiển thị kết quả"
+      ],
+      "expected": "Thả xuống (dropdown) các issue match với từ khóa",
+      "actual": "Không có gì thay đổi",
+      "affected_file": "src/app/components/general-components/header/header.tsx",
+      "fix_suggestion": "Kiểm tra xem API search có được gọi không. Đảm bảo hiển thị Empty state nếu không tìm thấy, và Render kết quả nếu tìm thấy."
+    },
+    {
+      "id": "GL-002",
+      "page": "Global Header",
+      "title": "Icon Notification (Bell) click không có phản hồi",
+      "severity": "Low",
+      "status": "Open",
+      "category": "Functional",
+      "description": "Top Header có thiết kế icon chuông thông báo, nhưng click vào không mở panel notifications.",
+      "steps_to_reproduce": [
+        "Click vào icon chuông ở góc phải Header"
+      ],
+      "expected": "Mở popover hoặc drawer Notifications",
+      "actual": "Không có phản hồi gì",
+      "affected_file": "src/app/components/general-components/header/header.tsx"
+    }
+  ],
+  "summary": {
+    "total": 29,
+    "by_page": {
+      "Backlog": 8,
+      "List": 7,
+      "Roadmap": 6,
+      "Board": 6,
+      "Summary": 1,
+      "Settings": 2,
+      "Global": 2
+    },
+    "by_severity": {
+      "High": 7,
+      "Medium": 14,
+      "Low": 8
+    },
+    "by_status": {
+      "Open": 24,
+      "Fixed": 5
+    },
+    "fixed_bugs": [
+      "BL-003",
+      "BL-004",
+      "BL-005",
+      "LS-002",
+      "LS-004"
+    ],
+    "open_critical_paths": [
+      "BL-001: Backlog row click opens edit instead of detail",
+      "BL-002: Multiple rows in edit mode simultaneously",
+      "LS-001: Story Point valuemax=0, cannot set values",
+      "RM-001: Calendar issue click does nothing / shows duplicate",
+      "RM-002: Issues with due dates missing from Calendar",
+      "BD-001: Board modal Status field is empty",
+      "BD-002: Complete Sprint has no confirmation dialog"
+    ],
+    "pages_not_yet_tested": []
+  }
+}

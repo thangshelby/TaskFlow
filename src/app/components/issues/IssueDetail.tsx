@@ -110,8 +110,15 @@ const IssueDetail = ({ selectedIssueId }: { selectedIssueId: string }) => {
         </div>
 
         {layout === "horizontal" ? (
-          <PanelGroup direction="horizontal">
-            <Panel>
+          <PanelGroup
+            style={{ overflowY: "scroll" }}
+            className="overflow-hidden"
+            direction="horizontal"
+          >
+            <Panel
+              style={{ overflowY: "scroll" }}
+
+            >
               <div className="flex flex-1 flex-col gap-8 overflow-y-auto pr-2">
                 <MetadataSection
                   selectedIssue={selectedIssue!}

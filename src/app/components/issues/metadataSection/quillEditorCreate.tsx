@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useImperativeHandle, forwardRef } from "react";
 import Quill from "quill";
 import "quill/dist/quill.snow.css";
 
@@ -7,16 +7,37 @@ import "quill/dist/quill.snow.css";
  * Does NOT call updateIssueAsync — instead fires `onChange`
  * with the same stringified format used by TextEditor:
  *   JSON.stringify({ plainText: string, delta: Delta })
+ *
+ * Exposes `insertText(text)` via ref so external code
+ * (e.g. speech-to-text) can append content.
  */
-export default function QuillEditorCreate({
-  onChange,
-  placeholder = "Add a description...",
-}: {
+
+export interface QuillEditorCreateRef {
+  insertText: (text: string) => void;
+}
+
+interface QuillEditorCreateProps {
   onChange: (value: string) => void;
   placeholder?: string;
-}) {
+}
+
+const QuillEditorCreate = forwardRef<
+  QuillEditorCreateRef,
+  QuillEditorCreateProps
+>(({ onChange, placeholder = "Add a description..." }, ref) => {
   const editorRef = useRef<HTMLDivElement | null>(null);
   const quillRef = useRef<Quill | null>(null);
+
+  useImperativeHandle(ref, () => ({
+    insertText(text: string) {
+      if (!quillRef.current) return;
+      const length = quillRef.current.getLength();
+      // Insert at end (before trailing newline)
+      quillRef.current.insertText(length - 1, text);
+      // Move cursor to end
+      quillRef.current.setSelection(quillRef.current.getLength() - 1, 0);
+    },
+  }));
 
   useEffect(() => {
     if (editorRef.current && !quillRef.current) {
@@ -62,4 +83,8 @@ export default function QuillEditorCreate({
   }, []);
 
   return <div ref={editorRef} />;
-}
+});
+
+QuillEditorCreate.displayName = "QuillEditorCreate";
+
+export default QuillEditorCreate;

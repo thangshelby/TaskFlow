@@ -9,6 +9,7 @@ import {
   ListProjectColumnsParams,
   UpdateColumnOrderParams,
   UpdateColumnProjectParams,
+  GetProjectSummaryParams,
 } from "@libs/types/project";
 import { Dispatch, SetStateAction } from "react";
 import { AxiosError } from "axios";
@@ -359,4 +360,39 @@ export function usePermissions() {
     },
   });
   return { permissions, isLoadingPermissions, errorPermissions };
+}
+
+export function useProjectSummary(data: GetProjectSummaryParams) {
+  const {
+    data: summaryData,
+    isLoading,
+    error,
+    isSuccess,
+    refetch,
+  } = useQuery({
+    queryKey: [
+      "projectSummary",
+      data.project_id,
+      data.sprint_id,
+      data.date_from,
+      data.date_to,
+    ],
+    queryFn: async () => {
+      if (!data.project_id) {
+        throw new Error("Project ID is required");
+      }
+      const response = await projects.getProjectSummary(data);
+      return response.data;
+    },
+    enabled: !!data.project_id,
+    refetchOnWindowFocus: false,
+  });
+
+  return {
+    summary: summaryData?.data,
+    isLoading,
+    isSuccess,
+    error,
+    refetch,
+  };
 }
