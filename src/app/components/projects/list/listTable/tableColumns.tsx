@@ -141,12 +141,13 @@ export const useTableColumns = (
       // Reporter
       TableColumn("reporter_id", "Reporter", (_, { id, reporter_id }) => (
         <Suspense fallback={<FallBack />}>
-          <div className="px-4">
+          <div className="px-4 cursor-not-allowed">
             <UserDropdown
               projectId={projectId}
               issueId={id}
               selectedUserId={reporter_id || ""}
               columnField="reporter_id"
+              isEditable={false}
             />
           </div>
         </Suspense>

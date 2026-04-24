@@ -28,6 +28,7 @@ const TypeDropdown = ({
 
   return (
     <ColumnDropdown
+      disabled={true}
       items={typeOptions.map((option) => {
         return {
           value: option.name,
