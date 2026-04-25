@@ -26,12 +26,12 @@ const UserAvatar = memo(
 
     if (!userId) {
       return (
-        <div className="flex flex-row items-center justify-start gap-2">
-          <div className="flex items-center justify-center rounded-full bg-gray-200 p-1">
-            <FaUserAltSlash />
+        <div className="flex flex-row items-center justify-start gap-2 font-manrope">
+          <div className="flex h-5 w-5 items-center justify-center rounded-full bg-[#e8e8e7] border border-white">
+            <FaUserAltSlash size={10} className="text-[#404944]/50" />
           </div>
           {isDisplayName && (
-            <span className="text-sm font-medium text-gray-700">
+            <span className="text-[10px] font-bold uppercase tracking-widest text-[#404944]/40">
               Unassigned
             </span>
           )}
@@ -42,7 +42,7 @@ const UserAvatar = memo(
     const avatarUrl = user?.avatar ? buildCloudinaryUrl(user.avatar, size) : "";
 
     return (
-      <div className={`flex flex-row items-center gap-2 ${className}`}>
+      <div className={`flex flex-row items-center gap-2 font-manrope ${className}`}>
         <Avatar
           size={size}
           src={
@@ -59,29 +59,30 @@ const UserAvatar = memo(
             ) : undefined
           }
           style={{
-            backgroundColor: "rgba(161, 157, 157)",
+            backgroundColor: "#064e3b",
             color: "#ffffff",
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
             fontSize: `${Math.floor(size / 2.5)}px`,
-            fontWeight: 500,
+            fontWeight: 800,
             textTransform: "uppercase",
             border: "2px solid white",
+            boxShadow: "0 1px 2px 0 rgba(0, 0, 0, 0.05)",
             borderRadius: borderRadius ? borderRadius : "100%",
           }}
-
         >
           {user?.first_name?.[0]}
           {user?.last_name?.[0]}
         </Avatar>
 
         {isDisplayName && (
-          <p className="text-sm font-medium text-gray-700">
+          <p className="text-xs font-bold text-[#404944] tracking-tight">
             {user?.first_name} {user?.last_name}
           </p>
         )}
       </div>
+
     );
   },
 );
