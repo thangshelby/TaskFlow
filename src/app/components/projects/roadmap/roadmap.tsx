@@ -4,7 +4,6 @@ import RoadmapSkeleton from "../../skeleton/roadmapSkeleton";
 import { SortableContext } from "@dnd-kit/sortable";
 import { useDraggable, useDroppable } from "@dnd-kit/core";
 import { Popover } from "antd";
-import { X } from "lucide-react";
 import dayjs from "dayjs";
 
 interface RoadmapProps {
@@ -19,55 +18,48 @@ const Roadmap: React.FC<RoadmapProps> = ({
   activeDate,
 }) => {
   return (
-    <div className="flex h-full w-full flex-col space-y-6 bg-white pb-32">
+    <div className="flex h-full w-full flex-col bg-white/50 backdrop-blur-sm rounded-lg border border-[#e8e8e7] overflow-hidden shadow-sm">
       {isLoadingProjectIssues ? (
         <RoadmapSkeleton />
       ) : (
-        <>
-          {/* Calendar Grid */}
-          <div className="flex flex-1 flex-col overflow-auto pr-4">
-            {/* Weekday Headers */}
-            <div className="grid grid-cols-5">
-              {[
-                "Monday",
-                "Tuesday",
-                "Wednesday",
-                "Thursday",
-                "Friday",
-                // "Saturday",
-                // "Sunday",
-              ].map((day) => (
-                <div
-                  key={day}
-                  className={`rounded-t-xs border border-b-0 border-gray-300 bg-gray-50 py-2 text-center text-sm font-semibold text-gray-600`}
-                >
-                  {day}
-                </div>
-              ))}
-            </div>
-
-            {/* Calendar Days */}
-            <div className="grid grid-cols-5">
-              {/* Hello workd */}
-              {Object.keys(calendarDays)
-
-                .map((dateStr: string) => (
-                  <DropableDate
-                    key={dateStr}
-                    dateStr={dateStr}
-                    issues={calendarDays[dateStr]}
-                    isActive={activeDate === dateStr}
-                  />
-                ))}
-            </div>
+        <div className="flex flex-1 flex-col overflow-hidden">
+          {/* Weekday Headers */}
+          <div className="grid grid-cols-5 border-b border-[#e8e8e7] bg-[#f9f9f8]/50">
+            {[
+              "Monday",
+              "Tuesday",
+              "Wednesday",
+              "Thursday",
+              "Friday",
+            ].map((day) => (
+              <div
+                key={day}
+                className="py-3 text-center text-[11px] font-bold text-[#064e3b]/40 font-manrope uppercase tracking-widest"
+              >
+                {day}
+              </div>
+            ))}
           </div>
-        </>
+
+          {/* Calendar Days */}
+          <div className="grid grid-cols-5 flex-1 overflow-y-auto custom-scrollbar">
+            {Object.keys(calendarDays).map((dateStr: string) => (
+              <DropableDate
+                key={dateStr}
+                dateStr={dateStr}
+                issues={calendarDays[dateStr]}
+                isActive={activeDate === dateStr}
+              />
+            ))}
+          </div>
+        </div>
       )}
     </div>
   );
 };
 
 export default Roadmap;
+
 const SortableIssue = ({ issue }: { issue: IIssue }) => {
   const { attributes, listeners, setNodeRef } = useDraggable({
     id: issue.id,
@@ -77,10 +69,9 @@ const SortableIssue = ({ issue }: { issue: IIssue }) => {
   return (
     <div
       ref={setNodeRef}
-      // style={style}
       {...attributes}
       {...listeners}
-      className="cursor-grab"
+      className={`cursor-grab transition-transform active:scale-95 ${isDragging ? "z-50" : ""}`}
     >
       <TaskItem issue={issue} isDragging={isDragging} />
     </div>
@@ -117,62 +108,60 @@ const DropableDate = ({
     return date.getDay() === 0 || date.getDay() === 6;
   };
 
+  const dateObj = new Date(dateStr);
+
   return (
-    <div ref={setNodeRef}>
+    <div ref={setNodeRef} className="h-full">
       <SortableContext items={issues.map((issue) => issue.id)}>
         <div
-          className={`h-36 overflow-hidden border p-2 hover:cursor-pointer hover:bg-gray-100 ${isToday(new Date(dateStr)) ? "border-green-500 bg-green-50" : "border-gray-200"} ${isWeekend(new Date(dateStr)) ? "hidden bg-gray-100" : ""} ${isActive ? "bg-green-100" : ""}`}
+          className={`h-44 min-h-[160px] border-r border-b border-[#e8e8e7] p-3 transition-all duration-200 group flex flex-col ${isToday(dateObj) ? "bg-[#f0fdf4]/30" : "bg-white/40"
+            } ${isWeekend(dateObj) ? "hidden" : "hover:bg-[#f9f9f8]"} ${isActive ? "bg-[#f0fdf4] ring-2 ring-inset ring-[#064e3b]/20" : ""
+            }`}
         >
-          <span
-            className={`mb-2 inline-flex text-sm font-medium text-gray-600 ${isToday(new Date(dateStr)) ? "rounded-md bg-green-200 px-2 font-semibold text-gray-800" : ""} `}
-          >
-            {new Date(dateStr).getDate()}
-          </span>
+          <div className="flex items-center justify-between">
+            <span
+              className={`text-sm font-bold font-manrope ${isToday(dateObj)
+                ? "flex h-7 w-7 items-center justify-center rounded-full bg-[#064e3b] text-white shadow-lg"
+                : "text-[#064e3b]/40 group-hover:text-[#064e3b]"
+                }`}
+            >
+              {dateObj.getDate()}
+            </span>
+          </div>
 
-          {/* Hiển thị tối đa 2 issue */}
-          <div className="flex flex-col gap-1">
+          <div className="flex flex-col gap-1 flex-1">
             {issues.slice(0, 2).map((issue) => (
               <SortableIssue key={issue.id} issue={issue} />
             ))}
-          </div>
 
-          {/* Nếu còn dư thì show Popover */}
-          {issues.length > 2 && (
-            <Popover
-              placement="top"
-              trigger="click"
-              content={
-                <div className="flex w-full max-w-56 flex-col gap-2 overflow-auto p-2 shadow-lg">
-                  <div className="flex flex-row items-center justify-between">
-                    <h5 className="text-md text-gray-00 font-semibold">
-                      {dayjs()
-                        .month(new Date(dateStr).getMonth())
-                        .format("MMMM")}{" "}
-                      {new Date(dateStr).getDate()}
-                    </h5>
-                    <button
-                      onClick={() => {
-                        // Handle button click
-                      }}
-                      className="cursor-pointer rounded-sm border border-green-500 p-0.5"
-                    >
-                      <X className="h-4 w-4 text-gray-500 hover:text-gray-700" />
-                    </button>
+            {issues.length > 2 && (
+              <Popover
+                placement="top"
+                trigger="click"
+                content={
+                  <div className="flex w-64 flex-col gap-3 p-2">
+                    <div className="flex items-center justify-between border-b border-[#f3f4f1] pb-2">
+                      <h5 className="text-[11px] font-black text-[#064e3b] font-manrope uppercase tracking-widest">
+                        {dayjs(dateObj).format("MMMM D")}
+                      </h5>
+                    </div>
+                    <div className="flex flex-col gap-2 max-h-60 overflow-y-auto custom-scrollbar p-2">
+                      {issues.map((issue) => (
+                        <SortableIssue key={issue.id} issue={issue} />
+                      ))}
+                    </div>
                   </div>
-
-                  {issues.map((issue) => (
-                    <SortableIssue key={issue.id} issue={issue} />
-                  ))}
+                }
+              >
+                <div className="mt-auto py-1 text-[10px] font-bold text-[#064e3b]/60 hover:text-[#064e3b] hover:bg-[#064e3b]/5 rounded-md text-center cursor-pointer transition-colors font-manrope uppercase tracking-wider">
+                  + {issues.length - 2} more
                 </div>
-              }
-            >
-              <div className="mt-2 cursor-pointer rounded-sm px-2 py-1 text-xs text-gray-500 hover:bg-gray-300">
-                +{issues.length - 2} more
-              </div>
-            </Popover>
-          )}
+              </Popover>
+            )}
+          </div>
         </div>
       </SortableContext>
     </div>
   );
 };
+

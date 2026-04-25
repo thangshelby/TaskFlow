@@ -112,7 +112,7 @@ const EpicIssueCard = ({
   return (
     <EpicIssueCardWrapper epicIssueId={epicIssue.id}>
       <div
-        className={`flex flex-col rounded-2xl border bg-white p-4 transition-all duration-300 ${isExpanded ? "border-[#064e3b]/20 shadow-lg" : "border-transparent bg-[#f9f9f8]"
+        className={`flex flex-col rounded-md border bg-white p-4 transition-all duration-300 ${isExpanded ? "border-[#064e3b]/20 shadow-lg" : "border-transparent bg-[#f9f9f8]"
           } ${overItemId === epicIssue.id ? "bg-[#f0fdf4] border-[#064e3b] scale-[1.02]" : ""}`}
       >
         <div

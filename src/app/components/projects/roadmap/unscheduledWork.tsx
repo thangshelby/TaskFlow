@@ -27,7 +27,7 @@ const UnscheduledWork: React.FC<UnscheduledWorkProps> = memo(
     });
 
     const sortedIssues = useMemo(() => {
-      return issues.sort((a, b) => {
+      return [...issues].sort((a, b) => {
         return (
           new Date(b.updated_at).getTime() - new Date(a.updated_at).getTime()
         );
@@ -41,124 +41,121 @@ const UnscheduledWork: React.FC<UnscheduledWorkProps> = memo(
     return (
       <div
         ref={setNodeRef}
-        className={`flex h-full w-full flex-col gap-4 rounded p-6 shadow-2xl`}
+        className="flex h-full w-full flex-col gap-6 rounded-md bg-white p-4 shadow-lg border border-[#064e3b]/10 animate-in slide-in-from-right duration-300"
       >
         {/* Header */}
-        <div className="flex items-center justify-between">
-          <h2 className="text-xl font-semibold text-gray-700">
-            Unscheduled work
-          </h2>
-          <button
-            onClick={handleToggleUnscheduledWork}
-            className="cursor-pointer rounded p-1 hover:bg-gray-50"
-          >
-            <X className="h-5 w-5 cursor-pointer text-gray-500 hover:text-gray-700" />
-          </button>
+        <div className="flex flex-col gap-1">
+          <div className="flex items-center justify-between">
+            <h2 className="text-[13px] font-black text-[#064e3b] font-manrope uppercase tracking-widest leading-none">
+              Issue Backlog
+            </h2>
+            <button
+              onClick={handleToggleUnscheduledWork}
+              className="group flex h-8 w-8 items-center justify-center rounded-xl bg-gray-50 text-gray-400 hover:bg-red-50 hover:text-red-500 transition-all"
+            >
+              <X size={16} />
+            </button>
+          </div>
+          <p className="text-[11px] font-medium text-[#064e3b]/40 font-manrope">
+            Drag items onto the calendar to set deadlines
+          </p>
         </div>
-        <span className="text-base text-gray-500">
-          Drag each work item onto the calendar to set a due date for the work.
-        </span>
 
-        {/* Search + Filter */}
-        <div className="space-y-2">
+        {/* Search */}
+        <div className="relative group">
           <ConfigProvider
             theme={{
               token: {
-                colorPrimary: "#22c55e", // xanh lá tailwind (green-500)
-                colorSuccess: "#16a34a",
-                colorError: "#dc2626",
-                colorWarning: "#f59e0b",
-                borderRadius: 8,
+                colorPrimary: "#064e3b",
+                borderRadius: 12,
+                fontFamily: "Manrope",
               },
               components: {
                 Input: {
-                  colorPrimaryHover: "#16a34a",
-                  colorPrimaryActive: "#15803d",
-                  activeBorderColor: "#22c55e",
-                  hoverBorderColor: "#22c55e",
-                  borderRadius: 4,
-                },
-                Button: {
-                  borderRadius: 4,
+                  colorBgContainer: "#f9f9f8",
+                  colorBorder: "#e8e8e7",
+                  activeBorderColor: "#064e3b",
+                  hoverBorderColor: "#064e3b",
                 },
               },
             }}
           >
             <Input.Search
-              size="middle"
-              placeholder="Search unscheduled items"
-              className="border-green-500"
+              size="large"
+              placeholder="Search unassigned items..."
+              className="premium-search"
               allowClear
             />
           </ConfigProvider>
         </div>
 
-        {/* List */}
+        {/* List Section */}
         <div
-          className={`transition-color flex h-full flex-1 flex-col overflow-y-auto rounded-sm border border-gray-100 bg-gray-100 p-4 ${
-            (isOver || isDroppableOver) && "border border-green-500 bg-green-50"
-          }`}
+          className={`relative flex flex-1 flex-col overflow-hidden rounded-lg border transition-all duration-300 ${(isOver || isDroppableOver)
+            ? "bg-[#f0fdf4] border-[#064e3b] scale-[1.02] shadow-xl"
+            : "bg-[#f9f9f8]/50 border-[#e8e8e7]"
+            }`}
         >
-          <div className="mb-1 flex items-center justify-between">
+          {/* List Toolbar */}
+          <div className="flex items-center justify-between p-3 border-b border-[#e8e8e7] bg-white/80 backdrop-blur-sm sticky top-0 z-10">
             <button
               onClick={() => setIsSort(!isSort)}
-              className="flex cursor-pointer items-center space-x-1 rounded-sm p-2 hover:bg-gray-200"
+              className="flex items-center gap-2 rounded-lg px-3 py-1.5 transition-all hover:bg-[#064e3b]/5 text-[#064e3b]/60 hover:text-[#064e3b]"
             >
-              <p className="text-sm font-semibold text-gray-500">Most Recent</p>
+              <span className="text-[10px] font-bold font-manrope uppercase tracking-wider">
+                {isSort ? "Newest First" : "Oldest First"}
+              </span>
               <ChevronDown
-                className={`h-4 w-4 text-gray-500 ${isSort ? "rotate-180" : ""} transition-transform duration-200`}
+                size={14}
+                className={`transition-transform duration-300 ${isSort ? "rotate-180" : ""}`}
               />
             </button>
             <Popover
               placement="bottomRight"
               trigger="click"
-              content={
-                <div className="w-40 rounded-lg bg-white p-2 shadow-lg"></div>
-              }
+              overlayClassName="premium-popover"
+              content={<div className="w-48 p-2">Filters...</div>}
             >
-              <button className="flex cursor-pointer items-center space-x-1 rounded-sm p-2 hover:bg-gray-200">
-                <ListFilter className="h-4 w-4 text-gray-500" />
-                <p className="text-sm font-semibold text-gray-500">Filters</p>
+              <button className="flex h-8 w-8 items-center justify-center rounded-lg hover:bg-[#064e3b]/5 text-[#064e3b]/60 hover:text-[#064e3b]">
+                <ListFilter size={16} />
               </button>
             </Popover>
           </div>
-          <SortableContext items={sortedIssues.map((issue) => issue.id)}>
-            {sortedIssues.length !== 0 ? (
-              <div className="space-y-2 overflow-y-auto pr-2">
-                {sortedIssues
-                  .sort((a, b) => {
-                    if (isSort) {
-                      return (
-                        new Date(b.created_at).getTime() -
-                        new Date(a.created_at).getTime()
-                      );
-                    } else {
-                      return (
-                        new Date(a.created_at).getTime() -
-                        new Date(b.created_at).getTime()
-                      );
-                    }
-                  })
-                  .map((issue) => (
-                    <IssueCard key={issue.id} issue={issue} />
-                  ))}
+
+          {sortedIssues.length !== 0 ? (
+            <div className="flex-1 overflow-y-auto p-4 custom-scrollbar">
+              <SortableContext items={sortedIssues.map((issue) => issue.id)}>
+                <div className="flex flex-col gap-3 pb-4">
+                  {[...sortedIssues]
+                    .sort((a, b) => {
+                      const timeA = new Date(a.created_at).getTime();
+                      const timeB = new Date(b.created_at).getTime();
+                      return isSort ? timeB - timeA : timeA - timeB;
+                    })
+                    .map((issue) => (
+                      <IssueCard key={issue.id} issue={issue} />
+                    ))}
+                </div>
+              </SortableContext>
+            </div>
+          ) : (
+            <div className="flex flex-1 flex-col items-center justify-center p-8 text-center bg-white/40">
+              <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-[#064e3b]/5 text-[#064e3b]/20">
+                <ListFilter size={32} />
               </div>
-            ) : (
-              <div className="flex h-full w-full flex-col items-center gap-4 border-2 border-dashed border-gray-300 p-8 text-center">
-                <p className="text-md font-bold text-gray-900">
-                  All works have been scheduled!
-                </p>
-                <span className="text-sm text-gray-400">
-                  To remove a work item from the calendar, drag it back into the
-                  unscheduled work panel
-                </span>
-              </div>
-            )}
-          </SortableContext>
+              <h3 className="text-[13px] font-bold text-[#064e3b] font-manrope mb-1 uppercase tracking-tight">
+                Inbox Zero!
+              </h3>
+              <p className="text-[11px] font-medium text-[#064e3b]/40 font-manrope max-w-[180px]">
+                Everything is scheduled. Drag items back here to unschedule.
+              </p>
+            </div>
+          )}
         </div>
       </div>
     );
   },
 );
+
 
 export default UnscheduledWork;

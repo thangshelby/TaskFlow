@@ -175,7 +175,7 @@ export const KanbanColumn = ({
           onOpenChange={setPopoverOpen}
           overlayClassName="premium-popover"
         >
-          <div className="cursor-pointer rounded-xl p-2 transition-all hover:bg-[#064e3b]/10 text-[#064e3b]/60 hover:text-[#064e3b]">
+          <div className="cursor-pointer rounded-md p-2 transition-all hover:bg-[#064e3b]/10 text-[#064e3b]/60 hover:text-[#064e3b]">
             <LuEllipsisVertical size={18} />
           </div>
         </Popover>

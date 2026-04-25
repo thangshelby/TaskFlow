@@ -269,7 +269,7 @@ export default function KanbanBoard({
               </div>
             ) : (
               <div className="h-fit w-80 min-w-80 flex flex-col">
-                <div className="flex flex-col gap-4 rounded-2xl bg-white p-5 shadow-2xl border border-[#064e3b]/10 animate-in fade-in zoom-in-95 duration-200">
+                <div className="flex flex-col gap-4 rounded-md bg-white p-5 shadow-2xl border border-[#064e3b]/10 animate-in fade-in zoom-in-95 duration-200">
                   <div className="flex flex-col gap-1">
                     <p className="text-[10px] font-bold uppercase tracking-widest text-[#064e3b]/50">Stage Name</p>
                     <input
@@ -294,7 +294,7 @@ export default function KanbanBoard({
                         }
                       }}
                       placeholder="e.g. READY FOR QA"
-                      className="w-full rounded-xl border border-[#e8e8e7] bg-[#f9f9f8] px-4 py-3 text-sm text-[#064e3b] placeholder-[#064e3b]/30 focus:border-[#064e3b] focus:ring-1 focus:ring-[#064e3b] focus:outline-none font-manrope font-semibold transition-all"
+                      className="w-full rounded-md border border-[#e8e8e7] bg-[#f9f9f8] px-4 py-3 text-sm text-[#064e3b] placeholder-[#064e3b]/30 focus:border-[#064e3b] focus:ring-1 focus:ring-[#064e3b] focus:outline-none font-manrope font-semibold transition-all"
                     />
                   </div>
                   <div className="flex items-center gap-3">
@@ -308,7 +308,7 @@ export default function KanbanBoard({
                         setNewColumnText("");
                         setIsAddingColumn(false);
                       }}
-                      className="flex-1 rounded-xl bg-[#064e3b] px-4 py-2.5 text-[11px] font-bold uppercase tracking-wider text-white transition-all hover:bg-[#059669] shadow-md"
+                      className="flex-1 rounded-md bg-[#064e3b] px-4 py-2.5 text-[11px] font-bold uppercase tracking-wider text-white transition-all hover:bg-[#059669] shadow-md"
                     >
                       Create Stage
                     </button>
@@ -317,7 +317,7 @@ export default function KanbanBoard({
                         setIsAddingColumn(false);
                         setNewColumnText("");
                       }}
-                      className="rounded-xl bg-[#f1f5f3] px-4 py-2.5 text-[11px] font-bold uppercase tracking-wider text-[#064e3b] transition-all hover:bg-[#e2e8e5]"
+                      className="rounded-md bg-[#f1f5f3] px-4 py-2.5 text-[11px] font-bold uppercase tracking-wider text-[#064e3b] transition-all hover:bg-[#e2e8e5]"
                     >
                       Cancel
                     </button>

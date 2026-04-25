@@ -218,7 +218,7 @@ const ScrumSprint = memo(
                       onOpenChange={setIsOpenButtonMenu}
                       open={isOpenButtonMenu}
                     >
-                      <button className={`flex h-8 w-8 items-center justify-center rounded-xl transition-all hover:bg-[#064e3b]/5 text-[#064e3b]/40 hover:text-[#064e3b] ${isOpenButtonMenu ? "bg-[#064e3b]/10 text-[#064e3b]" : ""}`}>
+                      <button className={`flex h-8 w-8 items-center justify-center rounded-md transition-all hover:bg-[#064e3b]/5 text-[#064e3b]/40 hover:text-[#064e3b] ${isOpenButtonMenu ? "bg-[#064e3b]/10 text-[#064e3b]" : ""}`}>
                         <BsThreeDots size={16} />
                       </button>
                     </Dropdown>
@@ -257,9 +257,9 @@ const ScrumSprint = memo(
 
                 <button
                   onClick={() => setIsCreateIssueModalOpen(true)}
-                  className="mt-2 cursor-pointer flex w-full items-center gap-3 rounded-xl border border-transparent py-2.5 px-4 text-[#064e3b]/60 transition-all hover:bg-[#064e3b]/5 hover:text-[#064e3b] active:scale-[0.99] group"
+                  className="mt-2 cursor-pointer flex w-full items-center gap-3 rounded-md border border-transparent py-2.5 px-4 text-[#064e3b]/60 transition-all hover:bg-[#064e3b]/5 hover:text-[#064e3b] active:scale-[0.99] group"
                 >
-                  <div className="flex h-5 w-5 items-center justify-center rounded-lg bg-[#064e3b]/10 text-[#064e3b] group-hover:bg-[#064e3b] group-hover:text-white transition-colors">
+                  <div className="flex h-5 w-5 items-center justify-center rounded-md bg-[#064e3b]/10 text-[#064e3b] group-hover:bg-[#064e3b] group-hover:text-white transition-colors">
                     <FaPlus size={10} />
                   </div>
                   <span className="text-[12px] font-bold font-manrope uppercase tracking-tight">Create Issue</span>

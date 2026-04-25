@@ -7,7 +7,7 @@ const DefaultLayout = () => {
   const location = useLocation();
   return (
     <div className="flex h-screen flex-col">
-      {!location.pathname.includes("projects") && (
+      {location.pathname.length < 10 && (
         <Header />
       )}
       <Suspense fallback={<div>Loading...</div>}>
