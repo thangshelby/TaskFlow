@@ -1,11 +1,11 @@
 import { useState, lazy, useTransition } from "react";
-import { FaGear } from "react-icons/fa6";
+import {
+  Settings,
+  Plus
+} from "lucide-react";
 import { useAuth } from "@libs/hooks/apis/useAuth";
-import Image from "../image";
-import logo from "@libs/assets/taskflow.png";
-import Button from "../button";
-import { useNavigate } from "react-router-dom";
-import SearchHeader from "@libs/app/components/general-components/user/search";
+import { useNavigate, Link } from "react-router-dom";
+import SearchHeader from "./search";
 
 // Lazy load Component
 const NotificationsPopover = lazy(
@@ -17,9 +17,6 @@ const ProjectInvitationsPopover = lazy(
 const CreateIssueModal = lazy(
   () => import("../../projects/modals/issue/createIssueModal"),
 );
-
-// 👇 Lazy load ProjectDropdown (fetch sẽ chỉ chạy khi mount)
-const ProjectDropdown = lazy(() => import("../dropdown/projectDropdown"));
 
 export const Header = () => {
   const [isUserDropdownOpen, setIsUserDropdownOpen] = useState(false);
@@ -39,102 +36,127 @@ export const Header = () => {
   };
 
   return (
-    <div>
-      <header className="flex w-full items-center justify-between border-b border-gray-200 bg-white px-4 py-3">
-        {/* Left section */}
-        <div className="flex w-1/4 items-center space-x-4">
-          {/* Logo */}
-          <div
-            className="flex cursor-pointer items-center"
-            onClick={() => navigate("/")}
-          >
-            <Image src={logo} className="h-[17px] w-[100px]" />
-          </div>
-
-          {/* Project Dropdown - Lazy fetch khi click */}
-          {user && <ProjectDropdown />}
-        </div>
-
-        {/*Middle section */}
-        <div className="flex w-1/2 items-center justify-center space-x-4">
-          <div className="relative w-[60%]">
-            <SearchHeader />
-          </div>
-          {user && (
-            <Button className="" onClick={handleOpenCreateIssue}>
-              <span className="text-base font-semibold">Create Issue</span>
-            </Button>
-          )}
-        </div>
-
-        {/* Right section */}
-        {user && (
-          <div className="flex w-1/4 items-center justify-end space-x-2">
-            <NotificationsPopover />
-            <ProjectInvitationsPopover userId={user?.id || ""} />
-            <div
-              className="cursor-pointer rounded-full p-2 text-gray-600 hover:bg-gray-100"
-              onClick={() => navigate("/settings")}
+    <div className="w-full">
+      <header className="sticky top-0 z-50 w-full bg-[#f9f9f8]/80 backdrop-blur-xl shadow-sm border-b border-[#e8e8e7]">
+        <div className="flex justify-between items-center h-16 px-8 w-full">
+          {/* Left section: Logo */}
+          <div className="shrink-0">
+            <Link
+              to="/"
+              className="text-xl font-bold tracking-tighter text-[#064e3b] no-underline"
             >
-              <FaGear />
-            </div>
+              Taskflow
+            </Link>
+          </div>
 
-            {/* User Menu */}
-            <div className="relative">
-              <div
-                className="flex items-center space-x-2 text-red-500"
-                onClick={() => setIsUserDropdownOpen(!isUserDropdownOpen)}
-              >
-                <p className="flex h-8 w-8 items-center justify-center rounded-full bg-gray-200">
-                  <span className="text-sm font-medium text-gray-600">
-                    {user?.first_name?.[0]}
-                  </span>
-                </p>
-              </div>
-              {isUserDropdownOpen && (
-                <div className="absolute right-0 z-10 mt-2 w-48 rounded-md bg-white shadow-lg">
-                  <div className="border-b px-4 py-3">
-                    <p className="text-sm font-medium">{`${user?.first_name} ${user?.last_name}`}</p>
-                    <p className="text-sm text-gray-600">{user?.email}</p>
+          {/* Center section: Search */}
+          <div className="flex-1 flex justify-center px-4">
+            <div className="relative hidden lg:block w-full max-w-3xl">
+              <SearchHeader />
+            </div>
+          </div>
+
+          {/* Right section: Actions & Profile */}
+          <div className="flex items-center gap-6 shrink-0">
+
+
+            {/* Actions */}
+            <div className="flex items-center gap-2">
+              {user && (
+                <>
+                  <div className="relative">
+                    <NotificationsPopover />
                   </div>
-                  <div className="py-1">
-                    <button className="block w-full px-4 py-2 text-left text-sm hover:bg-gray-100">
-                      Profile
-                    </button>
-                    <button className="block w-full px-4 py-2 text-left text-sm hover:bg-gray-100">
-                      Settings
-                    </button>
-                    <button
-                      onClick={async () => {
-                        try {
-                          setIsUserDropdownOpen(false);
-                          await logout();
-                          navigate("/auth/login", { replace: true });
-                        } catch (error) {
-                          console.error("Logout failed:", error);
-                        }
-                      }}
-                      className="block w-full px-4 py-2 text-left text-sm text-red-600 hover:bg-gray-100"
-                    >
-                      Sign out
-                    </button>
+                  <div className="relative">
+                    <ProjectInvitationsPopover userId={user.id} />
                   </div>
-                </div>
+                  <button
+                    onClick={() => navigate("/settings")}
+                    className="p-2.5 text-[#404944] hover:text-[#064e3b] transition-colors rounded-full hover:bg-[#eeeeed]"
+                  >
+                    <Settings size={22} />
+                  </button>
+                </>
               )}
             </div>
+
+            <div className="h-8 w-px bg-[#e8e8e7] mx-1"></div>
+
+            {user ? (
+              <div className="flex items-center gap-5">
+                <button
+                  onClick={handleOpenCreateIssue}
+                  className="bg-[#064e3b] text-white px-5 py-2 rounded-xl text-sm font-semibold hover:opacity-90 active:scale-95 transition-all flex items-center gap-2"
+                >
+                  <Plus size={16} strokeWidth={3} />
+                  Create New
+                </button>
+
+                {/* User Profile Trigger */}
+                <div className="relative">
+                  <button
+                    onClick={() => setIsUserDropdownOpen(!isUserDropdownOpen)}
+                    className="flex items-center active:scale-95 transition-transform"
+                  >
+                    {user.avatar ? (
+                      <img
+                        src={user.avatar}
+                        alt="Profile"
+                        className="w-10 h-10 rounded-full border border-[#e8e8e7] object-cover"
+                      />
+                    ) : (
+                      <div className="w-10 h-10 rounded-full bg-[#064e3b] text-white flex items-center justify-center text-sm font-bold shadow-sm">
+                        {user.first_name?.[0]}{user.last_name?.[0]}
+                      </div>
+                    )}
+                  </button>
+
+                  {/* Dropdown Menu */}
+                  {isUserDropdownOpen && (
+                    <div className="absolute right-0 z-50 mt-3 w-48 rounded-xl bg-white shadow-xl border border-[#e8e8e7] overflow-hidden">
+                      <div className="px-4 py-3 bg-[#f9f9f8]">
+                        <p className="text-sm font-semibold text-[#064e3b]">{`${user.first_name} ${user.last_name}`}</p>
+                        <p className="text-[10px] text-[#404944] font-medium opacity-70 truncate">{user.email}</p>
+                      </div>
+                      <div className="p-1">
+                        <button
+                          onClick={() => { setIsUserDropdownOpen(false); navigate("/settings/profile"); }}
+                          className="flex items-center w-full px-3 py-2 text-xs font-medium text-[#404944] hover:bg-[#f3f4f3] rounded-lg transition-colors"
+                        >
+                          My Profile
+                        </button>
+                        <button
+                          onClick={() => { setIsUserDropdownOpen(false); navigate("/settings"); }}
+                          className="flex items-center w-full px-3 py-2 text-xs font-medium text-[#404944] hover:bg-[#f3f4f3] rounded-lg transition-colors"
+                        >
+                          Workspace Settings
+                        </button>
+                        <div className="h-px bg-[#e8e8e7] my-1"></div>
+                        <button
+                          onClick={async () => {
+                            setIsUserDropdownOpen(false);
+                            await logout();
+                            navigate("/auth/login", { replace: true });
+                          }}
+                          className="flex items-center w-full px-3 py-2 text-xs font-medium text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                        >
+                          Sign out
+                        </button>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </div>
+            ) : (
+              <button
+                onClick={() => navigate("/auth/login")}
+                className="text-xs font-bold text-[#064e3b] uppercase tracking-widest hover:underline"
+              >
+                Sign In
+              </button>
+            )}
           </div>
-        )}
-        {!user && (
-          <div className="flex min-w-1/4 items-center justify-center">
-            <Button
-              className="w-[100px]"
-              onClick={() => navigate("/auth/login")}
-              variant="outline"
-            >
-              <span className="text-base font-semibold">Login</span>
-            </Button>
-          </div>
-        )}
+        </div>
       </header>
 
       {isCreateIssueModalOpen && (
@@ -146,3 +168,6 @@ export const Header = () => {
     </div>
   );
 };
+
+export default Header;
+

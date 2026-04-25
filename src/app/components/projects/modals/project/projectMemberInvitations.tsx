@@ -3,7 +3,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "react-toastify";
 import { projectMembers } from "@libs/apis/projectMember";
 import { IProjectMember } from "@libs/types/projectMember";
-import { FaCheck, FaTimes } from "react-icons/fa";
+import { Check, X } from "lucide-react";
 import { useUserMemberships } from "@libs/hooks/apis/useProjectMember";
 
 interface ProjectMemberInvitationsProps {
@@ -45,29 +45,31 @@ const ProjectMemberInvitations: React.FC<ProjectMemberInvitationsProps> = ({
   });
 
   if (isLoading) {
-    return <div className="p-4">Loading invitations...</div>;
+    return <div className="p-4 text-center text-sm text-[#404944]">Loading invitations...</div>;
   }
 
   if (!pendingMemberships.length) {
-    return <div className="p-4">No pending invitations</div>;
+    return <div className="p-6 text-center text-sm text-[#404944] font-medium">No pending invitations</div>;
   }
 
   return (
-    <div className="pt-2">
-      <h3 className="text-md p-2 font-semibold text-gray-700">
-        Project Invitations
-      </h3>
-      <div className="">
+    <div className="w-[320px] max-h-[400px] overflow-y-auto">
+      <div className="p-4 border-b border-[#e8e8e7] bg-[#f9f9f8]">
+        <h3 className="text-sm font-bold text-[#064e3b]">
+          Project Invitations
+        </h3>
+      </div>
+      <div className="p-2 space-y-2">
         {pendingMemberships.map((member: IProjectMember) => (
           <div
             key={member.id}
-            className="flex items-center justify-between rounded-lg bg-gray-50 p-3"
+            className="flex items-center justify-between rounded-xl bg-white border border-[#e8e8e7] p-3 hover:border-[#064e3b]/30 transition-all shadow-sm"
           >
-            <div>
-              <p className="font-sm">{member.project.name}</p>
-              <p className="text-xs text-gray-500">Role: {member.role}</p>
+            <div className="flex-1 min-w-0 mr-3">
+              <p className="text-sm font-bold text-[#404944] truncate">{member.project.name}</p>
+              <p className="text-[11px] text-[#404944]/60 font-medium">Role: {member.role}</p>
             </div>
-            <div className="flex gap-2">
+            <div className="flex gap-1.5 shrink-0">
               <button
                 onClick={() =>
                   acceptInvitationMutation.mutate({
@@ -76,10 +78,10 @@ const ProjectMemberInvitations: React.FC<ProjectMemberInvitationsProps> = ({
                   })
                 }
                 disabled={acceptInvitationMutation.isPending}
-                className="cursor-pointer rounded-full p-2 text-green-600 hover:scale-105 hover:bg-green-100"
-                title="Accept Invitation"
+                className="cursor-pointer rounded-lg p-2 text-white bg-[#064e3b] hover:opacity-90 active:scale-95 transition-all shadow-sm"
+                title="Accept"
               >
-                <FaCheck />
+                <Check size={14} strokeWidth={3} />
               </button>
               <button
                 onClick={() =>
@@ -89,10 +91,10 @@ const ProjectMemberInvitations: React.FC<ProjectMemberInvitationsProps> = ({
                   })
                 }
                 disabled={rejectInvitationMutation.isPending}
-                className="cursor-pointer rounded-full p-2 text-red-600 hover:scale-105 hover:bg-red-50"
-                title="Reject Invitation"
+                className="cursor-pointer rounded-lg p-2 text-[#404944] bg-white border border-[#e8e8e7] hover:bg-red-50 hover:text-red-600 hover:border-red-200 active:scale-95 transition-all"
+                title="Reject"
               >
-                <FaTimes />
+                <X size={14} strokeWidth={3} />
               </button>
             </div>
           </div>

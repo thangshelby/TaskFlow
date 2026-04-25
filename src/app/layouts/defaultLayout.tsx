@@ -1,11 +1,15 @@
 import { Header } from "@libs/app/components/general-components/user/header";
 import { Suspense } from "react";
 import { Outlet } from "react-router-dom";
+import { useLocation } from "react-router-dom";
 
 const DefaultLayout = () => {
+  const location = useLocation();
   return (
     <div className="flex h-screen flex-col">
-      <Header />
+      {!location.pathname.includes("projects") && (
+        <Header />
+      )}
       <Suspense fallback={<div>Loading...</div>}>
         <Outlet />
       </Suspense>

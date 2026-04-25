@@ -1,6 +1,6 @@
 import { useDebounce } from "@libs/hooks/common/useDebounce";
 import { useState, useRef } from "react";
-import { FaMagnifyingGlass } from "react-icons/fa6";
+import { Search } from "lucide-react";
 import { Popover } from "antd";
 import ElasticSearch from "./elasticSearch";
 
@@ -9,22 +9,24 @@ export default function SearchHeader() {
   const debouncedSearch = useDebounce(searchQuery, 300);
   const wrapperRef = useRef<HTMLDivElement>(null);
   return (
-    <div className="relative" ref={wrapperRef}>
+    <div className="relative w-full" ref={wrapperRef}>
       <Popover
         content={<ElasticSearch searchQuery={debouncedSearch} />}
         trigger="click"
+        placement="bottomLeft"
       >
         <div className="relative">
+          <Search
+            className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
+            size={16}
+          />
           <input
             type="text"
-            placeholder="Search for issue..."
-            className="w-full rounded-md border border-gray-300 px-4 py-2 outline-[#1447e6]"
+            placeholder="Search projects or tasks..."
+            className="bg-[#eeeeed] border-none rounded-sm pl-10 pr-4 py-2 text-sm w-full focus:ring-2 focus:ring-[#064e3b]/20 transition-all outline-none"
             value={searchQuery}
-            onChange={(e) => {
-              setSearchQuery(e.target.value);
-            }}
+            onChange={(e) => setSearchQuery(e.target.value)}
           />
-          <FaMagnifyingGlass className="absolute top-3 right-3 h-4 w-4 text-gray-400" />
         </div>
       </Popover>
     </div>
