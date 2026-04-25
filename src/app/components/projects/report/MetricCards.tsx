@@ -2,6 +2,7 @@ import { UserStats } from "@libs/types/project";
 import React from "react";
 import { HiCheck, HiPlus, HiRefresh, HiOutlineCalendar } from "react-icons/hi";
 import { motion } from "motion/react";
+
 interface MetricCardProps {
   label: string;
   value: number;
@@ -18,30 +19,35 @@ const MetricCard: React.FC<MetricCardProps> = ({
   highlight,
 }) => (
   <motion.div
-    initial={{ opacity: 0, y: 0 }}
+    initial={{ opacity: 0, y: 10 }}
     whileInView={{ opacity: 1, y: 0 }}
-    viewport={{ once: true, margin: "-100px" }}
-    transition={{ duration: 0.6 }}
-    className={`flex cursor-pointer items-center gap-3 rounded-md border border-gray-200 bg-white p-4 shadow-sm transition-all duration-200 hover:shadow-md ${
-      highlight ? "bg-green-50/30 ring-1 ring-green-100" : ""
+    viewport={{ once: true }}
+    transition={{ duration: 0.5 }}
+    className={`flex cursor-pointer items-center gap-4 rounded-xl border border-[#e8e8e7] bg-white p-6 shadow-sm transition-all duration-300 hover:shadow-md hover:-translate-y-1 group ${
+      highlight ? "border-[#064e3b]/20 bg-[#f0fdf4]/30" : ""
     }`}
   >
     {/* Icon container */}
-    <div
-      className={`flex h-8 w-8 items-center justify-center rounded-md ${
-        highlight ? "bg-green-100 text-green-700" : "bg-gray-100 text-gray-600"
-      }`}
-    >
-      {icon}
-    </div>
+      <div className={`flex h-12 w-12 items-center justify-center rounded-xl transition-all duration-300 ${
+        highlight 
+          ? "bg-[#064e3b] text-white shadow-lg shadow-[#064e3b]/20" 
+          : "bg-[#f3f4f3] text-[#404944] group-hover:bg-[#064e3b] group-hover:text-white"
+      }`}>
+        {icon}
+      </div>
 
-    {/* Content */}
-    <div className="flex flex-col leading-tight">
-      <span className="text-sm font-semibold text-gray-900">
-        {value} {label}
-      </span>
-      <span className="text-xs text-gray-500">{subLabel}</span>
-    </div>
+      {/* Content */}
+      <div className="flex flex-col gap-0.5">
+        <div className="flex items-baseline gap-2">
+          <span className="text-2xl font-bold tracking-tight text-[#064e3b]">
+            {value}
+          </span>
+          <span className="text-sm font-semibold text-[#404944] opacity-70 lowercase">
+            {label}
+          </span>
+        </div>
+        <span className="text-[10px] font-bold text-[#404944] opacity-50 uppercase tracking-widest">{subLabel}</span>
+      </div>
   </motion.div>
 );
 
@@ -50,29 +56,30 @@ const MetricCards = ({ data }: { data: UserStats }) => {
     {
       label: "completed",
       value: data.by_status[data.by_status.length - 1]?.count || 0,
-      icon: <HiCheck size={16} />,
+      icon: <HiCheck size={20} />,
       subLabel: "in the last 7 days",
       highlight: true,
     },
     {
       label: "updated",
       value: data.recently_updated_count || 0,
-      icon: <HiRefresh size={16} />,
+      icon: <HiRefresh size={20} />,
       subLabel: "in the last 7 days",
     },
     {
       label: "created",
       value: data.new_issues_count || 0,
-      icon: <HiPlus size={16} />,
+      icon: <HiPlus size={20} />,
       subLabel: "in the last 7 days",
     },
     {
       label: "due soon",
       value: 0,
-      icon: <HiOutlineCalendar size={16} />,
+      icon: <HiOutlineCalendar size={20} />,
       subLabel: "in the next 7 days",
     },
   ];
+
 
   if (!data.by_status.length) return null;
 
@@ -86,3 +93,4 @@ const MetricCards = ({ data }: { data: UserStats }) => {
 };
 
 export default MetricCards;
+

@@ -14,41 +14,41 @@ export const priorityOptions: {
   textColor: string;
   hoverBg: string;
 }[] = [
-  {
-    name: "Highest",
-    icon: <ChevronsUp size={18} strokeWidth={3.5} className="text-red-600" />,
-    textColor: "text-red-600",
-    hoverBg: "hover:bg-red-50",
-  },
-  {
-    name: "High",
-    icon: <ChevronUp size={18} strokeWidth={3.5} className="text-red-500" />,
-    textColor: "text-red-500",
-    hoverBg: "hover:bg-red-50",
-  },
-  {
-    name: "Medium",
-    icon: <Equal size={18} strokeWidth={3.5} className="text-orange-500" />,
-    textColor: "text-orange-500",
-    hoverBg: "hover:bg-orange-50",
-  },
-  {
-    name: "Low",
-    icon: (
-      <ChevronDown size={18} strokeWidth={3.5} className="text-green-600" />
-    ),
-    textColor: "text-green-600",
-    hoverBg: "hover:bg-green-50",
-  },
-  {
-    name: "Lowest",
-    icon: (
-      <ChevronsDown size={18} strokeWidth={3.5} className="text-blue-600" />
-    ),
-    textColor: "text-blue-600",
-    hoverBg: "hover:bg-blue-50",
-  },
-];
+    {
+      name: "Highest",
+      icon: <ChevronsUp size={18} strokeWidth={3.5} className="text-[#BA1A1A]" />,
+      textColor: "text-[#BA1A1A]",
+      hoverBg: "hover:bg-red-50",
+    },
+    {
+      name: "High",
+      icon: <ChevronUp size={18} strokeWidth={3.5} className="text-[#FF0000]" />,
+      textColor: "text-[#FF0000]",
+      hoverBg: "hover:bg-red-50",
+    },
+    {
+      name: "Medium",
+      icon: <Equal size={18} strokeWidth={3.5} className="text-[#064E3B]" />,
+      textColor: "text-[#064E3B]",
+      hoverBg: "hover:bg-orange-50",
+    },
+    {
+      name: "Low",
+      icon: (
+        <ChevronDown size={18} strokeWidth={3.5} className="text-gray-800" />
+      ),
+      textColor: "text-gray-800",
+      hoverBg: "hover:bg-green-50",
+    },
+    {
+      name: "Lowest",
+      icon: (
+        <ChevronsDown size={18} strokeWidth={3.5} className="text-gray-400" />
+      ),
+      textColor: "text-gray-400",
+      hoverBg: "hover:bg-blue-50",
+    },
+  ];
 const PriorityBadge = ({
   priority,
   isShowLabel,
@@ -65,7 +65,7 @@ const PriorityBadge = ({
     <div
       className={`flex items-center gap-2 rounded-full transition-colors duration-200 hover:bg-gray-100 ${className}`}
     >
-      <div className="flex-shrink-0">{currentPriority?.icon}</div>
+      <div className="shrink-0">{currentPriority?.icon}</div>
 
       {isShowLabel && (
         <p className={`truncate text-[13px] font-semibold text-gray-700`}>
