@@ -79,31 +79,44 @@ const CustomDatePicker = ({
   }, [issue, isEditable, field]);
 
   const permissionResult = useRowPermission();
-  if (isLoading) return;
+  if (isLoading) return null;
+
   return (
-    <button disabled={!permissionResult.isAllow} className={`${className} btn`}>
+    <div className={`font-manrope ${className}`}>
       <Tooltip title={permissionResult.isAllow ? "" : permissionResult.message}>
         <DatePicker
-          placeholder="None"
+          placeholder="NONE"
           value={parsedDate}
           onChange={handleChange}
-          disabled={field === "created_at" || !isEditable}
+          disabled={field === "created_at" || !isEditable || !permissionResult.isAllow}
+          format="YYYY-MM-DD"
+          allowClear={isEditable && field !== "created_at"}
+          variant="outlined"
           suffixIcon={
             isExpired ? (
-              <TriangleAlert className="text-red-800" size={16} />
+              <TriangleAlert className="text-red-600" size={14} />
             ) : (
-              <Calendar className="text-gray-400" size={16} />
+              <Calendar className="text-[#064e3b]/50 group-hover:text-[#064e3b]" size={14} />
             )
           }
+          className={`w-full premium-datepicker ${isExpired ? "is-expired" : ""}`}
           style={{
-            fontWeight: isExpired ? "bold" : "medium",
-            borderColor: isExpired ? "#9f0712" : undefined,
-            color: isExpired ? "#9f0712" : undefined,
+            height: "32px",
+            borderRadius: "6px",
+            border: isExpired ? "1px solid #fee2e2" : "1px solid #e8e8e7",
+            backgroundColor: isExpired ? "#fef2f2" : "white",
+            padding: "4px 12px",
+            fontSize: "11px",
+            fontWeight: "700",
+            fontFamily: "Manrope, sans-serif",
+            color: isExpired ? "#dc2626" : "#064e3b",
           }}
         />
       </Tooltip>
-    </button>
+    </div>
   );
 };
+
+
 
 export default CustomDatePicker;

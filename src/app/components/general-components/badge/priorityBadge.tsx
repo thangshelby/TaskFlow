@@ -12,43 +12,46 @@ export const priorityOptions: {
   name: IssuePriority;
   icon: React.ReactNode;
   textColor: string;
-  hoverBg: string;
+  bgColor: string;
+  borderColor: string;
 }[] = [
     {
       name: "Highest",
-      icon: <ChevronsUp size={18} strokeWidth={3.5} className="text-[#BA1A1A]" />,
-      textColor: "text-[#BA1A1A]",
-      hoverBg: "hover:bg-red-50",
+      icon: <ChevronsUp size={14} strokeWidth={3} />,
+      textColor: "text-[#991b1b]",
+      bgColor: "bg-[#fef2f2]",
+      borderColor: "border-[#ef4444]/20",
     },
     {
       name: "High",
-      icon: <ChevronUp size={18} strokeWidth={3.5} className="text-[#FF0000]" />,
-      textColor: "text-[#FF0000]",
-      hoverBg: "hover:bg-red-50",
+      icon: <ChevronUp size={14} strokeWidth={3} />,
+      textColor: "text-[#b45309]",
+      bgColor: "bg-[#fffbeb]",
+      borderColor: "border-[#f59e0b]/20",
     },
     {
       name: "Medium",
-      icon: <Equal size={18} strokeWidth={3.5} className="text-[#064E3B]" />,
-      textColor: "text-[#064E3B]",
-      hoverBg: "hover:bg-orange-50",
+      icon: <Equal size={14} strokeWidth={3} />,
+      textColor: "text-[#064e3b]",
+      bgColor: "bg-[#f0fdf4]",
+      borderColor: "border-[#064e3b]/20",
     },
     {
       name: "Low",
-      icon: (
-        <ChevronDown size={18} strokeWidth={3.5} className="text-gray-800" />
-      ),
-      textColor: "text-gray-800",
-      hoverBg: "hover:bg-green-50",
+      icon: <ChevronDown size={14} strokeWidth={3} />,
+      textColor: "text-[#0369a1]",
+      bgColor: "bg-[#f0f9ff]",
+      borderColor: "border-[#0ea5e9]/20",
     },
     {
       name: "Lowest",
-      icon: (
-        <ChevronsDown size={18} strokeWidth={3.5} className="text-gray-400" />
-      ),
-      textColor: "text-gray-400",
-      hoverBg: "hover:bg-blue-50",
+      icon: <ChevronsDown size={14} strokeWidth={3} />,
+      textColor: "text-[#404944]/70",
+      bgColor: "bg-[#f9f9f8]",
+      borderColor: "border-[#e8e8e7]",
     },
   ];
+
 const PriorityBadge = ({
   priority,
   isShowLabel,
@@ -60,20 +63,24 @@ const PriorityBadge = ({
 }) => {
   const currentPriority = priorityOptions.find(
     (option) => option.name === priority,
-  );
+  ) || priorityOptions[2];
+
   return (
     <div
-      className={`flex items-center gap-2 rounded-full transition-colors duration-200 hover:bg-gray-100 ${className}`}
+      className={`inline-flex items-center gap-1.5 rounded-xs border px-2 py-0.5 shadow-sm font-manrope ${currentPriority.bgColor} ${currentPriority.borderColor} ${className}`}
     >
-      <div className="shrink-0">{currentPriority?.icon}</div>
+      <div className={`${currentPriority.textColor} shrink-0`}>
+        {currentPriority.icon}
+      </div>
 
       {isShowLabel && (
-        <p className={`truncate text-[13px] font-semibold text-gray-700`}>
+        <p className={`text-[10px] font-bold uppercase tracking-widest ${currentPriority.textColor}`}>
           {priority || "-"}
         </p>
       )}
     </div>
   );
 };
+
 
 export default PriorityBadge;

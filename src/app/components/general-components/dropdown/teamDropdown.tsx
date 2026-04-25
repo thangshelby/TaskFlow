@@ -50,7 +50,7 @@ const TeamDropdown = ({
               boxShadow: "none",
             },
             label: (
-              <div className="border-l-2 border-transparent p-2 hover:border-emerald-600 hover:bg-gray-200">
+              <div className="border-l-2 border-transparent p-2 hover:border-[#064e3b] hover:bg-[#f0fdf4] transition-all duration-200 font-manrope">
                 <TeamBadge
                   team={team}
                   isShowLabel={true}
@@ -72,9 +72,11 @@ const TeamDropdown = ({
               boxShadow: "none",
             },
             label: (
-              <div className="flex items-center gap-2 border-l-2 border-transparent p-2 hover:border-emerald-600 hover:bg-gray-200">
-                <div className="h-4 w-4 rounded-full bg-gray-300"></div>
-                <span className="text-sm text-gray-600">Unassigned</span>
+              <div className="flex items-center gap-2 border-l-2 border-transparent p-2 hover:border-[#064e3b] hover:bg-[#f0fdf4] transition-all duration-200 font-manrope group">
+                <div className="h-4 w-4 rounded-full bg-[#e8e8e7] border border-white flex items-center justify-center">
+                  <div className="h-1.5 w-1.5 rounded-full bg-[#404944]/30"></div>
+                </div>
+                <span className="text-[10px] font-bold uppercase tracking-widest text-[#404944]/50 group-hover:text-[#064e3b]">Unassigned</span>
               </div>
             ),
             onClick: () => {
@@ -86,14 +88,17 @@ const TeamDropdown = ({
         selectedTeam ? (
           <TeamBadge team={selectedTeam} isShowLabel={isDisplayName} />
         ) : (
-          <div className="flex items-center gap-2">
-            <div className="h-4 w-4 rounded-full bg-gray-300"></div>
+          <div className="flex items-center gap-2 px-1 font-manrope">
+            <div className="h-4 w-4 rounded-full bg-[#e8e8e7] border border-white flex items-center justify-center">
+              <div className="h-1.5 w-1.5 rounded-full bg-[#404944]/30"></div>
+            </div>
             {isDisplayName && (
-              <span className="text-sm text-gray-600">Unassigned</span>
+              <span className="text-[10px] font-bold uppercase tracking-widest text-[#404944]/40">Unassigned</span>
             )}
           </div>
         )
       }
+
     />
   );
 };

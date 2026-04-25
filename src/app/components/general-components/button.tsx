@@ -17,6 +17,7 @@ interface ButtonProps {
   onClick?: () => void;
   children?: ReactNode;
   variant?: ButtonVariant;
+  size?: "sm" | "md" | "lg";
   className?: string;
   disabled?: boolean;
   isLoading?: boolean;
@@ -26,23 +27,32 @@ interface ButtonProps {
 
 const variantStyles = {
   primary:
-    "transform rounded-lg bg-gradient-to-r from-emerald-500 to-teal-600 px-4 py-2 font-medium text-white shadow-md transition-all duration-200 hover:-translate-y-0.5 hover:cursor-pointer hover:from-emerald-600 hover:to-teal-700 hover:shadow-lg",
-  secondary: "border border-gray-300 bg-white text-gray-700 hover:bg-gray-50",
-  dark: "border border-gray-800 bg-gray-800 text-white hover:bg-gray-900 hover:border-gray-900",
-  light: "border border-gray-200 bg-gray-100 text-gray-800 hover:bg-gray-200",
+    "bg-[#064e3b] text-white shadow-[0_4px_14px_0_rgba(6,78,59,0.39)] hover:bg-[#059669] hover:shadow-[0_6px_20px_rgba(5,150,105,0.23)] active:scale-95",
+  secondary: "border border-[#e8e8e7] bg-white text-[#064e3b] hover:bg-[#f9f9f8] hover:border-[#064e3b]/30 active:bg-gray-100",
+  dark: "bg-[#111827] text-white hover:bg-black active:scale-95",
+  light: "bg-[#f9f9f8] text-[#064e3b] border border-[#e8e8e7] hover:bg-[#f0fdf4] hover:border-[#064e3b]/20",
   "primary-outline":
-    "border-2 border-emerald-400 text-emerald-600 hover:bg-emerald-100 hover:text-black",
+    "border-2 border-[#064e3b] text-[#064e3b] hover:bg-[#f0fdf4] active:bg-[#dcfce7]",
   "secondary-outline":
-    "border-2 border-gray-500 text-gray-500 hover:bg-gray-500 hover:text-white",
-  "primary-light": "bg-emerald-50 text-emerald-700 hover:bg-emerald-100",
-  "secondary-light": "bg-gray-50 text-gray-700 hover:bg-gray-100",
-  outline: "border-2 border-emerald-500 hover:bg-gray-100 text-emerald-700",
+    "border-2 border-[#404944]/20 text-[#404944]/70 hover:bg-gray-50 hover:border-[#404944]/40",
+  "primary-light": "bg-[#f0fdf4] text-[#064e3b] hover:bg-[#dcfce7]",
+  "secondary-light": "bg-[#f9f9f8] text-gray-600 hover:bg-gray-100",
+  outline: "border border-[#cccbc8] bg-[#fcfcfb] text-[#064e3b] hover:border-[#064e3b] hover:bg-[#f0fdf4] shadow-sm",
+};
+
+const sizeStyles = {
+  xs: "px-2 py-1 text-[10px] tracking-wider rounded-xs",
+  sm: "px-3 py-1.5 text-[10px] tracking-wider rounded-sm",
+  md: "px-4 py-2 text-[12px] tracking-widest rounded-md",
+  lg: "px-6 py-3 text-[13px] tracking-widest rounded-lg",
+  xl: "px-8 py-4 text-[14px] tracking-widest rounded-xl",
 };
 
 const Button = ({
   onClick,
   children,
   variant = "primary",
+  size = "md",
   className = "",
   title,
   disabled = false,
@@ -50,11 +60,12 @@ const Button = ({
   type = "button",
 }: ButtonProps): React.ReactElement => {
   const baseStyles =
-    "px-2 py-1 rounded-md transition-all duration-200 font-medium text-sm outline-none ring-emerald-500 focus:ring-2 focus:ring-offset-2 select-none flex items-center justify-center gap-2";
+    "transition-all duration-200 font-bold outline-none ring-[#064e3b]/50 focus:ring-2 focus:ring-offset-2 select-none flex items-center justify-center gap-2 font-manrope uppercase";
 
   const variantStyle = variantStyles[variant];
+  const sizeStyle = sizeStyles[size];
   const disabledStyles =
-    disabled || isLoading ? "opacity-50 cursor-not-allowed" : "cursor-pointer";
+    disabled || isLoading ? "opacity-50 cursor-not-allowed grayscale" : "cursor-pointer";
 
   return (
     <Tooltip title={title}>
@@ -64,7 +75,7 @@ const Button = ({
         tabIndex={disabled || isLoading ? -1 : 0}
         onClick={!(disabled || isLoading) ? onClick : undefined}
         aria-disabled={disabled || isLoading}
-        className={`${baseStyles} ${variantStyle} ${disabledStyles} ${className} `}
+        className={`${baseStyles} ${variantStyle} ${sizeStyle} ${disabledStyles} ${className} `}
         onKeyDown={(e) => {
           if (
             !(disabled || isLoading) &&
@@ -75,11 +86,12 @@ const Button = ({
           }
         }}
       >
-        {isLoading && <LuLoader className="h-4 w-4 animate-spin" />}
-        {isLoading ? "Đang xử lý..." : children}
+        {isLoading && <LuLoader className="h-3.5 w-3.5 animate-spin" />}
+        {isLoading ? "Loading..." : children}
       </button>
     </Tooltip>
   );
 };
+
 
 export default Button;

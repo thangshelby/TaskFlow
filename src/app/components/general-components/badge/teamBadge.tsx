@@ -3,52 +3,40 @@ import { Users } from "lucide-react";
 
 export const teamColors = [
   {
-    textColor: "text-blue-700",
-    dotColor: "bg-blue-500",
-    bgColor: "bg-blue-100",
-    hoverBg: "hover:bg-blue-50",
+    textColor: "text-[#064e3b]",
+    dotColor: "bg-[#064e3b]",
+    bgColor: "bg-[#f0fdf4]",
+    hoverBg: "hover:bg-[#f0fdf4]",
   },
   {
-    textColor: "text-green-700",
-    dotColor: "bg-green-500",
-    bgColor: "bg-green-100",
-    hoverBg: "hover:bg-green-50",
+    textColor: "text-[#0369a1]",
+    dotColor: "bg-[#0ea5e9]",
+    bgColor: "bg-[#f0f9ff]",
+    hoverBg: "hover:bg-[#f0f9ff]",
   },
   {
-    textColor: "text-purple-700",
-    dotColor: "bg-purple-500",
-    bgColor: "bg-purple-100",
-    hoverBg: "hover:bg-purple-50",
+    textColor: "text-[#5b21b6]",
+    dotColor: "bg-[#8b5cf6]",
+    bgColor: "bg-[#f5f3ff]",
+    hoverBg: "hover:bg-[#f5f3ff]",
   },
   {
-    textColor: "text-orange-700",
-    dotColor: "bg-orange-500",
-    bgColor: "bg-orange-100",
-    hoverBg: "hover:bg-orange-50",
+    textColor: "text-[#059669]",
+    dotColor: "bg-[#10b981]",
+    bgColor: "bg-[#ecfdf5]",
+    hoverBg: "hover:bg-[#ecfdf5]",
   },
   {
-    textColor: "text-pink-700",
-    dotColor: "bg-pink-500",
-    bgColor: "bg-pink-100",
-    hoverBg: "hover:bg-pink-50",
+    textColor: "text-[#404944]",
+    dotColor: "bg-[#404944]",
+    bgColor: "bg-[#f9f9f8]",
+    hoverBg: "hover:bg-[#f9f9f8]",
   },
   {
-    textColor: "text-indigo-700",
-    dotColor: "bg-indigo-500",
-    bgColor: "bg-indigo-100",
-    hoverBg: "hover:bg-indigo-50",
-  },
-  {
-    textColor: "text-teal-700",
-    dotColor: "bg-teal-500",
-    bgColor: "bg-teal-100",
-    hoverBg: "hover:bg-teal-50",
-  },
-  {
-    textColor: "text-cyan-700",
-    dotColor: "bg-cyan-500",
-    bgColor: "bg-cyan-100",
-    hoverBg: "hover:bg-cyan-50",
+    textColor: "text-[#b45309]",
+    dotColor: "bg-[#f59e0b]",
+    bgColor: "bg-[#fffbeb]",
+    hoverBg: "hover:bg-[#fffbeb]",
   },
 ];
 
@@ -86,16 +74,16 @@ const TeamBadge = ({
 
   return (
     <div
-      className={`flex items-center gap-2 rounded-2xl transition-colors duration-200 ${selectedColor.hoverBg} ${className}`}
+      className={`flex items-center gap-2 rounded-lg transition-colors duration-200 ${selectedColor.hoverBg} ${className}`}
     >
       <div
-        className={`rounded-2xl ${selectedColor.bgColor} flex items-center gap-1 ${sizeClasses[size].button}`}
+        className={`rounded-lg ${selectedColor.bgColor} flex items-center gap-1.5 ${sizeClasses[size].button} border-white/50 border`}
       >
         <Users
-          className={`${sizeClasses[size].icon} ${selectedColor.textColor}`}
+          className={`${sizeClasses[size].icon} ${selectedColor.textColor} opacity-80`}
         />
         {isShowLabel && (
-          <p className={`truncate font-semibold ${selectedColor.textColor}`}>
+          <p className={`truncate font-bold text-[10px] uppercase tracking-widest font-manrope ${selectedColor.textColor}`}>
             {team.name || "Unnamed Team"}
           </p>
         )}

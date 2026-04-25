@@ -44,7 +44,7 @@ const StatusDropdown = ({
           },
           label: (
             <div className="border-l-2 border-transparent p-2 hover:border-emerald-600 hover:bg-gray-200">
-              <StatusBadge column={column} className="p-2" />
+              <StatusBadge column={column} className="p-4" />
             </div>
           ),
           onClick: () => {

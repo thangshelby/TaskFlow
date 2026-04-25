@@ -6,43 +6,43 @@ export const typeOptions: {
   id: IssueType;
   name: string;
   icon: React.ReactNode;
-  bgColor: string;
   textColor: string;
-  hoverBg: string;
+  bgColor: string;
+  borderColor: string;
 }[] = [
-  {
-    id: "Bug",
-    name: "Bug",
-    icon: <LuBug className="h-4 w-4 text-red-500" />,
-    bgColor: "bg-red-100",
-    textColor: "text-red-700",
-    hoverBg: "hover:bg-red-50",
-  },
-  {
-    id: "Task",
-    name: "Task",
-    icon: <LuClipboardCheck className="h-4 w-4 text-blue-500" />,
-    bgColor: "bg-blue-100",
-    textColor: "text-blue-700",
-    hoverBg: "hover:bg-blue-50",
-  },
-  {
-    id: "Story",
-    name: "Story",
-    icon: <LuBookmark className="h-4 w-4 text-green-500" />,
-    bgColor: "bg-green-100",
-    textColor: "text-green-700",
-    hoverBg: "hover:bg-green-50",
-  },
-  {
-    id: "Epic",
-    name: "Epic",
-    icon: <LuStar className="h-4 w-4 text-purple-500" />,
-    bgColor: "bg-purple-100",
-    textColor: "text-purple-700",
-    hoverBg: "hover:bg-purple-50",
-  },
-];
+    {
+      id: "Bug",
+      name: "Bug",
+      icon: <LuBug size={14} />,
+      textColor: "text-[#991b1b]",
+      bgColor: "bg-[#fef2f2]",
+      borderColor: "border-[#ef4444]/20",
+    },
+    {
+      id: "Task",
+      name: "Task",
+      icon: <LuClipboardCheck size={14} />,
+      textColor: "text-[#064e3b]",
+      bgColor: "bg-[#f0fdf4]",
+      borderColor: "border-[#064e3b]/20",
+    },
+    {
+      id: "Story",
+      name: "Story",
+      icon: <LuBookmark size={14} />,
+      textColor: "text-[#059669]",
+      bgColor: "bg-[#ecfdf5]",
+      borderColor: "border-[#10b981]/20",
+    },
+    {
+      id: "Epic",
+      name: "Epic",
+      icon: <LuStar size={14} />,
+      textColor: "text-[#5b21b6]",
+      bgColor: "bg-[#f5f3ff]",
+      borderColor: "border-[#8b5cf6]/20",
+    },
+  ];
 
 const TypeBadge = ({
   type,
@@ -53,25 +53,24 @@ const TypeBadge = ({
   isShowLabel?: boolean;
   className?: string;
 }) => {
-  const currentType = typeOptions.find((option) => option.name === type);
+  const currentType = typeOptions.find((option) => option.name === type) || typeOptions[1];
 
   return (
     <div
-      className={`flex items-center gap-2 px-2 py-1 transition-colors duration-200 ${currentType?.hoverBg || "hover:bg-gray-50"} ${className}`}
+      className={`inline-flex items-center gap-1.5 rounded-xs border px-2 py-0.5 shadow-sm font-manrope ${currentType.bgColor} ${currentType.borderColor} ${className}`}
     >
-      <div className={`flex items-center justify-center gap-2 rounded-md`}>
-        {currentType?.icon}
-
-        {isShowLabel && (
-          <p
-            className={`text-[13px] font-bold ${currentType?.textColor || "text-gray-700"}`}
-          >
-            {type || "-"}
-          </p>
-        )}
+      <div className={`${currentType.textColor} shrink-0`}>
+        {currentType.icon}
       </div>
+
+      {isShowLabel && (
+        <p className={`text-[10px] font-bold uppercase tracking-widest ${currentType.textColor}`}>
+          {type || "-"}
+        </p>
+      )}
     </div>
   );
 };
+
 
 export default TypeBadge;

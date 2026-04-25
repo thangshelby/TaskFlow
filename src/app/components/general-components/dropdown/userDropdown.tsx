@@ -46,7 +46,7 @@ const UserDropdown = ({
             boxShadow: "none",
           },
           label: (
-            <div className="border-l-2 border-transparent p-2 hover:border-emerald-600 hover:bg-gray-200">
+            <div className="border-l-2 border-transparent p-2 hover:border-[#064e3b] hover:bg-[#f0fdf4] transition-all duration-200 font-manrope">
               <UserAvatar userId={""} isDisplayName={true} />
             </div>
           ),
@@ -68,7 +68,7 @@ const UserDropdown = ({
         boxShadow: "none",
       },
       label: (
-        <div className="border-l-2 border-transparent p-2 hover:border-emerald-600 hover:bg-gray-200">
+        <div className="border-l-2 border-transparent p-2 hover:border-[#064e3b] hover:bg-[#f0fdf4] transition-all duration-200 font-manrope">
           <UserAvatar userId={member.user_id} isDisplayName={true} />
         </div>
       ),
@@ -89,7 +89,7 @@ const UserDropdown = ({
           boxShadow: "none",
         },
         label: (
-          <div className="border-l-2 border-transparent p-2 hover:border-emerald-600 hover:bg-gray-200">
+          <div className="border-l-2 border-transparent p-2 hover:border-[#064e3b] hover:bg-[#f0fdf4] transition-all duration-200 font-manrope">
             <UserAvatar userId={""} isDisplayName={true} />
           </div>
         ),
@@ -98,6 +98,7 @@ const UserDropdown = ({
         },
       },
     ];
+
   }, [projectMembers]);
 
   return (
