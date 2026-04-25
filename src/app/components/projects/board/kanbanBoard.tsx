@@ -233,10 +233,9 @@ export default function KanbanBoard({
   });
 
   return (
-    <div className="flex h-full overflow-hidden">
+    <div className="flex h-full overflow-hidden px-4 pb-10">
       <DndContext
         sensors={sensors}
-        // collisionDetection={closestCorners}
         onDragStart={handleDragStart}
         onDragOver={handleDragOver}
         onDragEnd={handleDragEnd}
@@ -245,87 +244,101 @@ export default function KanbanBoard({
           items={columns.map((col) => col.id)}
           strategy={horizontalListSortingStrategy}
         >
-          {columns.map((column) => (
-            <KanbanColumn
-              key={column.id}
-              column={column}
-              setColumns={setColumns}
-              columns={columns}
-              projectId={projectId}
-              isDragging={activeIssue !== null}
-            />
-          ))}
-          {/* Add Stage Section */}
-          {!isAddingColumn ? (
-            <div className="flex h-fit w-80 min-w-80 px-4">
-              <button
-                onClick={() => setIsAddingColumn(true)}
-                className="flex w-full items-center gap-2 rounded-lg bg-gray-100/50 p-4 font-semibold text-gray-600 transition-all hover:bg-gray-200/70"
-              >
-                <LuCirclePlus size={20} />
-                <span>Add Stage</span>
-              </button>
-            </div>
-          ) : (
-            <div className="flex h-fit w-80 min-w-80 flex-col gap-2 px-4">
-              <div className="flex flex-col gap-2 rounded-lg bg-gray-100 p-3 shadow-sm animate-in fade-in zoom-in-95 duration-200">
-                <input
-                  id="new-stage-name"
-                  autoFocus
-                  autoComplete="off"
-                  value={newColumnText}
-                  onChange={(e) => {
-                    setNewColumnText(e.target.value);
-                  }}
-                  onKeyDown={(e) => {
-                    if (e.key === "Enter" && newColumnText && projectId) {
-                      createColumn({
-                        name: newColumnText,
-                        projectId: projectId,
-                      });
-                      setNewColumnText("");
-                      setIsAddingColumn(false);
-                    } else if (e.key === "Escape") {
-                      setIsAddingColumn(false);
-                      setNewColumnText("");
-                    }
-                  }}
-                  placeholder="Name this stage"
-                  className="w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 placeholder-gray-400 focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 focus:outline-none"
-                />
-                <div className="flex items-center gap-2">
-                  <button
-                    onClick={() => {
-                      if (!newColumnText || !projectId) return;
-                      createColumn({
-                        name: newColumnText,
-                        projectId: projectId,
-                      });
-                      setNewColumnText("");
-                      setIsAddingColumn(false);
-                    }}
-                    className="rounded-md bg-emerald-600 px-3 py-1.5 text-xs font-bold text-white transition-colors hover:bg-emerald-700"
-                  >
-                    Add Stage
-                  </button>
-                  <button
-                    onClick={() => {
-                      setIsAddingColumn(false);
-                      setNewColumnText("");
-                    }}
-                    className="rounded-md bg-transparent px-3 py-1.5 text-xs font-bold text-gray-500 transition-colors hover:bg-gray-200"
-                  >
-                    Cancel
-                  </button>
+          <div className="flex h-full gap-4 overflow-x-auto pb-4 custom-scrollbar">
+            {columns.map((column) => (
+              <KanbanColumn
+                key={column.id}
+                column={column}
+                setColumns={setColumns}
+                columns={columns}
+                projectId={projectId}
+                isDragging={activeIssue !== null}
+              />
+            ))}
+
+            {/* Add Stage Section */}
+            {!isAddingColumn ? (
+              <div className="h-fit w-80 min-w-80">
+                <button
+                  onClick={() => setIsAddingColumn(true)}
+                  className="flex w-full items-center justify-center gap-3 rounded-md bg-[#064e3b]/5 border-2 border-dashed border-[#064e3b]/20 p-6 text-[13px] font-bold uppercase tracking-widest text-[#064e3b] transition-all duration-300 hover:bg-[#064e3b]/10 hover:border-[#064e3b]/40 font-manrope shadow-button"
+                >
+                  <LuCirclePlus size={20} className="text-[#064e3b]" />
+                  <span>Add New Stage</span>
+                </button>
+              </div>
+            ) : (
+              <div className="h-fit w-80 min-w-80 flex flex-col">
+                <div className="flex flex-col gap-4 rounded-2xl bg-white p-5 shadow-2xl border border-[#064e3b]/10 animate-in fade-in zoom-in-95 duration-200">
+                  <div className="flex flex-col gap-1">
+                    <p className="text-[10px] font-bold uppercase tracking-widest text-[#064e3b]/50">Stage Name</p>
+                    <input
+                      id="new-stage-name"
+                      autoFocus
+                      autoComplete="off"
+                      value={newColumnText}
+                      onChange={(e) => {
+                        setNewColumnText(e.target.value);
+                      }}
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter" && newColumnText && projectId) {
+                          createColumn({
+                            name: newColumnText,
+                            projectId: projectId,
+                          });
+                          setNewColumnText("");
+                          setIsAddingColumn(false);
+                        } else if (e.key === "Escape") {
+                          setIsAddingColumn(false);
+                          setNewColumnText("");
+                        }
+                      }}
+                      placeholder="e.g. READY FOR QA"
+                      className="w-full rounded-xl border border-[#e8e8e7] bg-[#f9f9f8] px-4 py-3 text-sm text-[#064e3b] placeholder-[#064e3b]/30 focus:border-[#064e3b] focus:ring-1 focus:ring-[#064e3b] focus:outline-none font-manrope font-semibold transition-all"
+                    />
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <button
+                      onClick={() => {
+                        if (!newColumnText || !projectId) return;
+                        createColumn({
+                          name: newColumnText,
+                          projectId: projectId,
+                        });
+                        setNewColumnText("");
+                        setIsAddingColumn(false);
+                      }}
+                      className="flex-1 rounded-xl bg-[#064e3b] px-4 py-2.5 text-[11px] font-bold uppercase tracking-wider text-white transition-all hover:bg-[#059669] shadow-md"
+                    >
+                      Create Stage
+                    </button>
+                    <button
+                      onClick={() => {
+                        setIsAddingColumn(false);
+                        setNewColumnText("");
+                      }}
+                      className="rounded-xl bg-[#f1f5f3] px-4 py-2.5 text-[11px] font-bold uppercase tracking-wider text-[#064e3b] transition-all hover:bg-[#e2e8e5]"
+                    >
+                      Cancel
+                    </button>
+                  </div>
                 </div>
               </div>
+            )}
+          </div>
+        </SortableContext>
+        <DragOverlay dropAnimation={{
+          duration: 250,
+          easing: 'cubic-bezier(0.18, 0.67, 0.6, 1.22)',
+        }}>
+          {activeIssue && (
+            <div className="rotate-3 scale-105 shadow-2xl transition-transform">
+              <IssueCard issue={activeIssue} isDragging={false} />
             </div>
           )}
-        </SortableContext>
-        <DragOverlay>
-          {activeIssue && <IssueCard issue={activeIssue} isDragging={false} />}
         </DragOverlay>
       </DndContext>
     </div>
+
   );
 }
