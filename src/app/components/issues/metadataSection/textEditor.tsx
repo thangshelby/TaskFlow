@@ -5,7 +5,6 @@ import { uploadFileToCloudinary } from "@libs/utils/file";
 import { useUpdateIssue } from "@libs/hooks/apis/useIssue";
 import { useSpeechToText } from "@libs/hooks/common/useSpeechToText";
 import { FaMicrophone, FaStop } from "react-icons/fa";
-import "../../projects/modals/issue/createIssueModal.css";
 
 export default function TextEditor({
   initialDeltaString,
@@ -27,6 +26,7 @@ export default function TextEditor({
   );
 
   const { updateIssueAsync } = useUpdateIssue({ projectId });
+  const [isSaving, setIsSaving] = useState(false);
 
   useEffect(() => {
     const toolbarOptions = [
@@ -70,25 +70,32 @@ export default function TextEditor({
   }, [initialDeltaString]);
 
   const handleSaveDescription = async () => {
-    if (!quillRef.current) return;
+    if (!quillRef.current || isSaving) return;
 
-    const rawDelta: Delta = quillRef.current.getContents();
-    const { delta, updatedAttachments } = await handleProcessDelta(rawDelta);
+    try {
+      setIsSaving(true);
+      const rawDelta: Delta = quillRef.current.getContents();
+      const { delta, updatedAttachments } = await handleProcessDelta(rawDelta);
 
-    const plainText = quillRef.current.getText();
+      const plainText = quillRef.current.getText();
 
-    const description = {
-      plainText,
-      delta,
-    };
-    await updateIssueAsync({
-      id: issueId,
-      data: {
-        description: JSON.stringify(description),
-        attachments: updatedAttachments,
-      },
-    });
-    handleClose();
+      const description = {
+        plainText,
+        delta,
+      };
+      await updateIssueAsync({
+        id: issueId,
+        data: {
+          description: JSON.stringify(description),
+          attachments: updatedAttachments,
+        },
+      });
+      handleClose();
+    } catch (error) {
+      console.error("Failed to save description:", error);
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   const handleProcessDelta = async (
@@ -193,8 +200,8 @@ export default function TextEditor({
 
       <div
         className={`rounded border transition-colors ${isListening
-            ? "border-red-400 shadow-[0_0_0_2px_rgba(248,113,113,0.2)]"
-            : "border-gray-300 focus-within:border-emerald-500"
+          ? "border-red-400 shadow-[0_0_0_2px_rgba(248,113,113,0.2)]"
+          : "border-gray-300 focus-within:border-emerald-500"
           }`}
       >
         <div ref={editorRef} />
@@ -209,13 +216,22 @@ export default function TextEditor({
       <div className="flex flex-row gap-2 mt-2">
         <button
           onClick={handleSaveDescription}
-          className="cursor-pointer rounded-sm bg-emerald-500 px-[10px] py-1 text-sm font-medium text-white"
+          disabled={isSaving}
+          className="flex items-center gap-2 cursor-pointer rounded-sm bg-emerald-500 px-3 py-1.5 text-sm font-semibold text-white transition-all hover:bg-emerald-600 disabled:opacity-50 disabled:cursor-not-allowed"
         >
-          Save
+          {isSaving ? (
+            <>
+              <div className="h-3.5 w-3.5 animate-spin rounded-full border-2 border-white border-t-transparent" />
+              <span>Saving...</span>
+            </>
+          ) : (
+            "Save"
+          )}
         </button>
         <button
           onClick={handleClose}
-          className="cursor-pointer rounded-sm bg-transparent px-[10px] py-1 text-sm font-medium text-gray-500 hover:bg-gray-100"
+          disabled={isSaving}
+          className="cursor-pointer rounded-sm bg-transparent px-[10px] py-1 text-sm font-medium text-gray-500 hover:bg-gray-200 disabled:opacity-30 disabled:cursor-not-allowed"
         >
           Cancel
         </button>

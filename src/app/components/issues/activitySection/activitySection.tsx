@@ -15,13 +15,13 @@ export default function ActivityIssue(props: { issueId: string }) {
   const [, startTransition] = useTransition();
 
   return (
-    <div className="bg-white">
-      <div className="mb-4 flex items-center justify-between">
-        <h2 className="text-lg font-semibold text-gray-900">Recent Activity</h2>
-        <div className="flex items-center space-x-2">
-          <button className="rounded p-1 text-gray-400 hover:bg-gray-100 hover:text-gray-600">
+    <div className="bg-transparent font-manrope">
+      <div className="mb-6 flex items-center justify-between">
+        <h2 className="text-[11px] font-black text-[#064e3b]/60 uppercase tracking-widest">Recent Activity</h2>
+        <div className="flex items-center space-x-1">
+          <button className="flex h-7 w-7 items-center justify-center rounded-lg text-[#064e3b]/60 hover:bg-[#064e3b]/5 hover:text-[#064e3b] transition-all border border-transparent hover:border-[#064e3b]/10 active:scale-90">
             <svg
-              className="h-4 w-4"
+              className="h-3.5 w-3.5"
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
@@ -34,26 +34,11 @@ export default function ActivityIssue(props: { issueId: string }) {
               />
             </svg>
           </button>
-          <button className="rounded p-1 text-gray-400 hover:bg-gray-100 hover:text-gray-600">
-            <svg
-              className="h-4 w-4"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z"
-              />
-            </svg>
-          </button>
         </div>
       </div>
 
-      <div className="mb-6 border-b border-gray-200">
-        <nav className="-mb-px flex space-x-8">
+      <div className="mb-6">
+        <nav className="flex space-x-1 p-1 bg-[#064e3b]/5 rounded-lg border border-[#064e3b]/5">
           {["All", "Comments", "History", "Work log"].map((tab) => (
             <button
               key={tab}
@@ -62,10 +47,10 @@ export default function ActivityIssue(props: { issueId: string }) {
                   setActiveTab(tab);
                 });
               }}
-              className={`cursor-pointer border-b-2 px-1 py-2 text-sm font-medium whitespace-nowrap ${
+              className={`flex-1 cursor-pointer px-3 py-1.5 text-xs font-black rounded-md transition-all transform active:scale-95 ${
                 activeTab === tab
-                  ? "border-blue-500 text-blue-600"
-                  : "border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700"
+                  ? "bg-white text-[#064e3b] shadow-sm border border-[#064e3b]/10"
+                  : "text-[#064e3b]/60 hover:text-[#064e3b] hover:bg-white/50"
               }`}
             >
               {tab}
@@ -74,43 +59,47 @@ export default function ActivityIssue(props: { issueId: string }) {
         </nav>
       </div>
 
-      {activeTab === "All" && projectId && (
-        <>
+      <div className="min-h-[200px]">
+        {activeTab === "All" && projectId && (
           <History issueId={props.issueId} projectId={projectId} />
-        </>
-      )}
-      {activeTab === "Comments" && (
-        <div className="">
-          {user && (
-            <Comment
-              issueId={props.issueId}
-              currentUserId={user.id}
-              currentUserName={user.first_name + " " + user.last_name}
-            />
-          )}
-        </div>
-      )}
-      {activeTab === "History" && projectId && (
-        <History issueId={props.issueId} projectId={projectId} />
-      )}
-      {activeTab === "Work log" && (
-        <div className="py-8 text-center text-gray-500">
-          <svg
-            className="mx-auto h-12 w-12 text-gray-400"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
-            />
-          </svg>
-          <p className="mt-2">No work logged</p>
-        </div>
-      )}
+        )}
+        {activeTab === "Comments" && (
+          <div className="animate-in fade-in slide-in-from-bottom-2 duration-300">
+            {user && (
+              <Comment
+                issueId={props.issueId}
+                currentUserId={user.id}
+                currentUserName={user.first_name + " " + user.last_name}
+              />
+            )}
+          </div>
+        )}
+        {activeTab === "History" && projectId && (
+          <div className="animate-in fade-in slide-in-from-bottom-2 duration-300">
+            <History issueId={props.issueId} projectId={projectId} />
+          </div>
+        )}
+        {activeTab === "Work log" && (
+          <div className="py-12 flex flex-col items-center justify-center text-center">
+            <div className="h-12 w-12 rounded-xl bg-[#064e3b]/5 flex items-center justify-center text-[#064e3b]/20 mb-3 border border-[#064e3b]/5">
+              <svg
+                className="h-6 w-6"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
+                />
+              </svg>
+            </div>
+            <p className="text-[13px] font-bold text-[#064e3b]/30">No work logged yet</p>
+          </div>
+        )}
+      </div>
     </div>
   );
 }

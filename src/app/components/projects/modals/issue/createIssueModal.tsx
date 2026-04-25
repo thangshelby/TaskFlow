@@ -435,13 +435,13 @@ const CreateIssueModal: React.FC<CreateIssueModalProps> = ({
                 options={["Bug", "Task", "Story", "Epic"].map((value) => ({
                   value,
                   label: value,
-                  customRender: <TypeBadge className="p-0!" type={value as IssueType} />,
+                  customRender: <TypeBadge type={value as IssueType} />,
                 }))}
                 placement="bottom"
                 rowClassName="w-full"
                 parent={
                   <button type="button" className={`${fieldClass()} flex items-center justify-between`}>
-                    <TypeBadge className="p-0!" type={watch("type") as IssueType} />
+                    <TypeBadge type={watch("type") as IssueType} />
                     <LuChevronDown className="h-4 w-4 text-gray-400" />
                   </button>
                 }
@@ -464,7 +464,7 @@ const CreateIssueModal: React.FC<CreateIssueModalProps> = ({
                   ...option,
                   customRender: (
                     <PriorityBadge
-                      className="p-0!"
+
                       priority={option.value as IssuePriority}
                       isShowLabel={true}
                     />
@@ -475,7 +475,7 @@ const CreateIssueModal: React.FC<CreateIssueModalProps> = ({
                 parent={
                   <button type="button" className={`${fieldClass()} flex items-center justify-between`}>
                     <PriorityBadge
-                      className="p-0!"
+
                       priority={watch("priority") as IssuePriority}
                       isShowLabel={true}
                     />
@@ -784,9 +784,9 @@ const CreateIssueModal: React.FC<CreateIssueModalProps> = ({
             reset();
           }}
           buttonContent="Discard"
-          style={{ 
-            confirmButtonColor: "!bg-none !bg-red-600 hover:!bg-red-700 !shadow-none", 
-            textColor: "text-red-600" 
+          style={{
+            confirmButtonColor: "!bg-none !bg-red-600 hover:!bg-red-700 !shadow-none",
+            textColor: "text-red-600"
           }}
           className="w-full max-w-sm"
         >
