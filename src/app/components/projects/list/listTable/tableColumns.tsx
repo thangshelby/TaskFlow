@@ -72,10 +72,10 @@ export const useTableColumns = (
         (_, { id, key }) => (
           <Suspense fallback={<FallBack />}>
             <div
-              className="cursor-pointer p-2 text-blue-600 hover:underline"
+              className="cursor-pointer p-2 text-[#064e3b] hover:underline"
               onClick={() => onIssueClick?.(id)}
             >
-              <p className="text-xs font-semibold">{key}</p>
+              <p className="text-xs font-bold tracking-tight">{key}</p>
             </div>
           </Suspense>
         ),

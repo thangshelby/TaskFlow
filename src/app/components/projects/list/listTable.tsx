@@ -142,8 +142,11 @@ const ListTable = ({
           columns={tableColumns}
           dataSource={dataSource}
           bordered={true}
+          className="premium-table"
           scroll={{ y: maxHeightListTable || 1000, x: 1000 }}
-          rowSelection={{ ...rowSelection }}
+          rowSelection={{ 
+            ...rowSelection,
+          }}
           rowKey="id"
           expandable={{
             childrenColumnName: "children",
@@ -194,7 +197,11 @@ const ListTable = ({
                         e.preventDefault();
                         e.stopPropagation();
                       }}
-                      className={`hover:bg-gray-100 ${permissionResult.isAllow ? "cursor-pointer" : "cursor-not-allowed"}`}
+                      className={`transition-colors duration-200 ${
+                        permissionResult.isAllow 
+                          ? "cursor-pointer hover:bg-[#f0fdf4]" 
+                          : "cursor-not-allowed"
+                      }`}
                     >
                       {children}
                     </tr>
@@ -204,6 +211,7 @@ const ListTable = ({
             },
           }}
         />
+
       )}
     </div>
   );
