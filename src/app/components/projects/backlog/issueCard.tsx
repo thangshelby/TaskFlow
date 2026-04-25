@@ -93,73 +93,67 @@ const IssueCard = memo(
       <DragableWrapper issueId={issue.id}>
         <div
           ref={ref}
-          className={`group bg-white px-2 py-1 shadow-sm transition-all duration-200 hover:bg-gray-100`}
+          className={`group bg-white px-2 py-0.5 transition-all duration-200 hover:bg-[#064e3b]/2 border-b border-[#064e3b]/5 last:border-0`}
         >
           <PermissionContext.Provider value={permissionResult}>
             <div
-              onClick={() => {
-                handleIssueCardClick();
-              }}
-              className="flex cursor-pointer items-center gap-4"
+              onClick={handleIssueCardClick}
+              className="flex cursor-pointer items-center justify-between gap-4"
             >
               {/* IssueCardLeft */}
-              <div className="group w-full min-w-0 flex-1">
-                <div className="flex w-full min-w-0 items-center justify-start gap-4">
-                  <div className="flex shrink-0 flex-row items-center">
-                    <TypeBadge type={issue.type} isShowLabel={false} />
-
-                    <span
-                      className={`block cursor-pointer text-xs font-medium text-blue-600 hover:underline ${issue?.column?.name === "DONE" ? "line-through" : ""}`}
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        openIssueDetail(issue.id);
-                        navigate(
-                          `/projects/${projectId}/backlog?selectedIssue=${issue.id}`,
-                        );
-                      }}
-                    >
-                      {issue?.key}
-                    </span>
+              <div className="flex min-w-0 flex-1 items-center gap-3">
+                <div className="flex shrink-0 items-center gap-1.5 opacity-50 group-hover:opacity-100 transition-opacity">
+                  <div className="cursor-grab active:cursor-grabbing text-gray-400">
+                    <div className="grid grid-cols-2 gap-0.5">
+                      <div className="h-0.5 w-0.5 rounded-full bg-current" />
+                      <div className="h-0.5 w-0.5 rounded-full bg-current" />
+                      <div className="h-0.5 w-0.5 rounded-full bg-current" />
+                      <div className="h-0.5 w-0.5 rounded-full bg-current" />
+                      <div className="h-0.5 w-0.5 rounded-full bg-current" />
+                      <div className="h-0.5 w-0.5 rounded-full bg-current" />
+                    </div>
                   </div>
-                  {/* ISSUE SUMMARY */}
-                  <div
-                    className="group relative min-w-0 flex-1 w-full"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                    }}
+                  <TypeBadge type={issue.type} isShowLabel={false} />
+                  <span
+                    className={`font-manrope text-xs font-black tracking-widest text-[#064e3b]/50 group-hover:text-[#064e3b] transition-colors ${issue?.column?.name === "DONE" ? "line-through opacity-50" : ""}`}
                   >
-                    <CustomInput
-                      field="summary"
-                      value={issueSummary}
-                      inputType="text"
-                      handleUpdateIssue={handleChangeIssueValue}
-                      containerClassName="flex items-center justify-center bg-transparent! flex  text-clip hover:text-underline! inline-block"
-                      contentClassName="block text-sm truncate px-1  bg-transparent! text-gray-500 hover:text-underline!"
-                      isEditing={editingIssueId === `${issue.id}-summary` ? undefined : false}
-                      onEditStart={() => setEditingIssueId(`${issue.id}-summary`)}
-                      onEditCancel={() => setEditingIssueId(null)}
-                    />
-                  </div>
+                    {issue?.key}
+                  </span>
+                </div>
+
+                {/* ISSUE SUMMARY */}
+                <div className="min-w-0 flex-1">
+                  <CustomInput
+                    field="summary"
+                    value={issueSummary}
+                    inputType="text"
+                    handleUpdateIssue={handleChangeIssueValue}
+                    containerClassName="flex items-center bg-transparent!"
+                    contentClassName={`block text-[13px] font-bold truncate px-1 bg-transparent! font-manrope transition-colors ${issue?.column?.name === "DONE" ? "text-gray-400 line-through" : "text-[#064e3b] group-hover:text-[#064e3b]"}`}
+                    isEditing={editingIssueId === `${issue.id}-summary` ? undefined : false}
+                    onEditStart={() => setEditingIssueId(`${issue.id}-summary`)}
+                    onEditCancel={() => setEditingIssueId(null)}
+                  />
                 </div>
               </div>
+
               {/* IssueCardRight */}
               <div
-                className="grid w-[35%] max-w-[50%] min-w-[400px] grid-cols-12 gap-1"
+                className="flex items-center gap-3 shrink-0"
                 onPointerDown={stopPropagation}
-                onClick={(e) => {
-                  e.stopPropagation();
-                }}
+                onClick={(e) => e.stopPropagation()}
               >
                 {/* parent dropdown */}
-                <div className="col-span-4 flex items-center hover:cursor-pointer">
+                <div className={`hidden lg:flex transition-all duration-300 ${issue.parent_id ? "opacity-100" : "opacity-0 group-hover:opacity-100"}`}>
                   <ParentDropdown
                     projectId={projectId}
                     issue={issue}
                     currentParentId={issue.parent_id}
                   />
                 </div>
+
                 {/* status dropdown */}
-                <div className="col-span-3 flex items-center">
+                <div className="origin-right w-[90px] overflow-hidden">
                   <StatusDropdown
                     projectId={projectId}
                     issueId={issue.id}
@@ -169,30 +163,32 @@ const IssueCard = memo(
                     }
                   />
                 </div>
+
                 {/* due date to */}
-                <div className="col-span-3 flex items-center">
+                <div className="hidden sm:flex items-center w-[100px] origin-right opacity-50 group-hover:opacity-100 transition-opacity">
                   <CustomDatePicker
                     issueId={issue.id}
                     field="due_date_to"
                     projectId={projectId}
                   />
                 </div>
-                {/* {/* story point */}
-                <div className="col-span-1 flex items-center">
-                  <div className="flex w-full items-center justify-center">
-                    <CustomInput
-                      field="story_point"
-                      containerClassName="flex items-center justify-center"
-                      value={issue.story_point || "-"}
-                      handleUpdateIssue={handleChangeIssueValue}
-                      isEditing={editingIssueId === `${issue.id}-story_point` ? undefined : false}
-                      onEditStart={() => setEditingIssueId(`${issue.id}-story_point`)}
-                      onEditCancel={() => setEditingIssueId(null)}
-                    />
-                  </div>
+
+                {/* story point */}
+                <div className="flex h-5 w-5 items-center justify-center rounded-md bg-[#064e3b]/5 text-[9px] font-black font-manrope text-[#064e3b] transition-all group-hover:bg-[#064e3b]/10">
+                  <CustomInput
+                    field="story_point"
+                    containerClassName="flex items-center justify-center"
+                    value={issue.story_point || "0"}
+                    handleUpdateIssue={handleChangeIssueValue}
+                    isEditing={editingIssueId === `${issue.id}-story_point` ? undefined : false}
+                    onEditStart={() => setEditingIssueId(`${issue.id}-story_point`)}
+                    onEditCancel={() => setEditingIssueId(null)}
+                    contentClassName="p-0 text-center"
+                  />
                 </div>
+
                 {/* assignee */}
-                <div className="col-span-1 flex items-center">
+                <div className="flex h-6 w-6 items-center justify-center transition-all opacity-50 group-hover:opacity-100 group-hover:scale-110">
                   <UserDropdown
                     projectId={projectId}
                     issueId={issue.id}

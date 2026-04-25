@@ -1,12 +1,11 @@
-import { useState, memo, useMemo, useTransition, lazy } from "react";
+import { useState, memo, useTransition, lazy } from "react";
 import { IIssue } from "@libs/types/issue";
 import { useProjectColumns } from "@libs/hooks/apis/useProject";
 import Button from "@libs/app/components/general-components/button";
 import { formatSprintDate } from "../../../../utils/date";
-import { FaChevronDown, FaChevronRight } from "react-icons/fa";
+import { FaChevronDown } from "react-icons/fa";
 import { ISprint } from "@libs/types/sprint";
 import IssueCard from "./issueCard";
-import { statusOptions } from "@libs/constants/list";
 import { MenuProps, Dropdown, Tooltip } from "antd";
 import { BsThreeDots } from "react-icons/bs";
 import { FaPlus } from "react-icons/fa6";
@@ -84,11 +83,6 @@ const ScrumSprint = memo(
 
     const [isExpanded, setIsExpanded] = useState(true);
     const { columns } = useProjectColumns({ project_id: projectId });
-    const estimate = useMemo(() => {
-      return sprint.issues.reduce((total, issue) => {
-        return total + (issue.story_point || 0);
-      }, 0);
-    }, [sprint.issues]);
 
     const buttonItems: MenuProps["items"] = [
       {
@@ -129,215 +123,147 @@ const ScrumSprint = memo(
 
     return (
       <DroppableWrapper id={sprint.id} data={{ type: "Sprint", sprint }}>
-        <div className="flex w-full flex-col gap-2">
-          <div className="overflow-hidden rounded-sm border border-gray-200 bg-white shadow-sm">
+        <div className="flex w-full flex-col gap-4">
+          <div className="overflow-hidden rounded-md border border-[#064e3b]/5 bg-white shadow-sm ring-1 ring-black/5">
             {/* Header */}
-            <div className="border-b border-gray-200 bg-[#f8f8f8] px-2 py-1">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center space-x-4">
+            <div
+              onClick={() => setIsExpanded(!isExpanded)}
+              className="bg-[#fcfcfb]/80 border-b border-[#064e3b]/5 px-4 py-2 cursor-pointer group/header"
+            >
+              <div className="flex items-center justify-between gap-4">
+                <div className="flex items-center gap-3 min-w-0 flex-1">
                   <button
                     title="Expand/Collapse Sprint"
-                    className="scale-110 text-gray-500 transition-colors hover:cursor-pointer hover:text-gray-900"
-                    onClick={() => setIsExpanded(!isExpanded)}
+                    className={`flex h-6 w-6 items-center justify-center rounded-lg bg-white shadow-sm border border-[#064e3b]/5 text-[#064e3b]/40 transition-all group-hover/header:text-[#064e3b] group-hover/header:border-[#064e3b]/20 active:scale-90 ${isExpanded ? "rotate-0" : "-rotate-90"}`}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setIsExpanded(!isExpanded);
+                    }}
                   >
-                    {isExpanded ? (
-                      <FaChevronDown size={12} />
-                    ) : (
-                      <FaChevronRight size={12} />
-                    )}
+                    <FaChevronDown size={8} />
                   </button>
-                  <div className="flex flex-row items-center space-x-4">
-                    <h2 className="text-md font-semibold text-gray-700">
+
+                  <div className="flex items-center gap-3 min-w-0">
+                    <h2 className="text-[12px] font-black text-[#064e3b] font-manrope uppercase tracking-tight truncate">
                       {sprint?.name}
                     </h2>
-                    <div className="flex items-center space-x-3 text-sm">
-                      {sprint?.name !== "Backlog" && (
-                        <span className="text-sm text-gray-600">
-                          {formatSprintDate(sprint?.date_started)} -{" "}
-                          {formatSprintDate(sprint?.date_ended)}
-                        </span>
-                      )}
-                      <span className="text-xs font-medium text-gray-700">
-                        {sprint.issues.length} issues
+                    {sprint?.name !== "Backlog" && (
+                      <span className="text-[10px] font-bold text-[#064e3b]/85 font-manrope whitespace-nowrap">
+                        {formatSprintDate(sprint?.date_started)} — {formatSprintDate(sprint?.date_ended)}
                       </span>
-                    </div>
+                    )}
+                    <span className="text-[10px] font-black text-[#064e3b]/80 py-0.5 px-1.5 bg-[#064e3b]/15 rounded-md font-manrope uppercase tracking-wider">
+                      {sprint.issues.length} {sprint.issues.length === 1 ? "Issue" : "Issues"}
+                    </span>
                   </div>
                 </div>
 
-                <div className="flex items-center space-x-6">
-                  {/* Column Count */}
-                  <div className="flex flex-row items-center space-x-3">
+                <div className="flex items-center gap-6">
+                  {/* metadata counters */}
+                  <div className="hidden md:flex items-center gap-1.5 opacity-40 group-hover/header:opacity-100 transition-opacity">
                     {columns?.map((column) => {
-                      const statusOption = statusOptions.find(
-                        (option) => option.key === column.name,
-                      );
                       const count = sprint.issues.filter(
-                        (issue) => issue?.column?.name === column.name,
+                        (issue) => issue?.column?.id === column.id,
                       ).length;
+                      if (count === 0) return null;
 
-                      // Map tailwind color classes to hex for Tooltip color prop
-                      const colorMap: Record<string, string> = {
-                        "bg-gray-100": "#6b7280",
-                        "bg-blue-100": "#3b82f6",
-                        "bg-green-100": "#22c55e",
-                      };
 
                       return (
                         <Tooltip
                           key={column.id}
-                          color={
-                            statusOption
-                              ? colorMap[statusOption.bgColor]
-                              : undefined
-                          }
                           title={
-                            <div className="flex flex-col py-0.5 px-1">
-                              <span className="text-[10px] font-bold uppercase tracking-wider opacity-90">
+                            <div className="flex flex-col py-0.5 px-1 font-manrope">
+                              <span className="text-[9px] font-black uppercase tracking-widest opacity-60">
                                 {column.name}
                               </span>
-                              <span className="text-sm font-extrabold">
-                                {count} {count <= 1 ? "Issue" : "Issues"}
+                              <span className="text-[11px] font-black">
+                                {count} {count === 1 ? "Item" : "Items"}
                               </span>
                             </div>
                           }
-                          mouseEnterDelay={0.2}
                         >
                           <div
-                            className={`rounded-sm px-1.5 py-0.5 text-center ${statusOption?.bgColor || "bg-gray-100"}`}
+                            className="flex h-5 min-w-[20px] items-center justify-center rounded-md bg-[#064e3b]/15 px-1.5 text-[9px] font-black text-[#064e3b] font-manrope"
                           >
-                            <div className="text-xs font-semibold text-gray-900">
-                              {count}
-                            </div>
+                            {count}
                           </div>
                         </Tooltip>
                       );
                     })}
                   </div>
 
-                  {/* Add Issue Button */}
-                  <div className="flex items-center space-x-3">
+                  <div className="flex items-center gap-2">
                     <Button
-                      variant="secondary"
-                      className="rounded-lg border border-gray-300 bg-white px-1 py-1 text-sm text-gray-700 shadow-sm transition-colors hover:bg-gray-50"
+                      variant={sprint.name === "Backlog" ? "light" : "primary"}
+                      size="sm"
+                      className="h-8 px-4!"
+                      onClick={() => {
+                        if (sprint.name === "Backlog") {
+                          setIsCreateSprintModalOpen({ isOpen: true, sprint: null });
+                        } else if (new Date(sprint.date_started).getTime() < new Date().getTime()) {
+                          setIsCompleteSprintModalOpen(true);
+                        } else {
+                          setIsCreateSprintModalOpen({ isOpen: true, sprint: sprint });
+                        }
+                      }}
                     >
-                      {sprint.name == "Backlog" ? (
-                        <span
-                          onClick={() => {
-                            startTransition(() => {
-                              setIsCreateSprintModalOpen({
-                                isOpen: true,
-                                sprint: null,
-                              });
-                            });
-                          }}
-                          className="text-sm font-semibold text-gray-900"
-                        >
-                          Create Sprint
-                        </span>
-                      ) : new Date(sprint.date_started).getTime() <
-                        new Date().getTime() ? (
-                        <span
-                          onClick={() => {
-                            startTransition(() => {
-                              setIsCompleteSprintModalOpen(true);
-                            });
-                          }}
-                          className="text-sm font-semibold text-gray-900"
-                        >
-                          Complete Sprint
-                        </span>
-                      ) : (
-                        <span
-                          onClick={() => {
-                            startTransition(() => {
-                              setIsCreateSprintModalOpen({
-                                isOpen: true,
-                                sprint: sprint,
-                              });
-                            });
-                          }}
-                          className="text-sm font-semibold text-gray-900"
-                        >
-                          Start Sprint
-                        </span>
-                      )}
+                      {sprint.name === "Backlog"
+                        ? "Create Sprint"
+                        : (new Date(sprint.date_started).getTime() < new Date().getTime() ? "Complete" : "Start")}
                     </Button>
 
                     <Dropdown
-                      menu={{
-                        items: buttonItems,
-                      }}
+                      menu={{ items: buttonItems }}
                       trigger={["click"]}
                       onOpenChange={setIsOpenButtonMenu}
                       open={isOpenButtonMenu}
                     >
-                      <div
-                        className={`rounded-sm border-2 p-1 text-gray-500 transition-colors hover:cursor-pointer hover:bg-gray-100 hover:text-gray-900 ${
-                          isOpenButtonMenu
-                            ? "border-emerald-500"
-                            : "border-transparent"
-                        } `}
-                      >
+                      <button className={`flex h-8 w-8 items-center justify-center rounded-xl transition-all hover:bg-[#064e3b]/5 text-[#064e3b]/40 hover:text-[#064e3b] ${isOpenButtonMenu ? "bg-[#064e3b]/10 text-[#064e3b]" : ""}`}>
                         <BsThreeDots size={16} />
-                      </div>
+                      </button>
                     </Dropdown>
                   </div>
                 </div>
               </div>
             </div>
+
             {/* Body */}
             {isExpanded && (
-              <div className="flex flex-col gap-2 divide-y divide-gray-100 bg-[#f8f8f8] p-2 px-3">
-                <div>
-                  <SortableContext
-                    strategy={horizontalListSortingStrategy}
-                    items={sprint.issues.map((issue) => issue.id)}
-                  >
+              <div className="bg-white p-2">
+                <SortableContext
+                  strategy={horizontalListSortingStrategy}
+                  items={sprint.issues.map((issue) => issue.id)}
+                >
+                  <div className="flex flex-col">
                     {sprint.issues.length > 0 ? (
                       sprint.issues.map((issue) => (
-                        <div key={issue.id} className="group relative my-1">
+                        <div key={issue.id} className="group relative">
                           <IssueCard issue={issue} projectId={projectId} />
-                          {/* // Line DragOverlay */}
                           <div
-                            style={{
-                              opacity:
-                                isDragging && issue.id === overItemId ? 1 : 0,
-                            }}
-                            className="absolute top-[-2px] left-0 z-50 flex w-full flex-row items-center"
-                          >
-                            <div className="h-[2px] w-full bg-emerald-500" />
-                          </div>
-
-                          <div
-                            style={{
-                              opacity:
-                                isDragging && issue.id === overItemId ? 1 : 0,
-                            }}
-                            className="absolute top-[-6px] left-[-8px] z-50 flex w-full flex-row items-center"
-                          >
-                            <div className="z-50 rounded-[100%] border-1 border-emerald-500 p-1" />
-                          </div>
+                            style={{ opacity: isDragging && issue.id === overItemId ? 1 : 0 }}
+                            className="absolute -top-[2px] left-0 z-50 w-full h-[3px] bg-[#064e3b] transition-opacity pointer-events-none rounded-full shadow-[0_0_8px_rgba(6,78,59,0.3)]"
+                          />
                         </div>
                       ))
                     ) : (
-                      <div
-                        className={`border-3 py-2 text-center text-sm text-gray-800 ${isDragging ? "border-emerald-500 bg-emerald-50" : "border-dashed border-gray-400"} `}
-                      >
-                        No issues in this sprint
+                      <div className={`flex flex-col items-center justify-center py-10 rounded-xl border-2 border-dashed transition-all duration-300 ${isDragging ? "border-[#064e3b] bg-[#f0fdf4]" : "border-[#10b981]/20 bg-[#f9f9f8]/50"}`}>
+                        <p className="text-[11px] font-black text-[#064e3b] font-manrope uppercase tracking-widest opacity-80">
+                          Drop issues here to plan your sprint
+                        </p>
                       </div>
                     )}
-                  </SortableContext>
-                </div>
+                  </div>
+                </SortableContext>
 
-                <div
-                  onClick={() => {
-                    setIsCreateIssueModalOpen(true);
-                  }}
-                  className="flex items-center space-x-2 rounded-sm bg-transparent p-2 text-gray-700 hover:cursor-pointer hover:bg-gray-200"
+                <button
+                  onClick={() => setIsCreateIssueModalOpen(true)}
+                  className="mt-2 cursor-pointer flex w-full items-center gap-3 rounded-xl border border-transparent py-2.5 px-4 text-[#064e3b]/60 transition-all hover:bg-[#064e3b]/5 hover:text-[#064e3b] active:scale-[0.99] group"
                 >
-                  <FaPlus size={16} />
-                  <span className="text-sm font-semibold">Create Issue</span>
-                </div>
+                  <div className="flex h-5 w-5 items-center justify-center rounded-lg bg-[#064e3b]/10 text-[#064e3b] group-hover:bg-[#064e3b] group-hover:text-white transition-colors">
+                    <FaPlus size={10} />
+                  </div>
+                  <span className="text-[12px] font-bold font-manrope uppercase tracking-tight">Create Issue</span>
+                </button>
               </div>
             )}
 
@@ -356,22 +282,11 @@ const ScrumSprint = memo(
             />
           </div>
 
-          {isExpanded && (
-            <div className="flex h-full flex-row items-center">
-              <div className="flex flex-1 flex-row items-center justify-end gap-1">
-                <div className="flex h-full gap-2">
-                  <span className="text-sm font-medium text-gray-600">
-                    {sprint.issues.length} work items
-                  </span>
-                  <span className="text-sm font-semibold text-gray-600">|</span>
-                  <span className="text-sm font-medium text-gray-600">
-                    Estimate:{" "}
-                    <span className="text-sm font-bold text-gray-800">
-                      {estimate}
-                    </span>
-                  </span>
-                </div>
-              </div>
+          {!isExpanded && (
+            <div className="flex justify-end px-4">
+              <span className="text-[10px] font-black text-[#064e3b]/80 font-manrope uppercase tracking-widest">
+                {sprint.issues.length} Items Packed • Expand to view
+              </span>
             </div>
           )}
 
