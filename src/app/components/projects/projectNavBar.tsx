@@ -81,12 +81,14 @@ const SortableNavItem: React.FC<SortableNavItemProps> = ({
       className={`relative w-full ${isDragging ? "z-50 opacity-50" : "z-0"}`}
       {...attributes}
       {...listeners}
+      aria-label={`Reorder ${item.label}`}
     >
       <Link
         to={item.route}
         onClick={() => {
           closeIssueDetail();
         }}
+        aria-label={item.label}
         className={`group relative flex w-full items-center ${isCollapsed ? "justify-center px-0" : "justify-start px-4"
           } py-2.5 text-xs font-semibold uppercase tracking-widest no-underline transition-all duration-200 rounded-md ${isActive
             ? "bg-white text-[#064e3b] shadow-sm"
@@ -231,6 +233,7 @@ const ProjectNavbar: React.FC<ProjectNavbarProps> = ({
         onClick={onToggle}
         className="absolute -right-3 top-[50%] z-50 flex h-6 w-6 items-center justify-center rounded-full border border-[#e8e8e7] bg-white text-[#404944] shadow-md hover:text-[#064e3b] hover:scale-110 transition-all duration-200 group/collapse"
         title={isCollapsed ? "Expand Sidebar" : "Collapse Sidebar"}
+        aria-label={isCollapsed ? "Expand Sidebar" : "Collapse Sidebar"}
       >
         {isCollapsed ? (
           <ChevronRight size={14} className="transition-transform group-hover/collapse:translate-x-0.5" />
@@ -313,6 +316,7 @@ const ProjectNavbar: React.FC<ProjectNavbarProps> = ({
           <button
             className="mb-4 p-2.5 bg-[#064e3b] text-white rounded-lg shadow-md hover:bg-[#085a44] active:scale-95 transition-all duration-200 group/sync"
             title="Sync Data"
+            aria-label="Sync Data"
           >
             <Zap size={18} className="group-hover/sync:animate-pulse" />
           </button>
@@ -322,6 +326,7 @@ const ProjectNavbar: React.FC<ProjectNavbarProps> = ({
           to="#"
           className={`flex items-center ${isCollapsed ? "justify-center" : "gap-3 px-4"} py-2 text-[#404944] hover:bg-[#eeeeed] hover:text-[#064e3b] rounded-md transition-all duration-200 group/nav`}
           title={isCollapsed ? "Support" : ""}
+          aria-label="Support"
         >
           <HelpCircle size={20} className="shrink-0" />
           {!isCollapsed && <span className="font-inter text-xs font-semibold uppercase tracking-widest whitespace-nowrap animate-slide-in-left transition-all duration-300">Support</span>}
@@ -331,6 +336,7 @@ const ProjectNavbar: React.FC<ProjectNavbarProps> = ({
           to="/logout"
           className={`flex items-center ${isCollapsed ? "justify-center" : "gap-3 px-4"} py-2 text-[#404944] hover:bg-[#eeeeed] hover:text-[#064e3b] rounded-md transition-all duration-200 group/nav`}
           title={isCollapsed ? "Sign Out" : ""}
+          aria-label="Sign Out"
         >
           <LogOut size={20} className="shrink-0" />
           {!isCollapsed && <span className="font-inter text-xs font-semibold uppercase tracking-widest whitespace-nowrap animate-slide-in-left transition-all duration-300">Sign Out</span>}

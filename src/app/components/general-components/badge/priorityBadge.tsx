@@ -46,7 +46,7 @@ export const priorityOptions: {
     {
       name: "Lowest",
       icon: <ChevronsDown size={14} strokeWidth={3} />,
-      textColor: "text-[#404944]/70",
+      textColor: "text-[#404944]",
       bgColor: "bg-[#f9f9f8]",
       borderColor: "border-[#e8e8e7]",
     },

@@ -51,12 +51,13 @@ const UnscheduledWork: React.FC<UnscheduledWorkProps> = memo(
             </h2>
             <button
               onClick={handleToggleUnscheduledWork}
+              aria-label="Close backlog"
               className="group flex h-8 w-8 items-center justify-center rounded-xl bg-gray-50 text-gray-400 hover:bg-red-50 hover:text-red-500 transition-all"
             >
               <X size={16} />
             </button>
           </div>
-          <p className="text-[11px] font-medium text-[#064e3b]/40 font-manrope">
+          <p className="text-[11px] font-medium text-[#064e3b]/70 font-manrope">
             Drag items onto the calendar to set deadlines
           </p>
         </div>
@@ -100,7 +101,7 @@ const UnscheduledWork: React.FC<UnscheduledWorkProps> = memo(
           <div className="flex items-center justify-between p-3 border-b border-[#e8e8e7] bg-white/80 backdrop-blur-sm sticky top-0 z-10">
             <button
               onClick={() => setIsSort(!isSort)}
-              className="flex items-center gap-2 rounded-lg px-3 py-1.5 transition-all hover:bg-[#064e3b]/5 text-[#064e3b]/60 hover:text-[#064e3b]"
+              className="flex items-center gap-2 rounded-lg px-3 py-1.5 transition-all hover:bg-[#064e3b]/5 text-[#064e3b]/80 hover:text-[#064e3b]"
             >
               <span className="text-[10px] font-bold font-manrope uppercase tracking-wider">
                 {isSort ? "Newest First" : "Oldest First"}
@@ -116,7 +117,10 @@ const UnscheduledWork: React.FC<UnscheduledWorkProps> = memo(
               overlayClassName="premium-popover"
               content={<div className="w-48 p-2">Filters...</div>}
             >
-              <button className="flex h-8 w-8 items-center justify-center rounded-lg hover:bg-[#064e3b]/5 text-[#064e3b]/60 hover:text-[#064e3b]">
+              <button 
+                aria-label="Filter unassigned items"
+                className="flex h-8 w-8 items-center justify-center rounded-lg hover:bg-[#064e3b]/5 text-[#064e3b]/80 hover:text-[#064e3b]"
+              >
                 <ListFilter size={16} />
               </button>
             </Popover>
@@ -146,7 +150,7 @@ const UnscheduledWork: React.FC<UnscheduledWorkProps> = memo(
               <h3 className="text-[13px] font-bold text-[#064e3b] font-manrope mb-1 uppercase tracking-tight">
                 Inbox Zero!
               </h3>
-              <p className="text-[11px] font-medium text-[#064e3b]/40 font-manrope max-w-[180px]">
+              <p className="text-[11px] font-medium text-[#064e3b]/70 font-manrope max-w-[180px]">
                 Everything is scheduled. Drag items back here to unschedule.
               </p>
             </div>

@@ -27,7 +27,7 @@ const RoadmapFilter = ({
     <div className="flex flex-col gap-2 w-full">
       <div className="flex flex-col gap-1">
         <h1 className="text-2xl font-black tracking-tight text-[#064e3b] font-manrope uppercase">Roadmap</h1>
-        <p className="text-[12px] text-[#404944]/60 font-manrope font-medium tracking-wide">Plan and visualize your project timeline and milestones</p>
+        <p className="text-[12px] text-[#404944]/80 font-manrope font-medium tracking-wide">Plan and visualize your project timeline and milestones</p>
       </div>
       <div className="flex items-center justify-between py-1">
 
@@ -51,7 +51,8 @@ const RoadmapFilter = ({
           <div className="flex items-center h-10 rounded-xl border border-[#e8e8e7] bg-white overflow-hidden shadow-button">
             <button
               onClick={previousMonth}
-              className="h-full px-3 flex items-center justify-center text-[#064e3b]/60 hover:bg-[#f9f9f8] hover:text-[#064e3b] transition-all"
+              aria-label="Previous Month"
+              className="h-full px-3 flex items-center justify-center text-[#064e3b]/80 hover:bg-[#f9f9f8] hover:text-[#064e3b] transition-all"
             >
               <FaChevronLeft size={10} />
             </button>
@@ -66,7 +67,8 @@ const RoadmapFilter = ({
 
             <button
               onClick={nextMonth}
-              className="h-full px-3 flex items-center justify-center text-[#064e3b]/60 hover:bg-[#f9f9f8] hover:text-[#064e3b] transition-all"
+              aria-label="Next Month"
+              className="h-full px-3 flex items-center justify-center text-[#064e3b]/80 hover:bg-[#f9f9f8] hover:text-[#064e3b] transition-all"
             >
               <FaChevronRight size={10} />
             </button>
@@ -76,13 +78,15 @@ const RoadmapFilter = ({
             <button
               onClick={handleToggleUnscheduledWork}
               title="Toggle Unscheduled Work"
-              className="flex h-10 w-10 items-center justify-center rounded-xl border border-[#e8e8e7] bg-white text-[#064e3b]/60 hover:text-[#064e3b] hover:bg-[#f9f9f8] transition-all shadow-button"
+              aria-label="Toggle Unscheduled Work"
+              className="flex h-10 w-10 items-center justify-center rounded-xl border border-[#e8e8e7] bg-white text-[#064e3b]/80 hover:text-[#064e3b] hover:bg-[#f9f9f8] transition-all shadow-button"
             >
               <CalendarPlus size={18} />
             </button>
             <button
               title="Roadmap Settings"
-              className="flex h-10 w-10 items-center justify-center rounded-xl border border-[#e8e8e7] bg-white text-[#064e3b]/60 hover:text-[#064e3b] hover:bg-[#f9f9f8] transition-all shadow-button"
+              aria-label="Roadmap Settings"
+              className="flex h-10 w-10 items-center justify-center rounded-xl border border-[#e8e8e7] bg-white text-[#064e3b]/80 hover:text-[#064e3b] hover:bg-[#f9f9f8] transition-all shadow-button"
             >
               <Settings2 size={18} />
             </button>

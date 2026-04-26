@@ -97,7 +97,7 @@ const ColumnDropdown = memo(
         >
           <Dropdown
             disabled={!permissionResult.isAllow || disabled}
-            dropdownRender={(menu) => (
+            popupRender={(menu) => (
               <div className="bg-white rounded-lg shadow-2xl border border-[#e8e8e7] overflow-hidden min-w-[220px] font-manrope animate-in fade-in zoom-in duration-200">
                 <div className="bg-[#f9f9f8] p-2 border-b border-[#e8e8e7]">
                   <div className="relative">

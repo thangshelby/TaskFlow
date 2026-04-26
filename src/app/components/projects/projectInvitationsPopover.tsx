@@ -17,7 +17,10 @@ const ProjectInvitationsPopover: React.FC<ProjectInvitationsPopoverProps> = ({
 
   return (
     <Popover content={content} trigger="click" placement="bottomRight">
-      <div className="relative cursor-pointer p-2.5 text-[#404944] hover:text-[#064e3b] transition-all rounded-full hover:bg-[#eeeeed] active:scale-95">
+      <button 
+        aria-label="View project invitations"
+        className="relative cursor-pointer p-2.5 text-[#404944] hover:text-[#064e3b] transition-all rounded-full hover:bg-[#eeeeed] active:scale-95"
+      >
         <UserPlus size={22} />
         {pendingInvitations.length > 0 && (
           <span className="absolute top-1.5 right-1.5 flex h-4 w-4 items-center justify-center rounded-full bg-red-500 shadow-sm border border-white">
@@ -26,7 +29,7 @@ const ProjectInvitationsPopover: React.FC<ProjectInvitationsPopoverProps> = ({
             </span>
           </span>
         )}
-      </div>
+      </button>
     </Popover>
   );
 };

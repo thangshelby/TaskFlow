@@ -133,7 +133,7 @@ const AddProjectMemberModal: React.FC<AddProjectMemberModalProps> = ({
             </label>
             <div ref={dropDownRef}>
               <Dropdown
-                dropdownRender={(menu) => (
+                popupRender={(menu) => (
                   <div
                     style={{
                       width: dropDownRef.current?.offsetWidth || "100%",

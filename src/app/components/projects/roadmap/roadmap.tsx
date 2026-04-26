@@ -34,7 +34,7 @@ const Roadmap: React.FC<RoadmapProps> = ({
             ].map((day) => (
               <div
                 key={day}
-                className="py-3 text-center text-[11px] font-bold text-[#064e3b]/40 font-manrope uppercase tracking-widest"
+                className="py-3 text-center text-[11px] font-bold text-[#064e3b]/70 font-manrope uppercase tracking-widest"
               >
                 {day}
               </div>
@@ -122,7 +122,7 @@ const DropableDate = ({
             <span
               className={`text-sm font-bold font-manrope ${isToday(dateObj)
                 ? "flex h-7 w-7 items-center justify-center rounded-full bg-[#064e3b] text-white shadow-lg"
-                : "text-[#064e3b]/40 group-hover:text-[#064e3b]"
+                : "text-[#064e3b]/70 group-hover:text-[#064e3b]"
                 }`}
             >
               {dateObj.getDate()}
@@ -153,7 +153,7 @@ const DropableDate = ({
                   </div>
                 }
               >
-                <div className="mt-auto py-1 text-[10px] font-bold text-[#064e3b]/60 hover:text-[#064e3b] hover:bg-[#064e3b]/5 rounded-md text-center cursor-pointer transition-colors font-manrope uppercase tracking-wider">
+                <div className="mt-auto py-1 text-[10px] font-bold text-[#064e3b]/80 hover:text-[#064e3b] hover:bg-[#064e3b]/5 rounded-md text-center cursor-pointer transition-colors font-manrope uppercase tracking-wider">
                   + {issues.length - 2} more
                 </div>
               </Popover>
