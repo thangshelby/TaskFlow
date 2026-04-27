@@ -8,10 +8,12 @@ const TypeDropdown = ({
   projectId,
   issueId,
   type,
+  size = "small"
 }: {
   projectId: string;
   issueId: string;
   type: IssueType;
+  size?: "small" | "medium" | "large";
 }) => {
   const { updateIssueAsync } = useUpdateIssue({ projectId });
 
@@ -39,14 +41,18 @@ const TypeDropdown = ({
             border: "none",
             boxShadow: "none",
           },
-          label: <TypeBadge type={option.name as IssueType} className="p-2" />,
+          label: (
+            <div className="border-l-2 border-transparent p-2 hover:border-[#064e3b] hover:bg-[#f0fdf4] transition-all duration-200">
+              <TypeBadge type={option.name as IssueType} size={size} />
+            </div>
+          ),
           onClick: () => {
             handleChangeType(option.name as IssueType);
           },
         };
       })}
       currentItem={undefined}
-      children={<TypeBadge type={currentType?.name as IssueType} />}
+      children={<TypeBadge type={currentType?.name as IssueType} size={size} />}
     />
   );
 };

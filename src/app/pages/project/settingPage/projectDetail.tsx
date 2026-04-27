@@ -1,13 +1,13 @@
 import React, { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import { Flag, MoreHorizontal, Info, Save } from "lucide-react";
-import { useProject, useUpdateProject } from "@libs/hooks/apis/useProject";
+import { useProjectByID, useUpdateProject } from "@libs/hooks/apis/useProject";
 import UserAvatar from "@libs/app/components/general-components/user/userAvatar";
 import { toast } from "react-toastify";
 
 const ProjectDetailPage: React.FC = () => {
   const { projectId } = useParams<{ projectId: string }>();
-  const { project, isLoading } = useProject(projectId || "");
+  const { project, isLoading } = useProjectByID(projectId || "");
   const { updateProject, isLoading: isUpdating } = useUpdateProject({
     onClose: () => toast.success("Project updated successfully!"),
   });
@@ -195,11 +195,10 @@ const ProjectDetailPage: React.FC = () => {
             <button
               onClick={handleSave}
               disabled={isUpdating}
-              className={`inline-flex items-center gap-2 rounded-md px-5 py-2.5 text-sm font-medium transition-colors ${
-                isUpdating
+              className={`inline-flex items-center gap-2 rounded-md px-5 py-2.5 text-sm font-medium transition-colors ${isUpdating
                   ? "bg-gray-300 text-gray-600"
                   : "bg-blue-600 text-white hover:bg-blue-700"
-              }`}
+                }`}
             >
               <Save className="h-4 w-4" />
               {isUpdating ? "Saving..." : "Save"}

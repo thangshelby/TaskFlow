@@ -39,11 +39,17 @@ export const statusColors = [
   },
 ];
 
+import {
+  UISize,
+  getBadgeSizeClass,
+} from "../constants/uiConfig";
+
 const StatusBadge = ({
   column,
   columnId,
   projectId,
   className,
+  size = "small",
 }: {
   column?: {
     name: string;
@@ -52,6 +58,7 @@ const StatusBadge = ({
   projectId?: string;
   columnId?: string;
   className?: string;
+  size?: UISize;
 }) => {
   const { columns } = useProjectColumns({ project_id: projectId || "" });
   const selectedColumn = columns.find((c) => c.id === columnId);
@@ -77,10 +84,10 @@ const StatusBadge = ({
 
   return (
     <div
-      className={`flex items-center justify-center w-full min-w-0 rounded-xs border px-1.5 py-1 shadow-sm font-manrope ${statusInfo.bgColor} ${statusInfo.borderColor} ${className}`}
+      className={`inline-flex items-center justify-center border shadow-sm font-manrope ${statusInfo.bgColor} ${statusInfo.borderColor} ${getBadgeSizeClass(size)} ${className}`}
     >
       <p
-        className={`truncate text-[10px] font-extrabold uppercase tracking-widest ${statusInfo.textColor}`}
+        className={`truncate font-bold uppercase tracking-widest ${statusInfo.textColor}`}
       >
         {column
           ? column.name

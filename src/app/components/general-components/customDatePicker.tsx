@@ -38,18 +38,22 @@ function parseIssueDate(value?: string | null): Dayjs | null {
   return parsed.isValid() ? parsed : null;
 }
 
+import { UISize, UI_COMMON_SIZES } from "./constants/uiConfig";
+
 const CustomDatePicker = ({
   issueId,
   projectId,
   field,
   isEditable = true,
   className,
+  size = "small",
 }: {
   issueId: string;
   projectId: string;
   field: IssueDateField;
   isEditable?: boolean;
   className?: string;
+  size?: UISize;
 }) => {
   const { updateIssue } = useUpdateIssue({ projectId });
 
@@ -94,22 +98,29 @@ const CustomDatePicker = ({
           variant="outlined"
           suffixIcon={
             isExpired ? (
-              <TriangleAlert className="text-red-600" size={14} />
+              <TriangleAlert
+                className="text-red-600"
+                size={UI_COMMON_SIZES[size].iconSize}
+              />
             ) : (
-              <Calendar className="text-[#064e3b]/50 group-hover:text-[#064e3b]" size={14} />
+              <Calendar
+                className="text-[#064e3b]/50 group-hover:text-[#064e3b]"
+                size={UI_COMMON_SIZES[size].iconSize}
+              />
             )
           }
           className={`w-full premium-datepicker ${isExpired ? "is-expired" : ""}`}
           style={{
-            height: "32px",
-            borderRadius: "6px",
+            height: UI_COMMON_SIZES[size].height,
+            fontSize: UI_COMMON_SIZES[size].fontSize,
+            padding: UI_COMMON_SIZES[size].padding,
+            borderRadius: UI_COMMON_SIZES[size].borderRadius,
             border: isExpired ? "1px solid #fee2e2" : "1px solid #e8e8e7",
             backgroundColor: isExpired ? "#fef2f2" : "white",
-            padding: "4px 12px",
-            fontSize: "11px",
             fontWeight: "700",
             fontFamily: "Manrope, sans-serif",
             color: isExpired ? "#dc2626" : "#064e3b",
+            boxShadow: "0 1px 2px 0 rgba(0, 0, 0, 0.05)",
           }}
         />
       </Tooltip>

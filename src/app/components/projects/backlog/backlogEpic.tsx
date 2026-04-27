@@ -132,7 +132,7 @@ const EpicIssueCard = ({
               {epicIssue.summary}
             </span>
           </div>
-          <button 
+          <button
             aria-label="More options"
             className="h-7 w-7 text-gray-400 hover:text-[#064e3b] transition-colors rounded-lg flex items-center justify-center hover:bg-white"
           >
@@ -156,11 +156,8 @@ const EpicIssueCard = ({
               })}
             </div>
             <div className="mt-2.5 flex items-center justify-between">
-              <span className="text-[11px] font-bold text-[#064e3b]/70 font-manrope uppercase tracking-tight">
+              <span className="text-[11px] font-bold text-[#064e3b]/70 font-manrope uppercase tracking-tight truncate">
                 {columnCounts["DONE"]} of {totalIssues} completed
-              </span>
-              <span className="text-[10px] font-black text-[#064e3b]/80 font-manrope bg-white px-2 py-0.5 rounded-full shadow-sm border border-[#064e3b]/5">
-                {totalIssues} {totalIssues === 1 ? "ISSUE" : "ISSUES"}
               </span>
             </div>
           </div>

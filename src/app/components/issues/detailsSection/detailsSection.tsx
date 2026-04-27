@@ -65,7 +65,7 @@ const Details = ({
         </DetailRow>
         
         <DetailRow label="Reporter" layout={layout}>
-          <div className="bg-[#fcfcfb]/50 p-1.5 rounded-lg border border-[#064e3b]/5 flex items-center gap-2">
+          <div className="bg-[#fcfcfb]/50 p-1.5 rounded-md border border-[#064e3b]/5 flex items-center gap-2">
             <UserAvatar
               userId={selectedIssue?.reporter_id || ""}
               size={24}
@@ -101,7 +101,7 @@ const Details = ({
           </DetailRow>
 
           <DetailRow label="Story Points" layout={layout}>
-            <div className="space-y-1 rounded-lg border border-[#064e3b]/5 bg-[#fcfcfb]/30 p-2 shadow-inner-sm">
+            <div className="space-y-1 rounded-md border border-[#064e3b]/5 bg-[#fcfcfb]/30 p-2 shadow-inner-sm">
               <CustomInput
                 field="story_point"
                 value={selectedIssue.story_point}
@@ -142,24 +142,20 @@ const Details = ({
           </DetailRow>
 
           <DetailRow label="Dates" layout={layout}>
-            <div className="flex items-center gap-2">
-              <div className="flex-1 bg-[#fcfcfb]/50 rounded-xl border border-[#064e3b]/5 p-0.5">
-                <CustomDatePicker
-                  field="due_date_from"
-                  projectId={projectId}
-                  className="px-2"
-                  issueId={selectedIssue.id}
-                />
-              </div>
-              <span className="text-[#064e3b]/40">→</span>
-              <div className="flex-1 bg-[#fcfcfb]/50 rounded-xl border border-[#064e3b]/5 p-0.5">
-                <CustomDatePicker
-                  field="due_date_to"
-                  projectId={projectId}
-                  className="px-2"
-                  issueId={selectedIssue.id}
-                />
-              </div>
+            <div className="flex items-center gap-2 bg-[#fcfcfb]/50 p-1 rounded-md border border-[#064e3b]/5">
+              <CustomDatePicker
+                field="due_date_from"
+                projectId={projectId}
+                issueId={selectedIssue.id}
+                className="flex-1"
+              />
+              <span className="text-[#064e3b]/40 text-xs">→</span>
+              <CustomDatePicker
+                field="due_date_to"
+                projectId={projectId}
+                issueId={selectedIssue.id}
+                className="flex-1"
+              />
             </div>
           </DetailRow>
         </div>

@@ -28,7 +28,7 @@ export function useProjectMembers(
     enabled: !!params.project_id && (enabled === undefined ? true : enabled),
   });
   return {
-    projectMembers: data,
+    projectMembers: data?.data,
     pagination: data?.pagination,
     isLoading,
     error,

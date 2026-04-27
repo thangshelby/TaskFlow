@@ -256,10 +256,10 @@ const ProjectNavbar: React.FC<ProjectNavbarProps> = ({
               {!isCollapsed && (
                 <div className="flex flex-col min-w-0 overflow-hidden animate-slide-in-left">
                   <h2 className="text-sm font-bold text-[#064e3b] uppercase tracking-widest truncate leading-tight">
-                    {project?.data.name || "Project Workspace"}
+                    {project?.name || "Project Workspace"}
                   </h2>
                   <p className="text-[10px] text-[#404944] font-medium opacity-70 truncate">
-                    {project?.data.key || "PROJ"} • Engineering Alpha
+                    {project?.key || "PROJ"} • Engineering Alpha
                   </p>
                 </div>
               )}

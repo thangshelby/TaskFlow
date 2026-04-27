@@ -172,15 +172,15 @@ export default function TextEditor({
   });
 
   return (
-    <div className="flex w-full flex-col gap-2">
+    <div className="flex w-full flex-col gap-2 p-4">
       {/* Speech to text control above editor */}
       <div className="flex items-center gap-2">
-        <p className="py-1 text-sm font-bold text-gray-600">Description</p>
+        <p className="text-[11px] font-black uppercase tracking-widest text-[#064e3b]/60">Description</p>
         {isSpeechSupported && (
           <button
             type="button"
             onClick={toggleListening}
-            className={`stt-mic-btn cursor-pointer ${isListening ? "stt-mic-btn--active" : ""}`}
+            className={`stt-mic-btn cursor-pointer transition-all duration-300 hover:scale-110 active:scale-95 ${isListening ? "stt-mic-btn--active bg-red-100 text-red-500!" : "text-[#064e3b]/40 hover:text-[#064e3b]"}`}
             title={isListening ? "Stop dictation" : "Start dictation"}
           >
             {isListening ? (
@@ -191,47 +191,49 @@ export default function TextEditor({
           </button>
         )}
         {isListening && (
-          <span className="stt-status-badge">
-            <span className="stt-pulse" />
+          <span className="stt-status-badge animate-pulse bg-red-50 text-red-600 text-[10px] font-bold px-2 py-0.5 rounded-full flex items-center gap-1">
+            <span className="h-1.5 w-1.5 rounded-full bg-red-500 animate-ping" />
             Listening...
           </span>
         )}
       </div>
 
       <div
-        className={`rounded border transition-colors ${isListening
-          ? "border-red-400 shadow-[0_0_0_2px_rgba(248,113,113,0.2)]"
-          : "border-gray-300 focus-within:border-emerald-500"
-          }`}
+        className={`rounded-md border transition-all duration-300 ${isListening
+          ? "border-red-400 shadow-[0_0_0_2px_rgba(248,113,113,0.1)]"
+          : "border-[#064e3b]/10 focus-within:border-[#064e3b]/30 focus-within:ring-2 focus-within:ring-[#064e3b]/5"
+          } bg-[#fcfcfb]/30 overflow-hidden [&_.ql-toolbar]:border-none [&_.ql-toolbar]:bg-gray-50/50 [&_.ql-container]:border-none [&_.ql-editor]:min-h-[180px] [&_.ql-editor]:text-[14px] [&_.ql-editor]:font-manrope`}
       >
         <div ref={editorRef} />
       </div>
 
       {isListening && interimText && (
-        <div className="stt-interim-preview">
-          <span className="stt-interim-text">{interimText}</span>
+        <div className="stt-interim-preview bg-gray-50 border-l-2 border-red-400 p-2 rounded-r-md">
+          <span className="stt-interim-text text-sm text-gray-500 italic">{interimText}</span>
         </div>
       )}
 
-      <div className="flex flex-row gap-2 mt-2">
+      <div className="flex flex-row items-center gap-3 mt-1">
         <button
           onClick={handleSaveDescription}
           disabled={isSaving}
-          className="flex items-center gap-2 cursor-pointer rounded-sm bg-emerald-500 px-3 py-1.5 text-sm font-semibold text-white transition-all hover:bg-emerald-600 disabled:opacity-50 disabled:cursor-not-allowed"
+          className="flex items-center gap-2 cursor-pointer rounded-md bg-[#064e3b] px-5 py-2 text-sm font-bold text-white transition-all hover:bg-[#053d2e] hover:shadow-md active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed group"
         >
           {isSaving ? (
             <>
-              <div className="h-3.5 w-3.5 animate-spin rounded-full border-2 border-white border-t-transparent" />
+              <div className="h-3.5 w-3.5 animate-spin rounded-full border-2 border-white/30 border-t-white" />
               <span>Saving...</span>
             </>
           ) : (
-            "Save"
+            <>
+              <span>Save</span>
+            </>
           )}
         </button>
         <button
           onClick={handleClose}
           disabled={isSaving}
-          className="cursor-pointer rounded-sm bg-transparent px-[10px] py-1 text-sm font-medium text-gray-500 hover:bg-gray-200 disabled:opacity-30 disabled:cursor-not-allowed"
+          className="cursor-pointer rounded-md bg-transparent px-4 py-2 text-sm font-bold text-[#064e3b]/60 transition-all hover:bg-[#064e3b]/5 hover:text-[#064e3b] disabled:opacity-30 disabled:cursor-not-allowed"
         >
           Cancel
         </button>

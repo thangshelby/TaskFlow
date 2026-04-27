@@ -79,10 +79,14 @@ const QuillEditorCreate = forwardRef<
         );
       });
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  return <div ref={editorRef} />;
+  return (
+    <div className="w-full border border-[#064e3b]/10 bg-[#fcfcfb]/30 overflow-hidden [&_.ql-toolbar]:border-none [&_.ql-toolbar]:bg-gray-50/50 [&_.ql-container]:border-none [&_.ql-editor]:min-h-[150px] [&_.ql-editor]:text-[14px] [&_.ql-editor]:font-manrope">
+      <div ref={editorRef} />
+    </div>
+  );
 });
 
 QuillEditorCreate.displayName = "QuillEditorCreate";

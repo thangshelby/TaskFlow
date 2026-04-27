@@ -7,53 +7,50 @@ export const teamColors = [
     dotColor: "bg-[#064e3b]",
     bgColor: "bg-[#f0fdf4]",
     hoverBg: "hover:bg-[#f0fdf4]",
+    borderColor: "border-[#064e3b]/20",
   },
   {
     textColor: "text-[#0369a1]",
     dotColor: "bg-[#0ea5e9]",
     bgColor: "bg-[#f0f9ff]",
     hoverBg: "hover:bg-[#f0f9ff]",
+    borderColor: "border-[#0ea5e9]/20",
   },
   {
     textColor: "text-[#5b21b6]",
     dotColor: "bg-[#8b5cf6]",
     bgColor: "bg-[#f5f3ff]",
     hoverBg: "hover:bg-[#f5f3ff]",
+    borderColor: "border-[#8b5cf6]/20",
   },
   {
     textColor: "text-[#059669]",
     dotColor: "bg-[#10b981]",
     bgColor: "bg-[#ecfdf5]",
     hoverBg: "hover:bg-[#ecfdf5]",
+    borderColor: "border-[#10b981]/20",
   },
   {
     textColor: "text-[#404944]",
     dotColor: "bg-[#404944]",
     bgColor: "bg-[#f9f9f8]",
     hoverBg: "hover:bg-[#f9f9f8]",
+    borderColor: "border-[#e8e8e7]",
   },
   {
     textColor: "text-[#b45309]",
     dotColor: "bg-[#f59e0b]",
     bgColor: "bg-[#fffbeb]",
     hoverBg: "hover:bg-[#fffbeb]",
+    borderColor: "border-[#f59e0b]/20",
   },
 ];
 
-const sizeClasses = {
-  small: {
-    button: "px-2 py-0.5 text-xs",
-    icon: "w-3 h-3",
-  },
-  medium: {
-    button: "px-3 py-1 text-sm",
-    icon: "w-4 h-4",
-  },
-  large: {
-    button: "px-4 py-1.5 text-base",
-    icon: "w-5 h-5",
-  },
-};
+import {
+  UISize,
+  UI_COMMON_SIZES,
+  getBadgeSizeClass,
+} from "../constants/uiConfig";
 
 const TeamBadge = ({
   team,
@@ -62,7 +59,7 @@ const TeamBadge = ({
   isShowLabel = true,
 }: {
   team: ITeam;
-  size?: "small" | "medium" | "large";
+  size?: UISize;
   className?: string;
   isShowLabel?: boolean;
 }) => {
@@ -74,20 +71,17 @@ const TeamBadge = ({
 
   return (
     <div
-      className={`flex items-center gap-2 rounded-lg transition-colors duration-200 ${selectedColor.hoverBg} ${className}`}
+      className={`inline-flex items-center justify-center border shadow-sm font-manrope ${selectedColor.bgColor} ${selectedColor.borderColor} ${getBadgeSizeClass(size)} ${className}`}
     >
-      <div
-        className={`rounded-lg ${selectedColor.bgColor} flex items-center gap-1.5 ${sizeClasses[size].button} border-white/50 border`}
-      >
-        <Users
-          className={`${sizeClasses[size].icon} ${selectedColor.textColor} opacity-80`}
-        />
-        {isShowLabel && (
-          <p className={`truncate font-bold text-[10px] uppercase tracking-widest font-manrope ${selectedColor.textColor}`}>
-            {team.name || "Unnamed Team"}
-          </p>
-        )}
-      </div>
+      <Users
+        size={UI_COMMON_SIZES[size].iconSize}
+        className={`${selectedColor.textColor} opacity-80 shrink-0 mr-1.5`}
+      />
+      {isShowLabel && (
+        <p className={`truncate font-bold uppercase tracking-widest ${selectedColor.textColor}`}>
+          {team.name || "Unnamed Team"}
+        </p>
+      )}
     </div>
   );
 };

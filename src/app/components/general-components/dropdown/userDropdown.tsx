@@ -14,6 +14,7 @@ const UserDropdown = ({
   isDisplayname = true,
   isEditable = true,
   user,
+  size = "small",
 }: {
   projectId: string;
   issueId: string;
@@ -21,7 +22,8 @@ const UserDropdown = ({
   columnField: string;
   isDisplayname?: boolean;
   isEditable?: boolean;
-  user?: IUser
+  user?: IUser;
+  size?: number | "small" | "medium" | "large";
 }) => {
   const [isOpenDropdown, setIsOpenDropdown] = useState(false);
 
@@ -90,7 +92,7 @@ const UserDropdown = ({
       unassignedItem,
     ];
 
-  }, [projectMembers]);
+  }, [projectMembers, size]);
 
   return (
     <ColumnDropdown

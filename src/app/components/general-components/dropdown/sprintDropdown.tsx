@@ -4,16 +4,20 @@ import { useProjectSprints } from "@libs/hooks/apis/useSprint";
 import { ISprint } from "@libs/types/sprint";
 import { useMemo, useState } from "react";
 
+import { UISize, getDropdownSizeClass } from "../constants/uiConfig";
+
 const SprintDropdown = ({
   projectId,
   issueId,
   sprintId,
   sprint: defaultSprint,
+  size = "small",
 }: {
   projectId: string;
   issueId: string;
   sprintId: string;
   sprint?: ISprint;
+  size?: UISize;
 }) => {
   const [isOpenDropdown, setIsOpenDropdown] = useState(false);
   const { updateIssueAsync } = useUpdateIssue({ projectId });
@@ -74,7 +78,7 @@ const SprintDropdown = ({
         })}
       currentItem={
         sprint
-          ? sprints.find((sprint: ISprint) => sprint.id === sprint.id)
+          ? sprints.find((s: ISprint) => s.id === sprint.id)
             ?.name
           : "Unassigned"
       }
@@ -82,15 +86,14 @@ const SprintDropdown = ({
 
     >
       <div className="group font-manrope">
-        <div className="flex justify-start rounded-lg border border-[#e8e8e7] bg-white px-2 py-1 transition-all duration-300 group-hover:border-[#064e3b]/30 group-hover:bg-[#f9f9f8] shadow-sm">
-          <p className={`truncate text-xs font-bold tracking-tight ${sprint ? "text-[#064e3b]" : "text-[#404944]/50"}`}>
+        <div className={`flex items-center justify-start border border-[#e8e8e7] bg-white transition-all duration-300 group-hover:border-[#064e3b]/30 group-hover:bg-[#f9f9f8] shadow-sm ${getDropdownSizeClass(size)}`}>
+          <p className={`truncate font-bold tracking-tight ${sprint ? "text-[#064e3b]" : "text-[#404944]/50"}`}>
             {sprint?.name || "Unassigned"}
           </p>
         </div>
       </div>
     </ColumnDropdown>
   );
-
 };
 
 export default SprintDropdown;

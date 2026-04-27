@@ -14,13 +14,20 @@ interface ParentDropdownProps {
   isShowNoParent?: boolean;
 }
 
+import {
+  UISize,
+  UI_COMMON_SIZES,
+  getBadgeSizeClass,
+} from "../constants/uiConfig";
+
 const ParentDropdown = ({
   projectId,
   issue,
   currentParentId,
   isShowIcon,
   isShowNoParent = true,
-}: ParentDropdownProps) => {
+  size = "small",
+}: ParentDropdownProps & { size?: UISize }) => {
   const { issues: epicIssues } = useProjectIssues({
     project_id: projectId,
     types: ["Epic"],
@@ -46,7 +53,7 @@ const ParentDropdown = ({
           return {
             value: issue.summary,
             key: issue.id,
-            label: <ParentBadge title={issue.summary} isShowIcon={true} />,
+            label: <ParentBadge title={issue.summary} isShowIcon={true} size={size} />,
             onClick: () => {
               handleChangeIssueParent(issue.id);
             },
@@ -57,9 +64,9 @@ const ParentDropdown = ({
           key: "NULL",
           label: (
             <div
-              className={`flex items-center gap-1 border-l-2 border-transparent p-2 hover:border-emerald-600 hover:bg-gray-200`}
+              className={`flex items-center gap-1 border-l-2 border-transparent p-2 hover:border-[#064e3b] hover:bg-[#f0fdf4] transition-all duration-200`}
             >
-              <p className="truncate text-sm font-medium">No Parent</p>
+              <p className="truncate text-xs font-bold text-[#404944] tracking-tight">No Parent</p>
             </div>
           ),
           onClick: () => {
@@ -73,6 +80,7 @@ const ParentDropdown = ({
         title={currentParent?.summary}
         isShowIcon={isShowIcon}
         isShowNoParent={isShowNoParent}
+        size={size}
       />
     </ColumnDropdown>
   );
@@ -83,11 +91,13 @@ export const ParentBadge = ({
   issueId,
   isShowIcon,
   isShowNoParent,
+  size = "small",
 }: {
   title?: string;
   issueId?: string;
   isShowIcon?: boolean;
   isShowNoParent?: boolean;
+  size?: UISize;
 }) => {
   const { projectId } = useParams();
   const { issue } = useIssue(projectId || "", issueId!);
@@ -103,9 +113,16 @@ export const ParentBadge = ({
     if (isShowNoParent) {
       return (
         <div className="flex items-center gap-1">
-          {isShowIcon && <AiOutlineThunderbolt className="text-purple-700" />}
-          <div className="rounded-sm border border-gray-300 bg-gray-100 px-1 py-0.5">
-            <p className="truncate text-xs font-medium text-gray-600">
+          {isShowIcon && (
+            <AiOutlineThunderbolt
+              size={UI_COMMON_SIZES[size].iconSize}
+              className="text-purple-700"
+            />
+          )}
+          <div
+            className={`flex items-center justify-center border border-gray-100 bg-[#f9f9f8] shadow-sm ${getBadgeSizeClass(size)}`}
+          >
+            <p className="truncate font-bold text-[#404944]/50 uppercase tracking-widest text-[9px]">
               No Parent
             </p>
           </div>
@@ -116,9 +133,16 @@ export const ParentBadge = ({
   }
   return (
     <div className="flex items-center gap-1">
-      {isShowIcon && <AiOutlineThunderbolt className="text-purple-700" />}
-      <div className="rounded-sm border border-purple-300 bg-purple-200 px-1 py-0.5">
-        <p className="truncate text-xs font-medium text-purple-700">
+      {isShowIcon && (
+        <AiOutlineThunderbolt
+          size={UI_COMMON_SIZES[size].iconSize}
+          className="text-purple-700"
+        />
+      )}
+      <div
+        className={`flex items-center justify-center border border-purple-200 bg-purple-50 shadow-sm ${getBadgeSizeClass(size)}`}
+      >
+        <p className="truncate font-bold text-purple-700 uppercase tracking-widest min-w-0 text-[10px]">
           {titleRender}
         </p>
       </div>

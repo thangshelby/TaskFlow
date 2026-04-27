@@ -1,6 +1,7 @@
 import { IssueType } from "@libs/types/issue";
 import { LuBookmark, LuBug, LuClipboardCheck, LuStar } from "react-icons/lu";
 import React from "react";
+import { UISize, UI_COMMON_SIZES, getBadgeSizeClass } from "../constants/uiConfig";
 
 export const typeOptions: {
   id: IssueType;
@@ -48,23 +49,28 @@ const TypeBadge = ({
   type,
   isShowLabel = true,
   className = "",
+  size = "small",
 }: {
   type: IssueType;
   isShowLabel?: boolean;
   className?: string;
+  size?: UISize;
 }) => {
   const currentType = typeOptions.find((option) => option.name === type) || typeOptions[1];
 
   return (
     <div
-      className={`inline-flex items-center gap-1.5 rounded-xs border px-2 py-0.5 shadow-sm font-manrope ${currentType.bgColor} ${currentType.borderColor} ${className}`}
+      className={`inline-flex items-center gap-1.5 border shadow-sm font-manrope ${currentType.bgColor} ${currentType.borderColor} ${getBadgeSizeClass(size)} ${className}`}
     >
       <div className={`${currentType.textColor} shrink-0`}>
-        {currentType.icon}
+        {React.cloneElement(currentType.icon as React.ReactElement, {
+          size: UI_COMMON_SIZES[size].iconSize,
+          className: "shrink-0",
+        } as any)}
       </div>
 
       {isShowLabel && (
-        <p className={`text-[10px] font-bold uppercase tracking-widest ${currentType.textColor}`}>
+        <p className={`font-bold uppercase tracking-widest ${currentType.textColor}`}>
           {type || "-"}
         </p>
       )}

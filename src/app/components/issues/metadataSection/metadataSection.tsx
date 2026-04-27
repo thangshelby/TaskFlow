@@ -80,7 +80,7 @@ const MetadataSection = ({
         )}
 
         {isShowingTextEditor ? (
-          <div className="w-full rounded-2xl border border-[#064e3b]/10 bg-white shadow-sm overflow-hidden animate-in fade-in zoom-in-95 duration-200">
+          <div className="w-full rounded-md border border-[#064e3b]/10 bg-white shadow-sm overflow-hidden animate-in fade-in zoom-in-95 duration-200">
             <TextEditor
               initialDeltaString={selectedIssue?.description || ""}
               issueId={selectedIssue?.id || ""}
@@ -98,7 +98,7 @@ const MetadataSection = ({
                 setIsShowingTextEditor(true);
               });
             }}
-            className="w-full min-h-[100px] rounded-xl border border-[#064e3b]/5 bg-[#fcfcfb]/50 p-4 text-[13px] text-[#064e3b]/90 font-medium cursor-pointer hover:bg-white hover:border-[#064e3b]/20 hover:shadow-sm transition-all group"
+            className="w-full min-h-[100px] rounded-md border border-[#064e3b]/5 bg-[#fcfcfb]/50 p-4 text-[13px] text-[#064e3b]/90 font-medium cursor-pointer hover:bg-white hover:border-[#064e3b]/20 hover:shadow-sm transition-all group"
           >
             {selectedIssue?.description && selectedIssue!.description[0] === "{" 
               ? JSON.parse(selectedIssue?.description || "{}")?.plainText || <span className="text-[#064e3b]/40 italic">Add a description...</span>
@@ -155,7 +155,7 @@ const MetadataSection = ({
         ) : !isShowingTextEditor && (
            <div 
              onClick={() => fileInputRef?.current?.click()}
-             className="flex items-center gap-3 p-4 rounded-xl border border-dashed border-[#064e3b]/20 bg-[#fcfcfb]/30 text-[#064e3b]/60 hover:bg-[#064e3b]/5 hover:border-[#064e3b]/30 cursor-pointer transition-all group"
+             className="flex items-center gap-3 p-4 rounded-md border border-dashed border-[#064e3b]/20 bg-[#fcfcfb]/30 text-[#064e3b]/60 hover:bg-[#064e3b]/5 hover:border-[#064e3b]/30 cursor-pointer transition-all group"
            >
              <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-white shadow-sm border border-[#064e3b]/10 text-[#064e3b]/40 group-hover:text-[#064e3b] transition-colors">
                <FaPlus size={12} />
