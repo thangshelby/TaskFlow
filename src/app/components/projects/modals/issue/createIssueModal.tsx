@@ -310,7 +310,7 @@ const CreateIssueModal: React.FC<CreateIssueModalProps> = ({
       buttonContent=""
       onClose={handleClose}
       onSubmit={() => { }}
-      className="w-full max-w-xl glass-panel flex-col rounded-xl border border-white/40 shadow-2xl"
+      className="w-full max-w-xl glass-panel flex-col rounded-xl border border-white/40 shadow-2xl z-50"
     >
       <form
         onSubmit={onSubmit}

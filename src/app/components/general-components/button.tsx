@@ -14,7 +14,7 @@ type ButtonVariant =
   | "outline"; // Added 'outline' variant
 
 interface ButtonProps {
-  onClick?: () => void;
+  onClick?: (e?: React.MouseEvent<HTMLButtonElement>) => void;
   children?: ReactNode;
   variant?: ButtonVariant;
   size?: "sm" | "md" | "lg";

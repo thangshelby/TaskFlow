@@ -196,8 +196,9 @@ const ScrumSprint = memo(
                     <Button
                       variant={sprint.name === "Backlog" ? "light" : "primary"}
                       size="sm"
-                      className="h-8 px-4!"
-                      onClick={() => {
+                      className="h-6 px-2! text-sm"
+                      onClick={(e) => {
+                        e?.stopPropagation()
                         if (sprint.name === "Backlog") {
                           setIsCreateSprintModalOpen({ isOpen: true, sprint: null });
                         } else if (new Date(sprint.date_started).getTime() < new Date().getTime()) {
@@ -220,7 +221,11 @@ const ScrumSprint = memo(
                     >
                       <button
                         aria-label="More sprint options"
-                        className={`flex h-8 w-8 items-center justify-center rounded-md transition-all hover:bg-[#064e3b]/5 text-[#064e3b]/60 hover:text-[#064e3b] ${isOpenButtonMenu ? "bg-[#064e3b]/10 text-[#064e3b]" : ""}`}>
+                        className={`flex h-8 w-8 items-center justify-center rounded-md transition-all hover:bg-[#064e3b]/5 text-[#064e3b]/60 hover:text-[#064e3b] ${isOpenButtonMenu ? "bg-[#064e3b]/10 text-[#064e3b]" : ""}`}
+                        onClick={(e) => {
+                          e?.stopPropagation()
+                        }}
+                      >
                         <BsThreeDots size={16} />
                       </button>
                     </Dropdown>
