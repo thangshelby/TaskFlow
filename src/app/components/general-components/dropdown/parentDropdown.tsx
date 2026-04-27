@@ -122,7 +122,7 @@ export const ParentBadge = ({
           <div
             className={`flex items-center justify-center border border-gray-100 bg-[#f9f9f8] shadow-sm ${getBadgeSizeClass(size)}`}
           >
-            <p className="truncate font-bold text-[#404944]/50 uppercase tracking-widest text-[9px]">
+            <p className="truncate font-bold text-[#404944]/80 uppercase tracking-widest text-[9px]">
               No Parent
             </p>
           </div>

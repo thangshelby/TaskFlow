@@ -99,6 +99,7 @@ const IssueCard = memo(
             <div
               onClick={handleIssueCardClick}
               className="flex cursor-pointer items-center justify-between gap-4"
+              aria-label={`Issue ${issue.key}: ${issue.summary}`}
             >
               {/* IssueCardLeft */}
               <div className="flex min-w-0 flex-1 items-center gap-3">
@@ -115,7 +116,7 @@ const IssueCard = memo(
                   </div>
                   <TypeBadge type={issue.type} isShowLabel={false} />
                   <span
-                    className={`font-manrope text-xs font-black tracking-widest text-[#064e3b]/50 group-hover:text-[#064e3b] transition-colors ${issue?.column?.name === "DONE" ? "line-through opacity-50" : ""}`}
+                    className={`font-manrope text-xs font-black tracking-widest text-[#064e3b]/70 group-hover:text-[#064e3b] transition-colors ${issue?.column?.name === "DONE" ? "line-through opacity-60" : ""}`}
                   >
                     {issue?.key}
                   </span>

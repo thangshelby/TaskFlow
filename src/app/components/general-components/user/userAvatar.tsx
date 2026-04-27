@@ -31,10 +31,10 @@ const UserAvatar = memo(
       return (
         <div className="flex flex-row items-center justify-start gap-2 font-manrope">
           <div className="flex h-5 w-5 items-center justify-center rounded-full bg-[#e8e8e7] border border-white">
-            <FaUserAltSlash size={10} className="text-[#404944]/50" />
+            <FaUserAltSlash size={10} className="text-[#404944]/80" />
           </div>
           {isDisplayName && (
-            <span className="text-[10px] font-bold uppercase tracking-widest text-[#404944]/40">
+            <span className="text-[10px] font-bold uppercase tracking-widest text-[#404944]/80">
               Unassigned
             </span>
           )}

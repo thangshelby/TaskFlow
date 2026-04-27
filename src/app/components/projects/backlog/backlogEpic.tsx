@@ -160,7 +160,7 @@ const EpicIssueCard = ({
               })}
             </div>
             <div className="mt-2.5 flex items-center justify-between">
-              <span className="text-[11px] font-bold text-[#064e3b]/70 font-manrope uppercase tracking-tight truncate">
+              <span className="text-[11px] font-bold text-[#064e3b]/90 font-manrope uppercase tracking-tight truncate">
                 {columnCounts["DONE"]} of {totalIssues} completed
               </span>
             </div>
@@ -171,18 +171,18 @@ const EpicIssueCard = ({
           <div className="mt-5 space-y-5 animate-in fade-in slide-in-from-top-2 duration-300">
             <div className="grid grid-cols-2 gap-4">
               <div className="flex flex-col gap-1">
-                <span className="text-[9px] font-black text-[#064e3b]/70 uppercase tracking-widest font-manrope">
+                <span className="text-[9px] font-black text-[#064e3b]/80 uppercase tracking-widest font-manrope">
                   Start Date
                 </span>
-                <span className="text-[11px] font-bold text-[#064e3b]/80 font-manrope">
+                <span className="text-[11px] font-bold text-[#064e3b] font-manrope">
                   {epicIssue.due_date_from ? formatSprintDate(epicIssue.due_date_from) : "Not set"}
                 </span>
               </div>
               <div className="flex flex-col gap-1">
-                <span className="text-[9px] font-black text-[#064e3b]/70 uppercase tracking-widest font-manrope">
+                <span className="text-[9px] font-black text-[#064e3b]/80 uppercase tracking-widest font-manrope">
                   Due Date
                 </span>
-                <span className="text-[11px] font-bold text-[#064e3b]/80 font-manrope">
+                <span className="text-[11px] font-bold text-[#064e3b] font-manrope">
                   {epicIssue.due_date_to ? formatSprintDate(epicIssue.due_date_to) : "Not set"}
                 </span>
               </div>

@@ -26,13 +26,14 @@ export const PermissionButton = ({
   return (
     <Tooltip
       placement="top"
-      trigger={["click", "hover"]}
+      trigger={["hover"]}
       title={message || title}
     >
       <button
         disabled={!isAllow}
         onClick={handleClick}
-        className={`${isAllow ? "cursor-pointer" : "cursor-not-allowed"}`}
+        className={`${isAllow ? "cursor-pointer" : "cursor-not-allowed opacity-50"}`}
+        aria-label={title}
       >
         {children}
       </button>

@@ -108,9 +108,9 @@ const ColumnDropdown = memo(
                       autoFocus={true}
                       onChange={(e) => setSearchText(e.target.value)}
                       onClick={(e) => e.stopPropagation()}
-                      className="w-full rounded-md border border-[#e8e8e7] pl-8 pr-2 py-1.5 text-[11px] font-bold text-[#064e3b] outline-none focus:border-[#064e3b]/30 focus:ring-1 focus:ring-[#064e3b]/10 bg-white placeholder:text-[#404944]/40 transition-all shadow-sm"
+                      className="w-full rounded-md border border-[#e8e8e7] pl-8 pr-2 py-1.5 text-[11px] font-bold text-[#064e3b] outline-none focus:border-[#064e3b]/30 focus:ring-1 focus:ring-[#064e3b]/10 bg-white placeholder:text-[#404944]/70 transition-all shadow-sm"
                     />
-                    <svg className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-[#404944]/40" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <svg className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-[#404944]/70" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                     </svg>
                   </div>

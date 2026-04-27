@@ -68,10 +68,11 @@ export const Header = () => {
                     <NotificationsPopover />
                   </div>
                   <div className="relative">
-                    {/* <ProjectInvitationsPopover userId={user.id} /> */}
+                    <ProjectInvitationsPopover userId={user.id} />
                   </div>
                   <button
                     onClick={() => navigate("/settings")}
+                    aria-label="Settings"
                     className="p-2.5 text-[#404944] hover:text-[#064e3b] transition-colors rounded-full hover:bg-[#eeeeed]"
                   >
                     <Settings size={22} />

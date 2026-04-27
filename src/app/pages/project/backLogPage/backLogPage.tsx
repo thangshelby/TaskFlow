@@ -204,7 +204,7 @@ const BackLogPageContent: React.FC = () => {
                         <div className="h-full min-w-0 overflow-auto">
                           <ul className="flex min-w-0 flex-col gap-2">
                             {sprintIssues?.map((sprint: ISprintIssues) => (
-                              <div key={sprint.id}>
+                              <li list-style="none" key={sprint.id}>
                                 <ScrumSprint
                                   sprint={sprint}
                                   projectId={projectId}
@@ -221,7 +221,7 @@ const BackLogPageContent: React.FC = () => {
                                     );
                                   }}
                                 />
-                              </div>
+                              </li>
                             ))}
                           </ul>
                         </div>
