@@ -1,4 +1,5 @@
 import { Skeleton } from "antd";
+import { UI_COMMON_SIZES } from "../general-components/constants/uiConfig";
 
 const IssueDetailSkeleton: React.FC = () => {
   return (
@@ -23,7 +24,8 @@ const IssueDetailSkeleton: React.FC = () => {
         {Array.from({ length: 6 }).map((_, idx) => (
           <div
             key={idx}
-            className="rounded-md border border-none bg-white p-3 shadow-sm"
+            className="border border-none bg-white p-3 shadow-sm"
+            style={{ borderRadius: UI_COMMON_SIZES.medium.borderRadius }}
           >
             {/* Dòng đầu: issue key + summary */}
             <div className="mb-2 flex items-center justify-between">

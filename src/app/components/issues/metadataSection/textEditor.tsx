@@ -5,6 +5,7 @@ import { uploadFileToCloudinary } from "@libs/utils/file";
 import { useUpdateIssue } from "@libs/hooks/apis/useIssue";
 import { useSpeechToText } from "@libs/hooks/common/useSpeechToText";
 import { FaMicrophone, FaStop } from "react-icons/fa";
+import { Image } from "antd";
 
 export default function TextEditor({
   initialDeltaString,
@@ -27,6 +28,30 @@ export default function TextEditor({
 
   const { updateIssueAsync } = useUpdateIssue({ projectId });
   const [isSaving, setIsSaving] = useState(false);
+  const [previewImage, setPreviewImage] = useState("");
+  const [previewOpen, setPreviewOpen] = useState(false);
+
+  useEffect(() => {
+    const handleImageClick = (e: MouseEvent) => {
+      const target = e.target as HTMLElement;
+      if (target.tagName === "IMG") {
+        const src = (target as HTMLImageElement).src;
+        setPreviewImage(src);
+        setPreviewOpen(true);
+      }
+    };
+
+    const editorRoot = quillRef.current?.root;
+    if (editorRoot) {
+      editorRoot.addEventListener("click", handleImageClick);
+    }
+
+    return () => {
+      if (editorRoot) {
+        editorRoot.removeEventListener("click", handleImageClick);
+      }
+    };
+  }, [quillRef.current]);
 
   useEffect(() => {
     const toolbarOptions = [
@@ -238,6 +263,20 @@ export default function TextEditor({
           Cancel
         </button>
       </div>
+      
+      {/* Hidden Image for Preview */}
+      {previewImage && (
+        <div className="hidden">
+          <Image
+            src={previewImage}
+            preview={{
+              visible: previewOpen,
+              onVisibleChange: (value) => setPreviewOpen(value),
+              src: previewImage,
+            }}
+          />
+        </div>
+      )}
     </div>
   );
 }

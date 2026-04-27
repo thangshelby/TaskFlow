@@ -13,6 +13,7 @@ import { useProjectTeamById } from "@libs/hooks/apis/useTeam";
 import UserAvatar from "@libs/app/components/general-components/user/userAvatar";
 import { useUpdateTeam } from "@libs/hooks/apis/useTeam";
 import AddProjectTeamMemberModal from "@libs/app/components/projects/modals/project/addProjectTeamMemberModal";
+import LoadingFallback from "@libs/app/components/general-components/loadingFallback";
 
 import { PERMISSIONS_CONFIG } from "@libs/config/permissons.config";
 import PermissionButton from "@libs/app/components/general-components/pemissionButton";
@@ -67,7 +68,7 @@ const TeamDetailPage: React.FC = () => {
     });
   };
 
-  if (isLoadingTeam || !team) return <div>Loading...</div>;
+  if (isLoadingTeam || !team) return <LoadingFallback />;
 
   return (
     <>

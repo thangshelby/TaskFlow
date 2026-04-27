@@ -22,6 +22,7 @@ import { useBackLogPage } from "@libs/hooks/pages/useBacklogPage";
 import ScrumSprint from "@libs/app/components/projects/backlog/scrumSprint";
 import { ISprint } from "@libs/types/sprint";
 import { Layers } from "lucide-react";
+import LoadingFallback from "@libs/app/components/general-components/loadingFallback";
 
 interface ISprintIssues extends ISprint {
   issues: IIssue[];
@@ -180,7 +181,7 @@ const BackLogPageContent: React.FC = () => {
                             maxSize={35}
                           >
                             <div className="h-full overflow-y-auto pr-2">
-                              <Suspense fallback={<div className="p-4 text-sm text-gray-400">Loading Epics...</div>}>
+                              <Suspense fallback={<LoadingFallback fullPage={false} message="Loading Epics..." />}>
                                 <BacklogEpic issues={issues}
                                   handleToggleEpic={handleToggleEpic}
                                 />

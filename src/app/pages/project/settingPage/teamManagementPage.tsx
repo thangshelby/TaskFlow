@@ -3,6 +3,7 @@ import { Search, Users, Plus } from "lucide-react";
 import { useProjectTeams } from "@libs/hooks/apis/useTeam";
 import { useNavigate, useParams } from "react-router-dom";
 import UserAvatar from "@libs/app/components/general-components/user/userAvatar";
+import LoadingFallback from "@libs/app/components/general-components/loadingFallback";
 const CreateProjectTeamModal = lazy(
   () =>
     import(
@@ -18,7 +19,7 @@ const TeamManagementPage: React.FC = () => {
   const [activeTab, setActiveTab] = useState<"all" | "yours">("yours");
   const [showAddTeamModal, setShowAddTeamModal] = useState(false);
   const { teams, isLoading } = useProjectTeams(projectId || "");
-  if (isLoading || !teams) return <div>Loading...</div>;
+  if (isLoading || !teams) return <LoadingFallback />;
   const filteredTeams = teams.filter(
     (team) =>
       team.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
