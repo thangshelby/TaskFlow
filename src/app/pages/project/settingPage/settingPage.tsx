@@ -54,10 +54,9 @@ const ProjectSettings = () => {
                       key={item.id}
                       to={to}
                       className={({ isActive }) =>
-                        `flex items-center gap-2 border-b-2 px-1 py-3 text-sm font-medium whitespace-nowrap transition-colors ${
-                          isActive
-                            ? "border-teal-600 text-teal-700"
-                            : "border-transparent text-gray-600 hover:border-gray-300 hover:text-gray-800"
+                        `flex items-center gap-2 border-b-2 px-1 py-3 text-sm font-medium whitespace-nowrap transition-colors ${isActive
+                          ? "border-teal-600 text-teal-700"
+                          : "border-transparent text-gray-600 hover:border-gray-300 hover:text-gray-800"
                         }`
                       }
                     >

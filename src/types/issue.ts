@@ -1,4 +1,8 @@
 import { IColumn } from "@libs/types/project";
+import { ISprint } from "@libs/types/sprint";
+import { IUser } from "@libs/types/user";
+import { ITeam } from "@libs/types/team"
+
 export interface IIssue {
   id: string;
   key: string;
@@ -10,7 +14,6 @@ export interface IIssue {
   parent_id?: string;
   reporter_id?: string;
   type: IssueType;
-  column: IColumn;
   priority: IssuePriority;
   summary: string;
   description: string;
@@ -24,6 +27,11 @@ export interface IIssue {
   // labels?: string[];
   team_id?: string;
   children?: IIssue[];
+  column: IColumn;
+  sprint?: ISprint
+  assignee?: IUser
+  reporter?: IUser
+  team?: ITeam
 }
 export type IIssueWithoutCoulumn = Omit<IIssue, "column">;
 

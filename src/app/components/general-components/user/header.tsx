@@ -43,7 +43,7 @@ export const Header = () => {
           <div className="shrink-0">
             <Link
               to="/"
-              className="text-xl font-bold tracking-tighter text-[#064e3b] no-underline"
+              className="text-3xl font-bold tracking-tighter text-[#064e3b] no-underline"
             >
               Taskflow
             </Link>
@@ -68,7 +68,7 @@ export const Header = () => {
                     <NotificationsPopover />
                   </div>
                   <div className="relative">
-                    <ProjectInvitationsPopover userId={user.id} />
+                    {/* <ProjectInvitationsPopover userId={user.id} /> */}
                   </div>
                   <button
                     onClick={() => navigate("/settings")}
