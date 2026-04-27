@@ -1,4 +1,5 @@
-import React, { useCallback, useState } from "react";
+import React, { useState, useRef, useCallback } from "react";
+import { uploadFileToCloudinary } from "@libs/utils/file";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -7,7 +8,6 @@ import Modal from "@libs/app/components/general-components/modal/modal";
 import DropdownAntd from "@libs/app/components/general-components/dropdown";
 import "./createIssueModal.css";
 import {
-  useProject,
   useProjectColumns,
   useUserProjects,
 } from "@libs/hooks/apis/useProject";
@@ -27,6 +27,13 @@ import PriorityBadge from "@libs/app/components/general-components/badge/priorit
 import TypeBadge from "@libs/app/components/general-components/badge/typeBadge";
 import StatusBadge from "@libs/app/components/general-components/badge/statusBadge";
 import UserAvatar from "@libs/app/components/general-components/user/userAvatar";
+import { MdCloudUpload } from "react-icons/md";
+import { FaMicrophone, FaStop } from "react-icons/fa";
+import AttachmentCard from "@libs/app/components/issues/metadataSection/attachmentCard";
+import QuillEditorCreate, {
+  type QuillEditorCreateRef,
+} from "@libs/app/components/issues/metadataSection/quillEditorCreate";
+import { useSpeechToText } from "@libs/hooks/common/useSpeechToText";
 
 interface CreateIssueModalProps {
   isOpen: boolean;
@@ -48,13 +55,11 @@ interface CreateIssueModalProps {
 
 interface IssueFormInputs {
   summary: string;
-  description?: string;
   priority: IssuePriority;
   type: IssueType;
   column_id: string;
   sprint_id?: string;
   assignee_id?: string;
-  attachments: File[];
   project_id: string;
   parent_id?: string;
   due_date_to?: string;
@@ -65,13 +70,11 @@ interface IssueFormInputs {
 
 const issueSchema = z.object({
   summary: z.string().min(1, "Summary is required"),
-  description: z.string().optional(),
   column_id: z.string().min(1),
   priority: z.enum(["Low", "Medium", "High", "Lowest", "Highest"] as const),
   type: z.enum(["Bug", "Task", "Story", "Epic"] as const),
   sprint_id: z.string().optional(),
   assignee_id: z.string().optional(),
-  attachments: z.array(z.instanceof(File)).min(0),
   project_id: z.string().min(1, "Project is required"),
   parent_id: z.string().optional(),
   due_date_to: z.string().optional(),
@@ -125,15 +128,19 @@ const CreateIssueModal: React.FC<CreateIssueModalProps> = ({
     project_id: selectedProjectId,
   });
 
+  // Attachments stored as JSON strings (same format as metadataSection)
+  const [attachments, setAttachments] = useState<string[]>([]);
+  // Description managed via Quill editor (already stringified as { plainText, delta })
+  const [descriptionValue, setDescriptionValue] = useState<string>("");
+  const [showConfirmClose, setShowConfirmClose] = useState(false);
+
   const defaultValues: IssueFormInputs = {
     summary: "",
-    description: "",
     column_id: "",
     priority: "Medium",
     type: "Task",
     project_id: projectId || "",
     sprint_id: sprintId || "",
-    attachments: [],
     parent_id: "",
     due_date_to: "",
     start_date: "",
@@ -147,18 +154,33 @@ const CreateIssueModal: React.FC<CreateIssueModalProps> = ({
     reset,
     setValue,
     watch,
-    formState: { errors },
+    formState: { errors, isDirty },
   } = useForm<IssueFormInputs>({
     resolver: zodResolver(issueSchema),
     defaultValues,
   });
+
+  const summaryValue = watch("summary");
+
+  const handleClose = useCallback(() => {
+    const hasSummary = summaryValue && summaryValue.trim().length > 0;
+    const hasDescription = descriptionValue && descriptionValue !== "" && descriptionValue.length > 20;
+    const hasAttachments = attachments.length > 0;
+    const isFormDirty = isDirty || hasDescription || hasAttachments || hasSummary;
+
+    if (isFormDirty) {
+      setShowConfirmClose(true);
+    } else {
+      onClose();
+      reset();
+    }
+  }, [isDirty, summaryValue, descriptionValue, attachments, onClose, reset]);
 
   React.useEffect(() => {
     if (isEditing && initialIssue) {
       reset({
         ...defaultValues,
         summary: initialIssue.summary || "",
-        description: initialIssue.description || "",
         column_id: initialIssue.column_id,
         priority: initialIssue.priority as IssuePriority,
         type: initialIssue.type,
@@ -174,63 +196,35 @@ const CreateIssueModal: React.FC<CreateIssueModalProps> = ({
   }, [isEditing, initialIssue, reset]);
 
   const column_id = watch("column_id");
-  const files = watch("attachments");
 
   React.useEffect(() => {
     if (columns?.length > 0 && !column_id) {
       setValue("column_id", columns[0].id);
     }
   }, [columns, setValue, column_id]);
-  const handleDragOver = (e: React.DragEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-  };
-
-  const handleDrop = useCallback(
-    (e: React.DragEvent) => {
-      e.preventDefault();
-      e.stopPropagation();
-      const droppedFiles = Array.from(e.dataTransfer.files);
-      setValue("attachments", droppedFiles);
-    },
-    [setValue],
-  );
-
-  const handleFileChange = useCallback(
-    (e: React.ChangeEvent<HTMLInputElement>) => {
-      const selectedFiles = Array.from(e.target.files || []);
-      setValue("attachments", selectedFiles);
-    },
-    [setValue],
-  );
 
   const onSubmit = handleSubmit(async (data: IssueFormInputs) => {
     if (!user?.id) {
-      console.error("No user found");
+      toast.error("You must be logged in to create an issue.");
       return;
     }
 
-    // Convert File objects to string paths (in real app, you'd upload files first)
-    const attachmentPaths = data.attachments.map((file: File) =>
-      URL.createObjectURL(file),
-    );
-
     if (!selectedProjectId) {
-      console.error("No project selected");
+      toast.error("Please select a project first.");
       return;
     }
 
     const issueData: CreateIssueParams = {
       project_id: selectedProjectId,
       summary: data.summary,
-      description: data.description,
+      description: descriptionValue,
       column_id: data.column_id,
       priority: data.priority,
       type: data.type as IssueType,
       sprint_id: data.sprint_id || "",
       reporter_id: user.id,
       assignee_id: data.assignee_id,
-      attachments: attachmentPaths,
+      attachments,
       parent_id: data.parent_id,
       due_date_to: data.due_date_to,
       start_date: data.start_date,
@@ -252,11 +246,62 @@ const CreateIssueModal: React.FC<CreateIssueModalProps> = ({
     }
   });
 
+  // Safe JSON parse — never throws, returns null on invalid input
+  const safeParseAttachment = (raw: string) => {
+    try { return JSON.parse(raw) as { url: string; type: string; uploadFrom: string; created_at: string }; }
+    catch { return null; }
+  };
+
+  // Upload file to Cloudinary and store as JSON string (same as metadataSection)
+  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    try {
+      const url = await uploadFileToCloudinary(undefined, file);
+      const newAttachment = JSON.stringify({
+        url,
+        type: file.type,
+        uploadFrom: "attachment",
+        created_at: new Date().toISOString(),
+      });
+      setAttachments((prev) => [...prev, newAttachment]);
+    } catch {
+      toast.error("Failed to upload file. Please try again.");
+    }
+  };
+
+  const handleDeleteAttachment = (url: string) => {
+    setAttachments((prev) =>
+      prev.filter((a) => safeParseAttachment(a)?.url !== url)
+    );
+  };
+
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const quillEditorRef = useRef<QuillEditorCreateRef>(null);
+
+  // Speech-to-text for description
+  const handleSpeechResult = useCallback((finalText: string) => {
+    quillEditorRef.current?.insertText(finalText);
+  }, []);
+
+  const {
+    isListening,
+    interimText,
+    isSupported: isSpeechSupported,
+    toggleListening,
+  } = useSpeechToText({
+    lang: "en-US",
+    continuous: true,
+    interimResults: true,
+    onResult: handleSpeechResult,
+  });
+
+
   if (!isOpen) return null;
   return (
     <Modal
       title={isEditing ? "Update Issue" : "Create Issue"}
-      onClose={onClose}
+      onClose={handleClose}
       buttonContent={
         isLoading || isColumnsLoading
           ? "Loading..."
@@ -350,13 +395,13 @@ const CreateIssueModal: React.FC<CreateIssueModalProps> = ({
                       </span>
                     </div>
                   </div>
-                ) : (
+                ) : sprints?.length > 0 ? (
                   <DropdownAntd
                     options={
-                      sprints?.map((sprint) => ({
+                      sprints.map((sprint) => ({
                         value: sprint.id,
                         label: sprint.name,
-                      })) || []
+                      }))
                     }
                     placement="bottom"
                     rowClassName="font-semibold text-gray-700"
@@ -372,7 +417,7 @@ const CreateIssueModal: React.FC<CreateIssueModalProps> = ({
                         customRender={
                           <div className="w-full">
                             {
-                              sprints?.find((s) => s.id === watch("sprint_id"))
+                              sprints.find((s) => s.id === watch("sprint_id"))
                                 ?.name
                             }
                           </div>
@@ -384,6 +429,17 @@ const CreateIssueModal: React.FC<CreateIssueModalProps> = ({
                       setValue("sprint_id", option.value as string)
                     }
                   />
+                ) : (
+                  <div>
+                    <label className="mb-1 block text-sm font-medium text-gray-700">
+                      Sprint
+                    </label>
+                    <div className="rounded-md bg-gray-50 border border-gray-300 px-3 py-2">
+                      <span className="text-gray-500 text-sm">
+                        No active sprints available
+                      </span>
+                    </div>
+                  </div>
                 )}
               </div>
             )}
@@ -474,14 +530,55 @@ const CreateIssueModal: React.FC<CreateIssueModalProps> = ({
             error={errors.summary?.message}
           />
 
-          <InputField
-            label="Description"
-            helperText="Detailed description of the issue"
-            type="textarea"
-            field="description"
-            register={register}
-            error={errors.description?.message}
-          />
+          {/* Description — Quill editor with speech-to-text */}
+          <div className="flex w-full flex-col gap-1">
+            <div className="flex items-center gap-2">
+              <p className="text-sm font-bold text-gray-600">Description</p>
+              {isSpeechSupported && (
+                <button
+                  type="button"
+                  onClick={toggleListening}
+                  className={`stt-mic-btn cursor-pointer ${isListening ? "stt-mic-btn--active" : ""
+                    }`}
+                  title={isListening ? "Stop dictation" : "Start dictation"}
+                >
+                  {isListening ? (
+                    <FaStop className="stt-mic-icon" />
+                  ) : (
+                    <FaMicrophone className="stt-mic-icon" />
+                  )}
+                </button>
+              )}
+              {isListening && (
+                <span className="stt-status-badge">
+                  <span className="stt-pulse" />
+                  Listening...
+                </span>
+              )}
+            </div>
+            <div
+              className={`rounded border transition-colors ${isListening
+                  ? "border-red-400 shadow-[0_0_0_2px_rgba(248,113,113,0.2)]"
+                  : "border-gray-300 focus-within:border-emerald-500"
+                }`}
+            >
+              <QuillEditorCreate
+                ref={quillEditorRef}
+                onChange={setDescriptionValue}
+                placeholder={
+                  isListening
+                    ? "🎤 Speak now… your words will appear here"
+                    : "Add a description..."
+                }
+              />
+            </div>
+            {/* Interim (live) transcript preview */}
+            {isListening && interimText && (
+              <div className="stt-interim-preview">
+                <span className="stt-interim-text">{interimText}</span>
+              </div>
+            )}
+          </div>
 
           {/* Parent Field */}
           <DropdownAntd
@@ -649,44 +746,105 @@ const CreateIssueModal: React.FC<CreateIssueModalProps> = ({
             onClickItem={(option) => setValue("assignee_id", option.value)}
           />
 
-          <div>
-            <label className="mb-1 block text-sm font-medium text-gray-700">
-              Attachments
-            </label>
-            <div
-              className={`cursor-pointer rounded-md border-2 border-dashed p-4 text-center transition-colors ${files.length ? "border-green-500 bg-green-50" : "hover:border-green-500 hover:bg-green-50"}`}
-              onDragOver={handleDragOver}
-              onDrop={handleDrop}
-              onClick={() => document.getElementById("file-input")?.click()}
-            >
-              <input
-                id="file-input"
-                type="file"
-                multiple
-                onChange={handleFileChange}
-                className="hidden"
-                accept="image/*,.pdf,.doc,.docx"
-              />
-              <p>
-                {files.length
-                  ? "Drop files here or click to replace"
-                  : "Drag & drop files here, or click to select files"}
-              </p>
+          {/* Attachments — same flow as metadataSection */}
+          <div className="flex w-full flex-col gap-2">
+            <div className="flex flex-row items-center gap-1">
+              <p className="text-sm font-bold text-gray-600">Attachments</p>
+              {attachments.length > 0 && (
+                <div className="rounded bg-gray-300 px-2 text-sm font-medium text-gray-600">
+                  {attachments.length}
+                </div>
+              )}
             </div>
-            {files.length > 0 && (
-              <div className="mt-2">
-                <ul className="list-disc pl-5">
-                  {files.map((file, index) => (
-                    <li key={index} className="text-sm text-gray-600">
-                      {file.name} ({(file.size / 1024).toFixed(1)} KB)
-                    </li>
+
+            {/* Drop zone */}
+            <div
+              className={`flex w-full cursor-pointer items-center justify-center gap-3 rounded-md border-2 border-dashed py-4 transition-colors ${attachments.length
+                  ? "border-emerald-400 bg-emerald-50"
+                  : "border-gray-300 hover:border-emerald-400 hover:bg-emerald-50"
+                }`}
+              onDragOver={(e) => { e.preventDefault(); e.stopPropagation(); }}
+              onDrop={async (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                const file = e.dataTransfer.files?.[0];
+                if (!file) return;
+                try {
+                  const url = await uploadFileToCloudinary(undefined, file);
+                  setAttachments((prev) => [...prev, JSON.stringify({
+                    url,
+                    type: file.type,
+                    uploadFrom: "attachment",
+                    created_at: new Date().toISOString(),
+                  })]);
+                } catch {
+                  toast.error("Failed to upload attachment. Please try again.");
+                }
+              }}
+              onClick={() => fileInputRef?.current?.click()}
+            >
+              <MdCloudUpload className="text-2xl text-gray-400" />
+              <span className="text-sm text-gray-500">
+                Drop files to attach or
+              </span>
+              <button
+                type="button"
+                className="rounded border border-gray-300 bg-white px-3 py-1 text-sm font-medium text-gray-700 hover:bg-gray-50"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  fileInputRef?.current?.click();
+                }}
+              >
+                Browse
+              </button>
+              <input
+                type="file"
+                onChange={handleFileUpload}
+                style={{ display: "none" }}
+                ref={fileInputRef}
+              />
+            </div>
+
+            {/* Attachment previews */}
+            {attachments.length > 0 && (
+              <div className="flex w-full flex-row gap-1 overflow-x-auto">
+                {attachments
+                  .map(safeParseAttachment)
+                  .filter(
+                    (p): p is NonNullable<ReturnType<typeof safeParseAttachment>> => p !== null
+                  )
+                  .map((parsed) => (
+                    <AttachmentCard
+                      key={parsed.url}
+                      attachment={parsed}
+                      handleDeleteAttachment={handleDeleteAttachment}
+                    />
                   ))}
-                </ul>
               </div>
             )}
           </div>
         </form>
       </div>
+
+      {showConfirmClose && (
+        <Modal
+          title="Discard changes?"
+          variant="warning"
+          onClose={() => setShowConfirmClose(false)}
+          onSubmit={() => {
+            setShowConfirmClose(false);
+            onClose();
+            reset();
+          }}
+          buttonContent="Discard"
+          style={{ confirmButtonColor: "bg-red-600 hover:bg-red-700 focus:ring-red-500", textColor: "text-red-700" }}
+          className="w-[450px]"
+        >
+          <div className="text-gray-600">
+            You have unsaved changes in this issue. Are you sure you want to discard them? This action cannot be undone.
+          </div>
+        </Modal>
+      )}
     </Modal>
   );
 };

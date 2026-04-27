@@ -71,7 +71,9 @@ const MetadataSection = ({
 
       {/* Description */}
       <div className="flex w-full flex-col items-start gap-1">
-        <p className="py-1 text-sm font-bold text-gray-600">Description</p>
+        {!isShowingTextEditor && (
+          <p className="py-1 text-sm font-bold text-gray-600">Description</p>
+        )}
 
         {isShowingTextEditor ? (
           <TextEditor

@@ -1,8 +1,11 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useCallback } from "react";
 import Quill, { Delta } from "quill";
 import "quill/dist/quill.snow.css";
 import { uploadFileToCloudinary } from "@libs/utils/file";
 import { useUpdateIssue } from "@libs/hooks/apis/useIssue";
+import { useSpeechToText } from "@libs/hooks/common/useSpeechToText";
+import { FaMicrophone, FaStop } from "react-icons/fa";
+import "../../projects/modals/issue/createIssueModal.css";
 
 export default function TextEditor({
   initialDeltaString,
@@ -142,10 +145,68 @@ export default function TextEditor({
     };
   };
 
+  const handleSpeechResult = useCallback((finalText: string) => {
+    if (!quillRef.current) return;
+    const length = quillRef.current.getLength();
+    quillRef.current.insertText(length > 0 ? length - 1 : 0, finalText + " ");
+    quillRef.current.setSelection(quillRef.current.getLength() - 1, 0);
+  }, []);
+
+  const {
+    isListening,
+    interimText,
+    isSupported: isSpeechSupported,
+    toggleListening,
+  } = useSpeechToText({
+    lang: "en-US",
+    continuous: true,
+    interimResults: true,
+    onResult: handleSpeechResult,
+  });
+
   return (
     <div className="flex w-full flex-col gap-2">
-      <div ref={editorRef} />
-      <div className="flex flex-row gap-2">
+      {/* Speech to text control above editor */}
+      <div className="flex items-center gap-2">
+        <p className="py-1 text-sm font-bold text-gray-600">Description</p>
+        {isSpeechSupported && (
+          <button
+            type="button"
+            onClick={toggleListening}
+            className={`stt-mic-btn cursor-pointer ${isListening ? "stt-mic-btn--active" : ""}`}
+            title={isListening ? "Stop dictation" : "Start dictation"}
+          >
+            {isListening ? (
+              <FaStop className="stt-mic-icon" />
+            ) : (
+              <FaMicrophone className="stt-mic-icon" />
+            )}
+          </button>
+        )}
+        {isListening && (
+          <span className="stt-status-badge">
+            <span className="stt-pulse" />
+            Listening...
+          </span>
+        )}
+      </div>
+
+      <div
+        className={`rounded border transition-colors ${isListening
+            ? "border-red-400 shadow-[0_0_0_2px_rgba(248,113,113,0.2)]"
+            : "border-gray-300 focus-within:border-emerald-500"
+          }`}
+      >
+        <div ref={editorRef} />
+      </div>
+
+      {isListening && interimText && (
+        <div className="stt-interim-preview">
+          <span className="stt-interim-text">{interimText}</span>
+        </div>
+      )}
+
+      <div className="flex flex-row gap-2 mt-2">
         <button
           onClick={handleSaveDescription}
           className="cursor-pointer rounded-sm bg-emerald-500 px-[10px] py-1 text-sm font-medium text-white"

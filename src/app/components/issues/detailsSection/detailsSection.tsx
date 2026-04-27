@@ -6,7 +6,7 @@ import { CiSettings } from "react-icons/ci";
 import {
   StatusDropdown,
   PriorityDropdown,
-  // TypeDropdown,
+  TypeDropdown,
   SprintDropdown,
   ParentDropdown,
 } from "../../general-components/dropdown/index";
@@ -108,13 +108,13 @@ const Details = ({
                 isShowLabel={true}
               />
             </DetailRow>
-            {/* <DetailRow label="Type" layout={layout}>
+            <DetailRow label="Type" layout={layout}>
               <TypeDropdown
                 projectId={projectId}
                 issueId={selectedIssue.id}
                 type={selectedIssue.type}
               />
-            </DetailRow> */}
+            </DetailRow>
             <DetailRow label="Team" layout={layout}>
               <TeamDropdown
                 projectId={projectId}

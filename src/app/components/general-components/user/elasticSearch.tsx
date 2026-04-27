@@ -204,7 +204,7 @@ export const RecentItems = ({ issues }: { issues: IIssue[] }) => {
         </p>
       </div>
       <div className="space-y-1">
-        {issues.slice(0, 10).map((issue: IIssue, index: number) => (
+        {issues.length && issues?.slice(0, 10).map((issue: IIssue, index: number) => (
           <Tooltip
             key={index}
             title={<IssueTooltip issue={issue} />}

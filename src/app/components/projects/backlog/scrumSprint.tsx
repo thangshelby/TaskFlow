@@ -7,7 +7,7 @@ import { FaChevronDown, FaChevronRight } from "react-icons/fa";
 import { ISprint } from "@libs/types/sprint";
 import IssueCard from "./issueCard";
 import { statusOptions } from "@libs/constants/list";
-import { MenuProps, Dropdown } from "antd";
+import { MenuProps, Dropdown, Tooltip } from "antd";
 import { BsThreeDots } from "react-icons/bs";
 import { FaPlus } from "react-icons/fa6";
 import ConfirmDeleteModal from "@libs/app/components/general-components/modal/modalDeleteConfirm";
@@ -151,10 +151,12 @@ const ScrumSprint = memo(
                       {sprint?.name}
                     </h2>
                     <div className="flex items-center space-x-3 text-sm">
-                      <span className="text-sm text-gray-600">
-                        {formatSprintDate(sprint?.date_started)} -{" "}
-                        {formatSprintDate(sprint?.date_ended)}
-                      </span>
+                      {sprint?.name !== "Backlog" && (
+                        <span className="text-sm text-gray-600">
+                          {formatSprintDate(sprint?.date_started)} -{" "}
+                          {formatSprintDate(sprint?.date_ended)}
+                        </span>
+                      )}
                       <span className="text-xs font-medium text-gray-700">
                         {sprint.issues.length} issues
                       </span>
@@ -165,20 +167,51 @@ const ScrumSprint = memo(
                 <div className="flex items-center space-x-6">
                   {/* Column Count */}
                   <div className="flex flex-row items-center space-x-3">
-                    {columns?.map((column) => (
-                      <div
-                        key={column.id}
-                        className={`rounded-sm px-1.5 py-0.5 text-center ${statusOptions.find((option) => option.key === column.name)?.bgColor}`}
-                      >
-                        <div className="text-xs font-semibold text-gray-900">
-                          {
-                            sprint.issues.filter(
-                              (issue) => issue?.column?.name === column.name,
-                            ).length
+                    {columns?.map((column) => {
+                      const statusOption = statusOptions.find(
+                        (option) => option.key === column.name,
+                      );
+                      const count = sprint.issues.filter(
+                        (issue) => issue?.column?.name === column.name,
+                      ).length;
+
+                      // Map tailwind color classes to hex for Tooltip color prop
+                      const colorMap: Record<string, string> = {
+                        "bg-gray-100": "#6b7280",
+                        "bg-blue-100": "#3b82f6",
+                        "bg-green-100": "#22c55e",
+                      };
+
+                      return (
+                        <Tooltip
+                          key={column.id}
+                          color={
+                            statusOption
+                              ? colorMap[statusOption.bgColor]
+                              : undefined
                           }
-                        </div>
-                      </div>
-                    ))}
+                          title={
+                            <div className="flex flex-col py-0.5 px-1">
+                              <span className="text-[10px] font-bold uppercase tracking-wider opacity-90">
+                                {column.name}
+                              </span>
+                              <span className="text-sm font-extrabold">
+                                {count} {count <= 1 ? "Issue" : "Issues"}
+                              </span>
+                            </div>
+                          }
+                          mouseEnterDelay={0.2}
+                        >
+                          <div
+                            className={`rounded-sm px-1.5 py-0.5 text-center ${statusOption?.bgColor || "bg-gray-100"}`}
+                          >
+                            <div className="text-xs font-semibold text-gray-900">
+                              {count}
+                            </div>
+                          </div>
+                        </Tooltip>
+                      );
+                    })}
                   </div>
 
                   {/* Add Issue Button */}
@@ -323,22 +356,24 @@ const ScrumSprint = memo(
             />
           </div>
 
-          <div className="flex h-full flex-row items-center">
-            <div className="flex flex-1 flex-row items-center justify-end gap-1">
-              <div className="flex h-full gap-2">
-                <span className="text-sm font-medium text-gray-600">
-                  {sprint.issues.length} work items
-                </span>
-                <span className="text-sm font-semibold text-gray-600">|</span>
-                <span className="text-sm font-medium text-gray-600">
-                  Estimate:{" "}
-                  <span className="text-sm font-bold text-gray-800">
-                    {estimate}
+          {isExpanded && (
+            <div className="flex h-full flex-row items-center">
+              <div className="flex flex-1 flex-row items-center justify-end gap-1">
+                <div className="flex h-full gap-2">
+                  <span className="text-sm font-medium text-gray-600">
+                    {sprint.issues.length} work items
                   </span>
-                </span>
+                  <span className="text-sm font-semibold text-gray-600">|</span>
+                  <span className="text-sm font-medium text-gray-600">
+                    Estimate:{" "}
+                    <span className="text-sm font-bold text-gray-800">
+                      {estimate}
+                    </span>
+                  </span>
+                </div>
               </div>
             </div>
-          </div>
+          )}
 
           <CompleteSprintModal
             isOpen={isCompleteSprintModalOpen}
