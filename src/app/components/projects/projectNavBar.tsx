@@ -31,7 +31,7 @@ import {
 } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import type { CSSProperties } from "react";
-import { useProject } from "../../../hooks/apis/useProject";
+import { useProjectByID } from "../../../hooks/apis/useProject";
 import AddProjectMemberModal from "./modals/project/addProjectMemberModal";
 import { useIssueStore } from "@libs/store/useIssueStore";
 import { PERMISSIONS_CONFIG } from "@libs/config/permissons.config";
@@ -124,7 +124,7 @@ const ProjectNavbar: React.FC<ProjectNavbarProps> = ({
   const { projectId } = useParams<{ projectId: string }>();
   const location = useLocation();
   const [isAddMemberModalOpen, setIsAddMemberModalOpen] = useState(false);
-  const { project } = useProject(projectId || "");
+  const { project } = useProjectByID(projectId || "");
 
   const getNavItems = (currentProjectId: string): NavItem[] => [
     {
@@ -256,10 +256,10 @@ const ProjectNavbar: React.FC<ProjectNavbarProps> = ({
               {!isCollapsed && (
                 <div className="flex flex-col min-w-0 overflow-hidden animate-slide-in-left">
                   <h2 className="text-sm font-bold text-[#064e3b] uppercase tracking-widest truncate leading-tight">
-                    {project?.name || "Project Workspace"}
+                    {project?.data.name || "Project Workspace"}
                   </h2>
                   <p className="text-[10px] text-[#404944] font-medium opacity-70 truncate">
-                    {project?.key || "PROJ"} • Engineering Alpha
+                    {project?.data.key || "PROJ"} • Engineering Alpha
                   </p>
                 </div>
               )}

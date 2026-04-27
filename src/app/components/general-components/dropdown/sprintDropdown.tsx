@@ -2,19 +2,22 @@ import ColumnDropdown from "./columnDropdown";
 import { useUpdateIssue } from "@libs/hooks/apis/useIssue";
 import { useProjectSprints } from "@libs/hooks/apis/useSprint";
 import { ISprint } from "@libs/types/sprint";
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 
 const SprintDropdown = ({
   projectId,
   issueId,
   sprintId,
+  sprint: defaultSprint,
 }: {
   projectId: string;
   issueId: string;
   sprintId: string;
+  sprint?: ISprint;
 }) => {
+  const [isOpenDropdown, setIsOpenDropdown] = useState(false);
   const { updateIssueAsync } = useUpdateIssue({ projectId });
-  const { sprints } = useProjectSprints(projectId);
+  const { sprints } = useProjectSprints(projectId, isOpenDropdown);
   const handleChangeSprint = (updatedSprintId: string) => {
     updateIssueAsync({
       id: issueId,
@@ -25,8 +28,10 @@ const SprintDropdown = ({
   };
 
   const currentSprint = useMemo(() => {
-    return sprints.find((sprint) => sprint.id === sprintId);
+    return sprints.find((sprint: ISprint) => sprint.id === sprintId);
   }, [sprintId, sprints]);
+
+  const sprint = defaultSprint ?? currentSprint;
 
   return (
     <ColumnDropdown
@@ -68,16 +73,18 @@ const SprintDropdown = ({
           },
         })}
       currentItem={
-        currentSprint
-          ? sprints.find((sprint: ISprint) => sprint.id === currentSprint.id)
-              ?.name
+        sprint
+          ? sprints.find((sprint: ISprint) => sprint.id === sprint.id)
+            ?.name
           : "Unassigned"
       }
+      setIsOpenDropdown={setIsOpenDropdown}
+
     >
       <div className="group font-manrope">
         <div className="flex justify-start rounded-lg border border-[#e8e8e7] bg-white px-2 py-1 transition-all duration-300 group-hover:border-[#064e3b]/30 group-hover:bg-[#f9f9f8] shadow-sm">
-          <p className={`truncate text-xs font-bold tracking-tight ${currentSprint ? "text-[#064e3b]" : "text-[#404944]/50"}`}>
-            {currentSprint?.name || "Unassigned"}
+          <p className={`truncate text-xs font-bold tracking-tight ${sprint ? "text-[#064e3b]" : "text-[#404944]/50"}`}>
+            {sprint?.name || "Unassigned"}
           </p>
         </div>
       </div>

@@ -2,6 +2,7 @@ import { memo } from "react";
 import { Avatar } from "antd";
 import { FaUserAltSlash } from "react-icons/fa";
 import { useUserById } from "@libs/hooks/apis/useUser";
+import { IUser } from "@libs/types/user";
 
 type Props = {
   userId?: string;
@@ -9,6 +10,7 @@ type Props = {
   isDisplayName?: boolean;
   className?: string;
   borderRadius?: string;
+  user?: IUser
 };
 
 function buildCloudinaryUrl(url: string, size: number) {
@@ -21,10 +23,11 @@ function buildCloudinaryUrl(url: string, size: number) {
 }
 
 const UserAvatar = memo(
-  ({ userId, size = 28, isDisplayName = true, className, borderRadius }: Props) => {
-    const { user } = useUserById(userId || "");
+  ({ userId, size = 28, isDisplayName = true, className, borderRadius, user: defaultUser }: Props) => {
+    const { user: fetchedUser } = useUserById(userId || "", !defaultUser);
+    const displayUser = defaultUser ?? fetchedUser ?? null;
 
-    if (!userId) {
+    if (!userId && !defaultUser) {
       return (
         <div className="flex flex-row items-center justify-start gap-2 font-manrope">
           <div className="flex h-5 w-5 items-center justify-center rounded-full bg-[#e8e8e7] border border-white">
@@ -39,7 +42,7 @@ const UserAvatar = memo(
       );
     }
 
-    const avatarUrl = user?.avatar ? buildCloudinaryUrl(user.avatar, size) : "";
+    const avatarUrl = displayUser?.avatar ? buildCloudinaryUrl(displayUser.avatar, size) : "";
 
     return (
       <div className={`flex flex-row items-center gap-2 font-manrope ${className}`}>
@@ -50,8 +53,8 @@ const UserAvatar = memo(
               <img
                 src={avatarUrl}
                 srcSet={`
-                ${buildCloudinaryUrl(user?.avatar || "", size)} 1x,
-                ${buildCloudinaryUrl(user?.avatar || "", size * 2)} 2x
+                ${buildCloudinaryUrl(displayUser?.avatar || "", size)} 1x,
+                ${buildCloudinaryUrl(displayUser?.avatar || "", size * 2)} 2x
               `}
                 alt={`user avatar`}
                 loading="lazy"
@@ -72,13 +75,13 @@ const UserAvatar = memo(
             borderRadius: borderRadius ? borderRadius : "100%",
           }}
         >
-          {user?.first_name?.[0]}
-          {user?.last_name?.[0]}
+          {displayUser?.first_name?.[0]}
+          {displayUser?.last_name?.[0]}
         </Avatar>
 
         {isDisplayName && (
           <p className="text-xs font-bold text-[#404944] tracking-tight">
-            {user?.first_name} {user?.last_name}
+            {displayUser?.first_name} {displayUser?.last_name}
           </p>
         )}
       </div>

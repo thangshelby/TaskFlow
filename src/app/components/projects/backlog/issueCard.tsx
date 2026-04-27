@@ -158,8 +158,7 @@ const IssueCard = memo(
                     projectId={projectId}
                     issueId={issue.id}
                     column={
-                      columns.find((col) => col.id === issue.column.id) ||
-                      columns[0]
+                      issue.column
                     }
                   />
                 </div>
@@ -195,6 +194,7 @@ const IssueCard = memo(
                     selectedUserId={issue?.assignee_id || ""}
                     columnField="assignee_id"
                     isDisplayname={false}
+                    user={issue.assignee}
                   />
                 </div>
               </div>

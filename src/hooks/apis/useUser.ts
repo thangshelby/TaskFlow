@@ -2,7 +2,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { users } from "@libs/apis/user";
 import { IUser } from "@libs/types/user";
 
-export function useUserById(userId: string) {
+export function useUserById(userId: string, enabled: boolean = true) {
   const {
     data: userData,
     isLoading,
@@ -12,17 +12,16 @@ export function useUserById(userId: string) {
     queryFn: async () => {
       if (!userId) throw new Error("User ID is required");
       const { data } = await users.getById(userId);
-      return data;
+      return data.data;
     },
-    enabled: !!userId,
+    enabled: !!userId && enabled,
   });
   return {
-    user: userData?.data,
+    user: userData,
     isLoading,
     error,
   };
 }
-
 
 export function useListUser(keyword: string, projectId?: string) {
   const { data, isLoading, error } = useQuery({
@@ -31,7 +30,7 @@ export function useListUser(keyword: string, projectId?: string) {
       const { data } = await users.list(keyword, projectId);
       return data;
     },
-    enabled: !!keyword ,
+    enabled: !!keyword,
   });
   return {
     users: data?.data,

@@ -26,7 +26,8 @@ const config = {
 // Projects endpoints
 export const projects = {
   getAll: () => api.get<IProject[]>("/projects", config),
-  getById: (id: string) => api.get<IProject>(`/projects/${id}`, config),
+  getById: (id: string) =>
+    api.get<ResponseApi<IProject>>(`/projects/${id}`, config),
   create: (data: Partial<IProject>) =>
     api.post<IProject>("/projects", data, config),
   update: (id: string, data: Partial<IProject>) =>

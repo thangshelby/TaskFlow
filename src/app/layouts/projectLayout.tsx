@@ -5,7 +5,6 @@ import { ClockLoader } from "react-spinners";
 import { useUserTeams } from "@libs/hooks/apis/useTeam";
 import { useParams } from "react-router-dom";
 import { useAuthStore } from "@libs/store/useAuthStore";
-import { useProjectMembers } from "@libs/hooks/apis/useProjectMember";
 import { Header } from "@libs/app/components/general-components/user/header";
 
 const ProjectLayout = (): React.ReactElement => {
@@ -13,12 +12,8 @@ const ProjectLayout = (): React.ReactElement => {
 
   const { user } = useAuthStore();
 
-  const { isLoading: isLoadingMembers } = useProjectMembers({
-    project_id: projectId || "",
-    email: user?.email || "",
-  });
 
-  useUserTeams(projectId || "", user?.id || "", !isLoadingMembers);
+  useUserTeams(projectId || "", user?.id || "");
 
   const [isCollapsed, setIsCollapsed] = useState(
     localStorage.getItem("isCollapsed") === "true",

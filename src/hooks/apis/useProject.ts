@@ -147,7 +147,7 @@ export function useDeleteProject({ onClose }: { onClose?: () => void }) {
   };
 }
 
-export function useProject(projectId: string) {
+export function useProjectByID(projectId: string) {
   const queryClient = useQueryClient();
   const { user, setUser } = useAuthStore();
   const {
@@ -160,9 +160,12 @@ export function useProject(projectId: string) {
       const { data } = await projects.getById(projectId);
       queryClient.setQueryData(
         ["projectMembers", projectId],
-        data.project_members,
+        data.data.project_members,
       );
-      data.project_members.forEach((member) => {
+      data.data.project_members.forEach((member) => {
+        queryClient.setQueryData(["user", member.user_id], member.user);
+      });
+      data.data.project_members.forEach((member) => {
         if (user?.id === member.user_id) {
           setUser({
             ...user,

@@ -3,7 +3,7 @@ import { ITeam } from "@libs/types/team";
 import { useProjectTeams } from "@libs/hooks/apis/useTeam";
 import TeamBadge from "../badge/teamBadge";
 import { useUpdateIssue } from "@libs/hooks/apis/useIssue";
-import { memo, useMemo } from "react";
+import { memo, useMemo, useState } from "react";
 import { useAuthStore } from "@libs/store/useAuthStore";
 
 const TeamDropdown = ({
@@ -12,14 +12,17 @@ const TeamDropdown = ({
   selectedTeamId,
   columnField = "team_id",
   isDisplayName = true,
+  team: defaultTeam,
 }: {
   projectId: string;
   issueId: string;
   selectedTeamId: string;
   columnField?: string;
   isDisplayName?: boolean;
+  team?: ITeam;
 }) => {
-  const { teams } = useProjectTeams(projectId);
+  const [isOpenDropdown, setIsOpenDropdown] = useState(false)
+  const { teams } = useProjectTeams(projectId, isOpenDropdown);
   const { updateIssueAsync } = useUpdateIssue({ projectId });
 
   const handleChangeTeam = (teamId: string) => {
@@ -28,10 +31,10 @@ const TeamDropdown = ({
       data: { [columnField]: teamId },
     });
   };
-  const selectedTeam = useMemo(
-    () => teams?.find((team: ITeam) => team.id === selectedTeamId),
-    [teams, selectedTeamId],
-  );
+  const currentTeam = useMemo(() => {
+    return teams?.find((team: ITeam) => team.id === selectedTeamId);
+  }, [selectedTeamId, teams]);
+  const selectedTeam = defaultTeam ?? currentTeam;
 
   const { user } = useAuthStore();
   return (
@@ -98,7 +101,7 @@ const TeamDropdown = ({
           </div>
         )
       }
-
+      setIsOpenDropdown={setIsOpenDropdown}
     />
   );
 };

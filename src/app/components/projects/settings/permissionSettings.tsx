@@ -14,7 +14,7 @@ import {
   ChevronDown,
   LoaderCircle,
 } from "lucide-react";
-import { usePermissions, useProject } from "@libs/hooks/apis/useProject";
+import { usePermissions, useProjectByID } from "@libs/hooks/apis/useProject";
 import { AnimatePresence, motion } from "motion/react";
 import { useRowPermission } from "@libs/app/context/permission.context";
 import { useAuthStore } from "@libs/store/useAuthStore";
@@ -86,7 +86,7 @@ const PermissionsSettings = ({
   >({});
 
   const { projectId } = useParams<{ projectId: string }>();
-  const { project } = useProject(projectId!);
+  const { project } = useProjectByID(projectId!);
   const { user } = useAuthStore();
   const { userTeams } = useUserTeams(projectId!, user?.id!);
 
@@ -219,18 +219,16 @@ const PermissionsSettings = ({
                       <div
                         className="h-2 rounded-full bg-green-600 transition-all duration-300"
                         style={{
-                          width: `${
-                            stats.total > 0
+                          width: `${stats.total > 0
                               ? (stats.granted / stats.total) * 100
                               : 0
-                          }%`,
+                            }%`,
                         }}
                       ></div>
                     </div>
                     <ChevronDown
-                      className={`h-5 w-5 text-gray-400 transition-transform duration-200 ${
-                        isExpanded ? "rotate-180 transform" : ""
-                      }`}
+                      className={`h-5 w-5 text-gray-400 transition-transform duration-200 ${isExpanded ? "rotate-180 transform" : ""
+                        }`}
                     />
                   </div>
                 </div>
