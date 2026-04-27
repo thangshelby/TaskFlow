@@ -7,6 +7,7 @@ import { queryClient } from "./apis/react-query";
 import { ToastContainer } from "react-toastify";
 import { NotificationProvider } from "@libs/app/context/notification.context";
 import { HelmetProvider } from "react-helmet-async";
+import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 
 function App() {
   return (
@@ -16,6 +17,7 @@ function App() {
           <NotificationProvider>
             <HelmetProvider>
               <Router />
+              <ReactQueryDevtools initialIsOpen={false} />
             </HelmetProvider>
           </NotificationProvider>
         </BrowserRouter>

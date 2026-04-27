@@ -22,6 +22,7 @@
     "@tailwindcss/forms": "^0.5.7",
     "@tailwindcss/vite": "^4.0.15",
     "@tanstack/react-query": "^5.0.0",
+    "@tanstack/react-query-devtools": "^5.100.5",
     "antd": "^5.27.6",
     "axios": "^1.6.0",
     "chart.js": "^4.5.0",
