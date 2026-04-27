@@ -229,7 +229,7 @@ const ScrumSprint = memo(
 
             {/* Body */}
             {isExpanded && (
-              <div className="bg-white p-2">
+              <div className={`p-2 transition-colors duration-300 ${overItemId === sprint.id ? "bg-[#d1fae5]" : "bg-white"}`}>
                 <SortableContext
                   strategy={horizontalListSortingStrategy}
                   items={sprint.issues.map((issue) => issue.id)}
@@ -246,7 +246,7 @@ const ScrumSprint = memo(
                         </div>
                       ))
                     ) : (
-                      <div className={`flex flex-col items-center justify-center py-10 rounded-xl border-2 border-dashed transition-all duration-300 ${isDragging ? "border-[#064e3b] bg-[#f0fdf4]" : "border-[#10b981]/20 bg-[#f9f9f8]/50"}`}>
+                      <div className={`flex flex-col items-center justify-center py-10 rounded-xl border-2 border-dashed transition-all duration-300 ${overItemId === sprint.id ? "border-[#064e3b] bg-[#d1fae5]" : "border-[#10b981]/20 bg-[#f9f9f8]/50"}`}>
                         <p className="text-[11px] font-black text-[#064e3b] font-manrope uppercase tracking-widest opacity-80">
                           Drop issues here to plan your sprint
                         </p>

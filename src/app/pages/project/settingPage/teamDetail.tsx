@@ -14,6 +14,7 @@ import UserAvatar from "@libs/app/components/general-components/user/userAvatar"
 import { useUpdateTeam } from "@libs/hooks/apis/useTeam";
 import AddProjectTeamMemberModal from "@libs/app/components/projects/modals/project/addProjectTeamMemberModal";
 import LoadingFallback from "@libs/app/components/general-components/loadingFallback";
+import { UI_COMMON_SIZES } from "@libs/app/components/general-components/constants/uiConfig";
 
 import { PERMISSIONS_CONFIG } from "@libs/config/permissons.config";
 import PermissionButton from "@libs/app/components/general-components/pemissionButton";
@@ -36,6 +37,7 @@ const TeamDetailPage: React.FC = () => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
+
   useEffect(() => {
     setNewPermissionKeys(new Set(team?.permission_keys || []));
   }, [team]);
@@ -58,6 +60,7 @@ const TeamDetailPage: React.FC = () => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
   }, [isDropdownOpen]);
+
   const memberIds = useMemo(() => team?.member_ids || [], [team]);
 
   const handleUpdateTeam = async () => {
@@ -72,93 +75,77 @@ const TeamDetailPage: React.FC = () => {
 
   return (
     <>
-      <div className="min-h-screen px-8">
-        <div className="mx-auto flex w-full flex-col gap-6">
-          {/* Green Banner */}
-          <div className="group relative flex h-52 cursor-pointer items-center justify-center rounded-lg bg-gradient-to-r from-teal-400 via-blue-200 to-indigo-100">
+      <div className="min-h-screen">
+        <div className="mx-auto flex w-full max-w-6xl flex-col gap-8">
+          {/* Premium Banner */}
+          <div 
+            className="group relative flex h-48 w-full cursor-pointer items-center justify-center overflow-hidden shadow-2xl transition-all duration-500 hover:shadow-[#064e3b]/10"
+            style={{ 
+              borderRadius: UI_COMMON_SIZES.medium.borderRadius,
+              background: "linear-gradient(135deg, #2dd4bf 0%, #818cf8 50%, #c084fc 100%)" 
+            }}
+          >
             <div
-              onClick={() => {
-                inputRef.current?.click();
-              }}
-              className="absolute top-0 right-0 hidden h-full w-full items-center justify-center bg-black/30 group-hover:flex"
+              onClick={() => inputRef.current?.click()}
+              className="absolute inset-0 flex items-center justify-center bg-[#064e3b]/20 opacity-0 backdrop-blur-[2px] transition-all duration-300 group-hover:opacity-100"
             >
-              <button
-                type="button"
-                className="inline-flex cursor-pointer items-center gap-2 rounded-md border border-white px-3 py-1 text-sm text-white shadow-sm"
-              >
-                <ImagePlus className="h-4 w-4" />
-                Add cover image
-              </button>
+              <div className="flex flex-col items-center gap-3">
+                <div className="rounded-full bg-white/20 p-4 shadow-xl ring-1 ring-white/50">
+                  <ImagePlus className="h-6 w-6 text-white" />
+                </div>
+                <span className="font-manrope text-[10px] font-black uppercase tracking-widest text-white">Update Cover</span>
+              </div>
               <input
                 ref={inputRef}
                 type="file"
                 className="hidden"
-                onChange={(e) => {
-                  console.log(e.target.files);
-                }}
+                onChange={(e) => console.log(e.target.files)}
               />
             </div>
           </div>
 
-          <div className="flex flex-row items-center justify-between">
-            <div>
-              <h1 className="text-2xl font-bold text-gray-900">{team?.name}</h1>
+          <div className="flex flex-col gap-6 sm:flex-row sm:items-end sm:justify-between">
+            <div className="animate-slide-in-left">
+              <div className="flex items-center gap-3 mb-1">
+                <div className="h-2 w-8 bg-[#064e3b] rounded-full" />
+                <span className="font-manrope text-[10px] font-black uppercase tracking-widest text-[#064e3b]/30">Team Profile</span>
+              </div>
+              <h1 className="font-manrope text-5xl font-black tracking-tight text-[#064e3b]">{team?.name}</h1>
             </div>
-            <div className="flex flex-row items-center gap-2">
+            
+            <div className="flex items-center gap-3">
               <PermissionButton
                 title="Add people to team"
                 action={PERMISSIONS_CONFIG.team.addMember}
-                handleClick={() => {
-                  setIsAddPeopleOpen(true);
-                }}
+                handleClick={() => setIsAddPeopleOpen(true)}
               >
-                <div className="text-md inline-flex items-center gap-2 rounded-md border border-gray-200 bg-white px-3 py-2 text-gray-700 hover:bg-gray-50">
-                  <Plus className="h-4 w-4" />
-                  Add people
-                </div>
+                <button className="flex h-12 items-center gap-2.5 rounded-xl bg-[#064e3b] px-8 font-manrope text-[11px] font-black uppercase tracking-widest text-white shadow-xl shadow-[#064e3b]/20 transition-all hover:bg-[#064e3b]/90 hover:-translate-y-0.5 active:translate-y-0">
+                  <Plus size={16} />
+                  Add People
+                </button>
               </PermissionButton>
 
               <div className="relative" ref={dropdownRef}>
                 <button
                   onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-                  className="inline-flex items-center gap-2 rounded-md border border-gray-200 bg-white px-2 py-2 text-sm text-gray-700 hover:bg-gray-50"
+                  className="flex h-12 w-12 items-center justify-center rounded-xl border border-[#064e3b]/10 bg-white text-[#064e3b]/40 transition-all hover:bg-[#064e3b]/5 hover:text-[#064e3b] hover:-translate-y-0.5 active:translate-y-0"
                 >
-                  <MoreHorizontal className="h-5 w-5" />
+                  <MoreHorizontal size={20} />
                 </button>
 
                 {isDropdownOpen && (
-                  <div className="absolute top-full right-0 z-50 mt-1 w-48 rounded-md border border-gray-200 bg-white py-1 shadow-lg">
-                    <button
-                      onClick={() => {
-                        setIsDropdownOpen(false);
-                        // Handle team settings
-                        console.log("Team settings clicked");
-                      }}
-                      className="flex w-full items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
-                    >
-                      <Settings className="h-4 w-4" />
+                  <div className="absolute right-0 top-full z-50 mt-2 w-56 rounded-2xl border border-[#064e3b]/10 bg-white py-2 shadow-2xl shadow-[#064e3b]/10 animate-scale-in">
+                    <button className="flex w-full items-center gap-3 px-4 py-3 font-manrope text-xs font-bold text-[#064e3b] transition-colors hover:bg-[#064e3b]/5">
+                      <Settings size={14} className="opacity-40" />
                       Team settings
                     </button>
-                    <button
-                      onClick={() => {
-                        setIsDropdownOpen(false);
-                        // Handle leave team
-                        console.log("Leave team clicked");
-                      }}
-                      className="flex w-full items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
-                    >
-                      <LogOut className="h-4 w-4" />
+                    <button className="flex w-full items-center gap-3 px-4 py-3 font-manrope text-xs font-bold text-[#064e3b] transition-colors hover:bg-[#064e3b]/5">
+                      <LogOut size={14} className="opacity-40" />
                       Leave team
                     </button>
-                    <button
-                      onClick={() => {
-                        setIsDropdownOpen(false);
-                        // Handle delete team
-                        console.log("Delete team clicked");
-                      }}
-                      className="flex w-full items-center gap-3 px-4 py-2 text-sm text-red-600 hover:bg-red-50"
-                    >
-                      <Trash2 className="h-4 w-4" />
+                    <div className="my-1 border-t border-[#064e3b]/5" />
+                    <button className="flex w-full items-center gap-3 px-4 py-3 font-manrope text-xs font-bold text-red-600 transition-colors hover:bg-red-50">
+                      <Trash2 size={14} className="opacity-40" />
                       Delete team
                     </button>
                   </div>
@@ -167,56 +154,57 @@ const TeamDetailPage: React.FC = () => {
             </div>
           </div>
 
-          <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
-            {/* Left Sidebar - Team Profile */}
-            <div className="space-y-6 lg:col-span-1">
-              {/* Team Profile Card */}
-              <div className="rounded-lg border border-gray-200 bg-white p-6">
-                <div className="space-y-4">
-                  <div>
-                    <h3 className="mb-2 text-sm font-medium text-gray-700">
-                      About
-                    </h3>
-                    <p className="text-sm text-gray-600">
-                      {team?.description || "No description provided"}
-                    </p>
-                  </div>
+          <div className="grid grid-cols-1 gap-8 lg:grid-cols-4">
+            {/* Sidebar - Profile Details */}
+            <div className="lg:col-span-1 space-y-8 animate-fade-in">
+              {/* About Section */}
+              <div 
+                className="overflow-hidden bg-white px-6 py-8 ring-1 ring-[#064e3b]/5 transition-all hover:shadow-xl hover:shadow-[#064e3b]/5"
+                style={{ borderRadius: UI_COMMON_SIZES.medium.borderRadius }}
+              >
+                <div className="mb-6 flex items-center gap-2">
+                  <div className="h-1.5 w-4 bg-[#064e3b]/20 rounded-full" />
+                  <h3 className="font-manrope text-[10px] font-black uppercase tracking-widest text-[#064e3b]/50">About Team</h3>
+                </div>
+                <p className="font-manrope text-sm leading-relaxed text-[#064e3b]">
+                  {team?.description || "A cohesive group dedicated into building TaskFlow core."}
+                </p>
+              </div>
 
-                  <div>
-                    <h3 className="mb-2 text-sm font-medium text-gray-700">
-                      Members
-                    </h3>
-                    <div className="flex flex-col gap-2">
-                      {memberIds.length === 0 && (
-                        <span className="text-sm text-gray-500">
-                          No members
-                        </span>
-                      )}
-                      {memberIds.map((uid) => (
-                        <div
-                          key={uid}
-                          className="flex items-center justify-between rounded-md border border-gray-100 px-2 py-1.5 hover:bg-gray-50"
-                        >
-                          <div className="flex items-center gap-3">
-                            <UserAvatar
-                              userId={uid}
-                              size={28}
-                              isDisplayName={true}
-                            />
-                          </div>
-                        </div>
-                      ))}
-                      <span className="mt-1 text-sm text-gray-600">
-                        {memberIds.length} members
-                      </span>
-                    </div>
+              {/* Members Section */}
+              <div 
+                className="overflow-hidden bg-white px-6 py-8 ring-1 ring-[#064e3b]/5 transition-all hover:shadow-xl hover:shadow-[#064e3b]/5"
+                style={{ borderRadius: UI_COMMON_SIZES.medium.borderRadius }}
+              >
+                <div className="mb-8 flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <div className="h-1.5 w-4 bg-[#064e3b]/20 rounded-full" />
+                    <h3 className="font-manrope text-[10px] font-black uppercase tracking-widest text-[#064e3b]/50">Roster</h3>
                   </div>
+                  <span className="rounded-full bg-[#064e3b]/5 px-3 py-1 font-manrope text-[9px] font-black text-[#064e3b]">
+                    {memberIds.length} ACTIVE
+                  </span>
+                </div>
+                
+                <div className="flex flex-col gap-3">
+                  {memberIds.length === 0 ? (
+                    <span className="font-manrope text-xs italic text-[#064e3b]/30">No active members</span>
+                  ) : (
+                    memberIds.map((uid) => (
+                      <div
+                        key={uid}
+                        className="group/member flex items-center justify-between transition-all hover:translate-x-1"
+                      >
+                        <UserAvatar userId={uid} size={32} isDisplayName />
+                      </div>
+                    ))
+                  )}
                 </div>
               </div>
             </div>
 
-            {/* Right Content - Team Permissions */}
-            <div className="lg:col-span-2">
+            {/* Main Content - Permissions System */}
+            <div className="lg:col-span-3 animate-fade-in shadow-2xl shadow-[#064e3b]/5" style={{ borderRadius: UI_COMMON_SIZES.medium.borderRadius }}>
               <PermissionsSettings
                 permissionKeys={newPermissionKeys}
                 setPermissionKeys={setNewPermissionKeys}

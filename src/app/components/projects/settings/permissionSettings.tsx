@@ -14,14 +14,9 @@ import {
   ChevronDown,
   LoaderCircle,
 } from "lucide-react";
-import { usePermissions, useProjectByID } from "@libs/hooks/apis/useProject";
+import { usePermissions } from "@libs/hooks/apis/useProject";
 import { AnimatePresence, motion } from "motion/react";
-import { useRowPermission } from "@libs/app/context/permission.context";
-import { useAuthStore } from "@libs/store/useAuthStore";
-import { PERMISSIONS_CONFIG } from "@libs/config/permissons.config";
-import { usePermission } from "@libs/hooks/common/usePermission";
-import { useUserTeams } from "@libs/hooks/apis/useTeam";
-import { useParams } from "react-router-dom";
+import { UI_COMMON_SIZES } from "@libs/app/components/general-components/constants/uiConfig";
 
 // Map resource -> display info
 const RESOURCE_CONFIG: Record<string, { name: string; icon: any }> = {
@@ -81,24 +76,7 @@ const PermissionsSettings = ({
 }) => {
   const { permissions: rawPermissions } = usePermissions();
   const [PERMISSIONS_DATA, setPERMISSIONS_DATA] = useState<any[]>([]);
-  const [permissionStates, setPermissionStates] = useState<
-    Record<string, string>
-  >({});
 
-  const { projectId } = useParams<{ projectId: string }>();
-  const { project } = useProjectByID(projectId!);
-  const { user } = useAuthStore();
-  const { userTeams } = useUserTeams(projectId!, user?.id!);
-
-  // const permissionResult = usePermission({
-  //   user: user!,
-  //   action: PERMISSIONS_CONFIG.project.update,
-  //   resource: {
-  //     issue: {
-  //       teams: userTeams!,
-  //     },
-  //   },
-  // });
   useEffect(() => {
     if (rawPermissions) {
       setPERMISSIONS_DATA(normalizePermissions(rawPermissions));
@@ -110,7 +88,7 @@ const PermissionsSettings = ({
 
   const toggleGroup = (groupId: string) => {
     setExpandedGroups((prev) => {
-      const newSet = new Set();
+      const newSet = new Set(prev);
       if (prev.has(groupId)) newSet.delete(groupId);
       else newSet.add(groupId);
       return newSet;
@@ -121,21 +99,21 @@ const PermissionsSettings = ({
     const newPermissionKeys = new Set(permissionKeys);
     if (value === "granted") {
       newPermissionKeys.add(permissionId);
-      setPermissionKeys(newPermissionKeys);
     } else {
       newPermissionKeys.delete(permissionId);
-      setPermissionKeys(newPermissionKeys);
     }
+    setPermissionKeys(newPermissionKeys);
   };
 
   const handleGroupPermissionChange = (groupId: string, value: string) => {
     const group = PERMISSIONS_DATA.find((g) => g.id === groupId);
     if (group) {
-      const newStates = { ...permissionStates };
+      const newPermissionKeys = new Set(permissionKeys);
       group.permissions.forEach((p: { id: string }) => {
-        newStates[p.id] = value;
+        if (value === "granted") newPermissionKeys.add(p.id);
+        else newPermissionKeys.delete(p.id);
       });
-      setPermissionStates(newStates);
+      setPermissionKeys(newPermissionKeys);
     }
   };
 
@@ -162,33 +140,32 @@ const PermissionsSettings = ({
     ).length;
     return { total, granted };
   };
-  if (!PERMISSIONS_DATA) return null;
+
+  if (!PERMISSIONS_DATA.length) return null;
 
   return (
-    <div className="rounded-lg border border-gray-200 bg-white p-6">
-      <div className="mb-6 flex items-center gap-2">
-        <Settings className="h-5 w-5 text-gray-600" />
-        <h3 className="text-lg font-semibold text-gray-900">
-          Team Permissions
-        </h3>
-      </div>
-
-      {/* Search */}
-      <div className="mb-4 rounded-lg bg-gray-50">
-        <div className="relative">
-          <Search className="absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 transform text-gray-400" />
+    <div className="bg-white p-8">
+      <div className="mb-8 flex items-center justify-between">
+        <div className="flex items-center gap-3">
+          <div className="h-2 w-8 rounded-full bg-[#064e3b]" />
+          <h3 className="font-manrope text-2xl font-black text-[#064e3b]">
+            Team Permissions
+          </h3>
+        </div>
+        
+        <div className="group relative w-72">
+          <Search className="absolute top-1/2 left-4 h-4 w-4 -translate-y-1/2 text-[#064e3b]/30 transition-colors group-focus-within:text-[#064e3b]" />
           <input
             type="text"
-            placeholder="Search permissions..."
+            placeholder="Search filters..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full rounded-lg border border-gray-300 py-2 pr-4 pl-10 focus:border-transparent focus:ring-2 focus:ring-green-500 focus:outline-none"
+            className="w-full h-11 rounded-xl border border-[#064e3b]/10 bg-[#fcfcfb] pl-11 pr-4 font-manrope text-sm text-[#064e3b] transition-all focus:border-[#064e3b]/30 focus:outline-none focus:ring-4 focus:ring-[#064e3b]/5 placeholder:text-[#064e3b]/30"
           />
         </div>
       </div>
 
-      {/* Permissions Accordion */}
-      <div className="w-full space-y-2">
+      <div className="space-y-4">
         {filteredPermissionsData.map((group) => {
           const stats = getGroupStats(group.id);
           const IconComponent = group.icon;
@@ -197,152 +174,109 @@ const PermissionsSettings = ({
           return (
             <div
               key={group.id}
-              className="overflow-hidden rounded-lg border border-gray-200"
+              className={`overflow-hidden border transition-all duration-300 ${
+                isExpanded ? "border-[#064e3b]/20 bg-white shadow-xl shadow-[#064e3b]/5" : "border-[#064e3b]/5 bg-[#fcfcfb]/50"
+              }`}
+              style={{ borderRadius: UI_COMMON_SIZES.medium.borderRadius }}
             >
-              {/* Accordion Header */}
               <button
                 onClick={() => toggleGroup(group.id)}
-                className="w-full cursor-pointer px-6 py-4 text-left transition-colors hover:bg-gray-50 focus:ring-2 focus:ring-green-500 focus:outline-none focus:ring-inset"
+                className="group w-full cursor-pointer p-6 transition-colors hover:bg-white"
               >
                 <div className="flex items-center justify-between">
-                  <div className="flex items-center space-x-3">
-                    <IconComponent className="h-5 w-5 text-gray-600" />
-                    <span className="font-semibold text-gray-900">
+                  <div className="flex items-center gap-4">
+                    <div className={`p-2.5 rounded-xl transition-colors ${isExpanded ? "bg-[#064e3b] text-white" : "bg-[#064e3b]/5 text-[#064e3b]"}`}>
+                      <IconComponent size={20} />
+                    </div>
+                    <span className="font-manrope text-sm font-black text-[#064e3b] uppercase tracking-wider">
                       {group.name}
                     </span>
                   </div>
-                  <div className="flex items-center space-x-4">
-                    <span className="text-sm text-gray-500">
-                      {stats.granted}/{stats.total} permissions granted
-                    </span>
-                    <div className="h-2 w-20 rounded-full bg-gray-200">
-                      <div
-                        className="h-2 rounded-full bg-green-600 transition-all duration-300"
-                        style={{
-                          width: `${stats.total > 0
-                              ? (stats.granted / stats.total) * 100
-                              : 0
-                            }%`,
-                        }}
-                      ></div>
+                  
+                  <div className="flex items-center gap-8">
+                    <div className="flex flex-col items-end gap-1.5">
+                      <span className="font-manrope text-[10px] font-black uppercase tracking-widest text-[#064e3b]/40">
+                         {stats.granted} / {stats.total} GRANTED
+                      </span>
+                      <div className="h-1.5 w-32 rounded-full bg-[#064e3b]/5 overflow-hidden">
+                        <div
+                          className="h-full bg-emerald-500 transition-all duration-500"
+                          style={{ width: `${(stats.granted / stats.total) * 100}%` }}
+                        />
+                      </div>
                     </div>
                     <ChevronDown
-                      className={`h-5 w-5 text-gray-400 transition-transform duration-200 ${isExpanded ? "rotate-180 transform" : ""
-                        }`}
+                      size={18}
+                      className={`text-[#064e3b]/30 transition-transform duration-300 ${isExpanded ? "rotate-180 text-[#064e3b]" : ""}`}
                     />
                   </div>
                 </div>
               </button>
 
               <AnimatePresence>
-                {/* Accordion Content */}
                 {isExpanded && (
                   <motion.div
-                    initial={{
-                      opacity: 0,
-                      height: 0,
-                    }}
-                    animate={{
-                      opacity: 1,
-                      height: "auto",
-                    }}
-                    exit={{
-                      opacity: 0,
-                      height: 0,
-                    }}
-                    transition={{
-                      duration: 0.2,
-                      ease: "easeOut",
-                    }}
-                    className="border-t border-gray-100 px-6 pb-4"
+                    initial={{ height: 0, opacity: 0 }}
+                    animate={{ height: "auto", opacity: 1 }}
+                    exit={{ height: 0, opacity: 0 }}
+                    className="overflow-hidden"
                   >
-                    {/* Group Actions */}
-                    <div className="mb-4 border-b border-gray-200 pt-4 pb-4">
-                      <div className="flex flex-col gap-2 sm:flex-row">
+                    <div className="border-t border-[#064e3b]/5 p-6">
+                      <div className="mb-8 flex items-center gap-3">
                         <button
-                          onClick={() =>
-                            handleGroupPermissionChange(group.id, "granted")
-                          }
-                          className="rounded-md bg-green-100 px-4 py-2 text-sm font-medium text-green-700 transition-colors hover:bg-green-200"
+                          onClick={() => handleGroupPermissionChange(group.id, "granted")}
+                          className="rounded-lg bg-emerald-50 px-4 py-2 font-manrope text-[10px] font-black uppercase tracking-widest text-emerald-700 transition-all hover:bg-emerald-100"
                         >
                           Allow All
                         </button>
                         <button
-                          onClick={() =>
-                            handleGroupPermissionChange(group.id, "denied")
-                          }
-                          className="rounded-md bg-red-100 px-4 py-2 text-sm font-medium text-red-700 transition-colors hover:bg-red-200"
+                          onClick={() => handleGroupPermissionChange(group.id, "denied")}
+                          className="rounded-lg bg-red-50 px-4 py-2 font-manrope text-[10px] font-black uppercase tracking-widest text-red-700 transition-all hover:bg-red-100"
                         >
                           Deny All
                         </button>
                       </div>
-                    </div>
 
-                    {/* Permissions List */}
-                    <div>
-                      {group.permissions.map(
-                        (permission: {
-                          id: string;
-                          name: string;
-                          description: string;
-                        }) => {
-                          return (
-                            <div
-                              key={permission.id}
-                              className="flex flex-col rounded-lg border border-gray-100 bg-white p-2 transition-shadow hover:shadow-sm sm:flex-row sm:items-center sm:justify-between"
-                            >
-                              <div className="mb-3 flex-1 sm:mb-0">
-                                <h4 className="text-sm font-medium text-gray-900">
-                                  {permission.name}
-                                </h4>
-                                <p className="mt-1 text-sm text-gray-600">
-                                  {permission.description}
-                                </p>
-                              </div>
-
-                              <div className="flex items-center space-x-4">
-                                <label className="flex cursor-pointer items-center space-x-2">
-                                  <input
-                                    type="radio"
-                                    name={permission.id}
-                                    value="denied"
-                                    checked={!permissionKeys.has(permission.id)}
-                                    onChange={(e) =>
-                                      handlePermissionChange(
-                                        permission.id,
-                                        e.target.value,
-                                      )
-                                    }
-                                    className="h-4 w-4 text-red-600 focus:ring-red-500"
-                                  />
-                                  <span className="text-sm text-gray-700">
-                                    Deny
-                                  </span>
-                                </label>
-
-                                <label className="flex cursor-pointer items-center space-x-2">
-                                  <input
-                                    type="radio"
-                                    name={permission.id}
-                                    value="granted"
-                                    checked={permissionKeys.has(permission.id)}
-                                    onChange={(e) =>
-                                      handlePermissionChange(
-                                        permission.id,
-                                        e.target.value,
-                                      )
-                                    }
-                                    className="h-4 w-4 text-green-600 focus:ring-green-500"
-                                  />
-                                  <span className="text-sm text-gray-700">
-                                    Allow
-                                  </span>
-                                </label>
-                              </div>
+                      <div className="space-y-4">
+                        {group.permissions.map((permission: any) => (
+                          <div
+                            key={permission.id}
+                            className="flex flex-col gap-4 py-4 sm:flex-row sm:items-center sm:justify-between border-b border-[#064e3b]/2 last:border-0"
+                          >
+                            <div className="max-w-md">
+                              <h4 className="font-manrope text-sm font-black text-[#064e3b]">
+                                {permission.name}
+                              </h4>
+                              <p className="mt-1 font-manrope text-xs leading-relaxed text-[#064e3b]/50">
+                                {permission.description}
+                              </p>
                             </div>
-                          );
-                        },
-                      )}
+
+                            <div className="inline-flex rounded-xl bg-[#064e3b]/5 p-1">
+                              <button
+                                onClick={() => handlePermissionChange(permission.id, "denied")}
+                                className={`px-4 py-1.5 font-manrope text-[10px] font-black uppercase tracking-widest transition-all rounded-lg ${
+                                  !permissionKeys.has(permission.id)
+                                    ? "bg-white text-red-600 shadow-sm"
+                                    : "text-[#064e3b]/30 hover:text-[#064e3b]/50"
+                                }`}
+                              >
+                                Deny
+                              </button>
+                              <button
+                                onClick={() => handlePermissionChange(permission.id, "granted")}
+                                className={`px-4 py-1.5 font-manrope text-[10px] font-black uppercase tracking-widest transition-all rounded-lg ${
+                                  permissionKeys.has(permission.id)
+                                    ? "bg-[#064e3b] text-white shadow-lg"
+                                    : "text-[#064e3b]/30 hover:text-[#064e3b]/50"
+                                }`}
+                              >
+                                Allow
+                              </button>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
                     </div>
                   </motion.div>
                 )}
@@ -352,26 +286,22 @@ const PermissionsSettings = ({
         })}
       </div>
 
-      {/* No Results */}
-      {filteredPermissionsData.length === 0 && (
-        <div className="py-8 text-center">
-          <p className="text-gray-500">
-            No permissions found matching your search.
-          </p>
-        </div>
-      )}
-
-      {/* Save Button */}
-      <div className="flex justify-end border-t border-gray-200 pt-6">
+      <div className="mt-12 flex justify-end border-t border-[#064e3b]/5 pt-8">
         <button
           onClick={onSave}
-          className={`inline-flex items-center rounded-md border border-transparent bg-green-600 px-6 py-3 text-base font-medium text-white transition-colors hover:bg-green-700 focus:ring-2 focus:ring-green-500 focus:ring-offset-2 focus:outline-none ${isUpdatingTeam ? "cursor-not-allowed opacity-50" : ""}`}
+          disabled={isUpdatingTeam}
+          className={`flex h-12 items-center gap-2.5 rounded-xl px-12 font-manrope text-[11px] font-black uppercase tracking-widest text-white shadow-xl transition-all ${
+            isUpdatingTeam
+              ? "bg-[#064e3b]/30 cursor-not-allowed"
+              : "bg-[#064e3b] shadow-[#064e3b]/20 hover:bg-[#064e3b]/90 hover:-translate-y-0.5 active:translate-y-0"
+          }`}
         >
-          <Save className="mr-2 h-4 w-4" />
-          Save Settings
-          {isUpdatingTeam && (
-            <LoaderCircle className="ml-2 h-4 w-4 animate-spin" />
+          {isUpdatingTeam ? (
+            <LoaderCircle size={16} className="animate-spin" />
+          ) : (
+            <Save size={16} />
           )}
+          {isUpdatingTeam ? "Updating..." : "Save Settings"}
         </button>
       </div>
     </div>

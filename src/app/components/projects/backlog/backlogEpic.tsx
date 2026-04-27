@@ -40,6 +40,7 @@ const BacklogEpic = ({ issues, handleToggleEpic }: { issues: IIssue[], handleTog
         <button
           aria-label="Close Epic panel"
           className="group flex h-8 w-8 items-center justify-center rounded-md bg-gray-50 text-gray-400 hover:bg-red-50 hover:text-red-500 transition-all"
+          onClick={handleToggleEpic}
         >
           <IoClose size={16} />
         </button>
@@ -49,10 +50,9 @@ const BacklogEpic = ({ issues, handleToggleEpic }: { issues: IIssue[], handleTog
         <EpicIssueCardWrapper epicIssueId="no-epic">
           <div
             className={`flex items-center gap-3 rounded-md border px-4 py-3.5 transition-all cursor-pointer group ${overItemId === "no-epic"
-              ? "bg-[#f0fdf4] border-[#064e3b] shadow-md"
+              ? "bg-[#d1fae5] border-[#064e3b] shadow-md"
               : "bg-[#f9f9f8] border-transparent hover:border-[#064e3b]/20 hover:shadow-sm"
               }`}
-            onClick={handleToggleEpic}
           >
             <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-white text-gray-400 group-hover:text-[#064e3b] transition-colors shadow-sm">
               <CopyCheck size={16} />
@@ -112,8 +112,12 @@ const EpicIssueCard = ({
   return (
     <EpicIssueCardWrapper epicIssueId={epicIssue.id}>
       <div
-        className={`flex flex-col rounded-md border bg-white p-4 transition-all duration-300 ${isExpanded ? "border-[#064e3b]/20 shadow-lg" : "border-transparent bg-[#f9f9f8]"
-          } ${overItemId === epicIssue.id ? "bg-[#f0fdf4] border-[#064e3b] scale-[1.02]" : ""}`}
+        className={`flex flex-col rounded-md border p-4 transition-all duration-300 ${overItemId === epicIssue.id
+          ? "border-[#064e3b] scale-[1.02] bg-[#d1fae5]"
+          : isExpanded
+            ? "bg-white border-[#064e3b]/20 shadow-lg"
+            : "border-transparent bg-[#f9f9f8]"
+          }`}
       >
         <div
           className="flex flex-row items-center justify-between gap-2 cursor-pointer group"
@@ -185,7 +189,7 @@ const EpicIssueCard = ({
             </div>
 
             <button
-              className="w-full h-10 rounded-xl bg-[#064e3b] text-white text-[11px] font-black uppercase tracking-widest font-manrope hover:bg-[#059669] transition-all shadow-md active:scale-95"
+              className="w-full h-6 rounded-sm bg-[#064e3b] text-white text-[10px] font-black uppercase tracking-widest font-manrope hover:bg-[#059669] transition-all shadow-md active:scale-95 hover:cursor-pointer"
               onClick={(e) => {
                 e.stopPropagation();
                 openIssueDetail(epicIssue.id);
