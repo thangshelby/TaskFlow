@@ -23,7 +23,7 @@ export default function SearchHeader() {
           <input
             type="text"
             placeholder="Search projects or tasks..."
-            className="bg-[#eeeeed] border-none rounded-sm pl-10 pr-4 py-2 text-sm w-full focus:ring-2 focus:ring-[#064e3b]/20 transition-all outline-none"
+            className="bg-surface-container border-none rounded-xl pl-10 pr-4 py-2.5 text-sm w-full focus:ring-2 focus:ring-emerald-600/20 transition-all outline-none font-body text-gray-800 placeholder:text-gray-400 shadow-inner"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
           />

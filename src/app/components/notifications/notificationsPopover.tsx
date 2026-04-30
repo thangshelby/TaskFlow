@@ -1,5 +1,5 @@
 import React, { lazy, useState, useTransition } from "react";
-import { FaBell } from "react-icons/fa";
+import { LuBell } from "react-icons/lu";
 import { Popover } from "antd";
 
 import { useNotificationContext } from "@libs/app/context/notification.context";
@@ -23,11 +23,18 @@ const NotificationsPopover: React.FC = () => {
       }}
       placement="bottomRight"
     >
-      <div className="relative cursor-pointer rounded-full p-2 text-gray-600 hover:bg-gray-100">
-        <FaBell />
+      <div
+        className={`relative cursor-pointer rounded-lg p-2 transition-colors duration-150 ${
+          isOpen
+            ? "bg-[#064e3b]/10 text-[#064e3b]"
+            : "text-[#404944] hover:bg-[#064e3b]/8 hover:text-[#064e3b]"
+        }`}
+        aria-label="Notifications"
+      >
+        <LuBell className="h-[18px] w-[18px]" />
         {unreadCount > 0 && (
-          <div className="absolute -top-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full bg-red-500 shadow-sm">
-            <span className="text-xs font-medium text-white">
+          <div className="absolute -top-0.5 -right-0.5 flex h-4 w-4 items-center justify-center rounded-full bg-[#064e3b] shadow-sm">
+            <span className="text-[10px] font-bold text-white">
               {unreadCount > 99 ? "99+" : unreadCount}
             </span>
           </div>
