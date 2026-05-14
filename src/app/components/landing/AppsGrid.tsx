@@ -21,8 +21,8 @@ export default function AppsGrid() {
 
         <div className="mb-12 grid gap-8 md:grid-cols-3">
           <div className="rounded-lg bg-white p-8 shadow-sm transition-shadow hover:shadow-md">
-            <div className="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-lg bg-emerald-100">
-              <FileText className="h-8 w-8 text-emerald-600" />
+            <div className="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-lg bg-[#f0f9f0]">
+              <FileText className="h-8 w-8 text-[#064e3b]" />
             </div>
             <h3 className="mb-4 text-center text-xl font-semibold text-gray-800">
               Project Management
@@ -35,8 +35,8 @@ export default function AppsGrid() {
           </div>
 
           <div className="rounded-lg bg-white p-8 shadow-sm transition-shadow hover:shadow-md">
-            <div className="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-lg bg-emerald-100">
-              <Users className="h-8 w-8 text-emerald-600" />
+            <div className="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-lg bg-[#f0f9f0]">
+              <Users className="h-8 w-8 text-[#064e3b]" />
             </div>
             <h3 className="mb-4 text-center text-xl font-semibold text-gray-800">
               Hr Management
@@ -49,8 +49,8 @@ export default function AppsGrid() {
           </div>
 
           <div className="rounded-lg bg-white p-8 shadow-sm transition-shadow hover:shadow-md">
-            <div className="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-lg bg-emerald-100">
-              <ClipboardList className="h-8 w-8 text-emerald-600" />
+            <div className="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-lg bg-[#f0f9f0]">
+              <ClipboardList className="h-8 w-8 text-[#064e3b]" />
             </div>
             <h3 className="mb-4 text-center text-xl font-semibold text-gray-800">
               Task Board
@@ -64,7 +64,7 @@ export default function AppsGrid() {
         </div>
 
         <div className="text-center">
-          <Button className="bg-gray-800 px-8 py-3 text-white hover:bg-gray-900">
+          <Button className="bg-[#002117] px-8 py-3 text-white hover:bg-[#064e3b]">
             Buy Extended License
           </Button>
         </div>

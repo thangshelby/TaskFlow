@@ -38,7 +38,7 @@ export default function AuthRoles() {
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: "-100px" }}
       transition={{ duration: 0.6 }}
-      className="h-[800px] bg-linear-to-br from-[#6b9bd8] via-[#5ba3a3] to-emerald-500 px-6 py-16"
+      className="h-[800px] bg-gradient-to-br from-[#003527] via-[#064e3b] to-[#2b6954] px-6 py-16"
     >
       <div className="mx-auto max-w-7xl py-20">
         {/* Title */}
@@ -46,7 +46,7 @@ export default function AuthRoles() {
           <h2 className="mb-2 text-4xl font-bold text-white">
             Users Authorization & Roles Management
           </h2>
-          <p className="text-white/90">Best Feature Available in My-Task App</p>
+          <p className="text-white/90">Best Feature Available in Taskflow App</p>
         </div>
 
         {/* Tabs */}

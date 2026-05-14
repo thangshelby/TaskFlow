@@ -17,7 +17,7 @@ export default function StickyHeader({ isShow }: { isShow: boolean }) {
             <nav className="w-full px-6 py-4">
               <div className="mx-auto flex max-w-7xl items-center justify-between">
                 <div className="flex items-center gap-2">
-                  <ClipboardCheck className="h-8 w-8 text-emerald-600" />
+                  <ClipboardCheck className="h-8 w-8 text-[#064e3b]" />
                   <span className="text-xl font-semibold text-gray-800">
                     Taskflow
                   </span>
@@ -25,37 +25,37 @@ export default function StickyHeader({ isShow }: { isShow: boolean }) {
                 <div className="flex items-center gap-8">
                   <a
                     href="#hero"
-                    className="text-gray-700 transition-colors hover:text-emerald-600"
+                    className="text-gray-700 transition-colors hover:text-[#064e3b]"
                   >
                     Home
                   </a>
                   <a
                     href="#features"
-                    className="text-gray-700 transition-colors hover:text-emerald-600"
+                    className="text-gray-700 transition-colors hover:text-[#064e3b]"
                   >
                     Features
                   </a>
                   <a
                     href="#auth"
-                    className="text-gray-700 transition-colors hover:text-emerald-600"
+                    className="text-gray-700 transition-colors hover:text-[#064e3b]"
                   >
                     Authorization
                   </a>
                   <a
                     href="#apps"
-                    className="text-gray-700 transition-colors hover:text-emerald-600"
+                    className="text-gray-700 transition-colors hover:text-[#064e3b]"
                   >
                     Apps
                   </a>
                   <a
                     href="#why"
-                    className="text-gray-700 transition-colors hover:text-emerald-600"
+                    className="text-gray-700 transition-colors hover:text-[#064e3b]"
                   >
                     Why
                   </a>
                   <a
                     href="#footer"
-                    className="text-gray-700 transition-colors hover:text-emerald-600"
+                    className="text-gray-700 transition-colors hover:text-[#064e3b]"
                   >
                     Contact Us
                   </a>

@@ -27,7 +27,7 @@ interface ButtonProps {
 
 const variantStyles = {
   primary:
-    "bg-[#064e3b] text-white shadow-[0_4px_14px_0_rgba(6,78,59,0.39)] hover:bg-[#059669] hover:shadow-[0_6px_20px_rgba(5,150,105,0.23)] active:scale-95",
+    "bg-[#064e3b] text-white shadow-[0_4px_14px_0_rgba(6,78,59,0.39)] hover:bg-[#0b513d] hover:shadow-[0_6px_20px_rgba(11,81,61,0.23)] active:scale-95",
   secondary: "border border-[#e8e8e7] bg-white text-[#064e3b] hover:bg-[#f9f9f8] hover:border-[#064e3b]/30 active:bg-gray-100",
   dark: "bg-[#111827] text-white hover:bg-black active:scale-95",
   light: "bg-[#f9f9f8] text-[#064e3b] border border-[#e8e8e7] hover:bg-[#f0fdf4] hover:border-[#064e3b]/20",

@@ -42,17 +42,17 @@ export default function FeaturesList() {
                   setActiveFeature(label);
                 }}
                 key={label}
-                className={`flex cursor-pointer items-center gap-4 rounded-lg p-4 py-2 transition-colors ${activeFeature === label ? "bg-emerald-50" : ""}`}
+                className={`flex cursor-pointer items-center gap-4 rounded-lg p-4 py-2 transition-colors ${activeFeature === label ? "bg-[#f0f9f0]" : ""}`}
               >
                 <span
-                  className={`text-lg font-bold hover:text-emerald-600 ${activeFeature === label ? "text-emerald-600" : "text-gray-500"}`}
+                  className={`text-lg font-bold hover:text-[#064e3b] ${activeFeature === label ? "text-[#064e3b]" : "text-gray-500"}`}
                 >
                   {String(index + 1).padStart(2, "0")} :
                 </span>
                 <span
-                  className={`font-bold hover:text-emerald-600 ${
+                  className={`font-bold hover:text-[#064e3b] ${
                     activeFeature === label
-                      ? "text-emerald-600"
+                      ? "text-[#064e3b]"
                       : "text-gray-600"
                   }`}
                 >
