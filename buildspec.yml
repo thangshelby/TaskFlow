@@ -1,0 +1,32 @@
+# AWS CodeBuild / CodePipeline — TaskFlow (Vite SPA)
+#
+# CodeBuild project: set Buildspec name to `TaskFlow/buildspec.yml` if the repo root is the artifact.
+# Production targets (update if you change infra):
+#   S3: frontend.taskkfloww.shop | CloudFront: E2RGM9XABY19D9
+# Override via CodeBuild env vars if preferred.
+#
+# IAM (CodeBuild service role) needs at minimum:
+# - S3 on arn:aws:s3:::frontend.taskkfloww.shop and arn:aws:s3:::frontend.taskkfloww.shop/* :
+#   s3:ListBucket, s3:GetObject, s3:PutObject, s3:DeleteObject, s3:GetBucketLocation
+# - CloudFront on arn:aws:cloudfront::<account>:distribution/E2RGM9XABY19D9 :
+#   cloudfront:CreateInvalidation
+
+version: 0.2
+
+phases:
+  install:
+    runtime-versions:
+      nodejs: 20
+    commands:
+      - node --version
+      - npm --version
+
+  build:
+    commands:
+      - cd TaskFlow && npm install
+      - cd TaskFlow && npm run build
+
+  post_build:
+    commands:
+      - aws s3 sync TaskFlow/dist/ s3://frontend.taskkfloww.shop/ --delete
+      - aws cloudfront create-invalidation --distribution-id E2RGM9XABY19D9 --paths "/*"
