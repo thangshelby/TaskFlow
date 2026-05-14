@@ -4,9 +4,11 @@ import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import Modal from "@libs/app/components/general-components/modal/modal";
 import { useCreateSprint, useUpdateSprint } from "@libs/hooks/apis/useSprint";
-import { LuCalendar, LuClock, LuChevronDown } from "react-icons/lu";
+import { LuCalendar, LuChevronDown, LuX, LuZap } from "react-icons/lu";
 import { ISprint } from "@libs/types/sprint";
 import { IIssue } from "@libs/types/issue";
+import "@libs/app/components/projects/modals/modal.css";
+
 interface ISprintIssues extends ISprint {
   issues: IIssue[];
 }
@@ -41,6 +43,17 @@ const sprintSchema = z
   });
 
 type SprintFormData = z.infer<typeof sprintSchema>;
+
+const labelClass =
+  "block text-[10px] font-bold uppercase tracking-widest text-gray-500";
+
+const fieldClass = (hasError?: boolean) =>
+  [
+    "w-full rounded-md border px-4 py-2.5 text-sm font-medium outline-none transition-all",
+    "bg-white text-gray-700 placeholder:text-gray-400",
+    "border-gray-200 focus:border-emerald-900 focus:ring-2 focus:ring-emerald-900/15",
+    hasError ? "border-red-300 bg-red-50" : "",
+  ].join(" ");
 
 const CreateSprintModal: React.FC<CreateSprintModalProps> = ({
   isOpen,
@@ -87,7 +100,6 @@ const CreateSprintModal: React.FC<CreateSprintModalProps> = ({
     },
   });
 
-  // Pre-fill form when editing
   useEffect(() => {
     if (isEditing && initialSprint) {
       setValue("name", initialSprint.name);
@@ -96,8 +108,6 @@ const CreateSprintModal: React.FC<CreateSprintModalProps> = ({
       setValue("date_ended", initialSprint.date_ended.split("T")[0]);
       setValue("goal", initialSprint.goal || "");
     }
-
-    console.log(initialSprint);
   }, [isEditing, initialSprint, setValue]);
 
   const handleFormSubmit: SubmitHandler<SprintFormData> = async (data) => {
@@ -109,7 +119,7 @@ const CreateSprintModal: React.FC<CreateSprintModalProps> = ({
       duration: Math.ceil(
         (new Date(data.date_ended).getTime() -
           new Date(data.date_started).getTime()) /
-          (1000 * 60 * 60 * 24),
+        (1000 * 60 * 60 * 24),
       ),
     };
 
@@ -123,196 +133,193 @@ const CreateSprintModal: React.FC<CreateSprintModalProps> = ({
   if (!isOpen) return null;
 
   const durationOptions = [
-    { value: "1", label: "1 week" },
-    { value: "2", label: "2 weeks" },
-    { value: "3", label: "3 weeks" },
-    { value: "4", label: "4 weeks" },
+    { value: "1", label: "1 Week" },
+    { value: "2", label: "2 Weeks" },
+    { value: "3", label: "3 Weeks" },
+    { value: "4", label: "4 Weeks" },
     { value: "custom", label: "Custom" },
   ];
 
+  const modalTitle = isEditing ? "Edit Sprint" : "Create New Sprint";
+  const submitLabel = isLoading
+    ? "Loading..."
+    : isEditing
+      ? "Update Sprint"
+      : "Create Sprint";
+
   return (
     <Modal
-      title={
-        isEditing
-          ? `Edit sprint: ${initialSprint?.name || ""}`
-          : "Create sprint"
-      }
+      bare
+      title=""
+      buttonContent=""
       onClose={onClose}
-      buttonContent={isLoading ? "Loading..." : isEditing ? "Update" : "Create"}
-      onSubmit={(e: React.FormEvent<HTMLFormElement>) => {
-        handleSubmit(handleFormSubmit)(e);
-      }}
-      isLoadingButton={isLoading}
-      className="max-w-2xl"
+      onSubmit={() => { }}
+      className="w-full max-w-xl glass-panel flex-col rounded-xl border border-white/40 shadow-2xl"
     >
-      <div className="px-1">
-        <div className="mb-4">
-          <p className="text-sm text-gray-600">
-            Required fields are marked with an asterisk{" "}
-            <span className="text-red-500">*</span>
-          </p>
+      <form
+        onSubmit={handleSubmit(handleFormSubmit)}
+        className="flex min-h-0 flex-1 flex-col"
+      >
+        {/* Header */}
+        <div className="flex shrink-0 items-center justify-between border-b border-gray-200 bg-white/50 p-6">
+          <div className="flex items-center gap-3">
+            <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded bg-emerald-900 text-white">
+              <LuZap className="h-4 w-4" aria-hidden />
+            </div>
+            <h2 className="text-xl font-bold tracking-tight text-emerald-900">
+              {modalTitle}
+            </h2>
+          </div>
+          <button
+            type="button"
+            onClick={onClose}
+            className="text-gray-400 transition-colors hover:text-gray-900 focus:outline-none"
+            aria-label="Close"
+          >
+            <LuX className="h-6 w-6" />
+          </button>
         </div>
 
-        <form className="space-y-4">
-          {/* Sprint Name */}
-          <div>
-            <label
-              htmlFor="name"
-              className="mb-1 block text-sm font-medium text-gray-700"
-            >
-              Sprint name <span className="text-red-500">*</span>
+        {/* Body */}
+        <div className="min-h-0 flex-1 space-y-6 overflow-y-auto overscroll-contain px-8 py-8">
+          {/* Sprint name */}
+          <div className="space-y-1.5">
+            <label htmlFor="name" className={labelClass}>
+              Sprint name
             </label>
             <input
               id="name"
               type="text"
               {...register("name")}
-              className={`w-full rounded border px-3 py-2 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500 focus:outline-none ${
-                errors.name ? "border-red-300 bg-red-50" : "border-gray-300"
-              }`}
-              placeholder="Enter sprint name"
+              className={fieldClass(!!errors.name)}
+              placeholder="e.g. Q4 Performance Phase"
             />
             {errors.name && (
-              <p className="mt-1 text-sm text-red-600">{errors.name.message}</p>
+              <p className="text-sm text-red-600">{errors.name.message}</p>
             )}
           </div>
 
-          {/* Duration */}
-          <div>
-            <label className="mb-1 block text-sm font-medium text-gray-700">
-              Duration
-            </label>
-            <div className="relative">
-              <button
-                type="button"
-                onClick={() => setIsDurationOpen(!isDurationOpen)}
-                className="w-full rounded border border-gray-300 bg-white px-3 py-2 text-left text-sm hover:border-gray-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-500 focus:outline-none"
-              >
-                <span className="flex items-center justify-between">
-                  {durationOptions.find((opt) => opt.value === selectedDuration)
-                    ?.label || "Custom"}
-                  <LuChevronDown className="h-4 w-4" />
-                </span>
-              </button>
-
-              {isDurationOpen && (
-                <div className="absolute z-10 mt-1 w-full rounded border border-gray-300 bg-white shadow-lg">
-                  {durationOptions.map((option) => (
-                    <button
-                      key={option.value}
-                      type="button"
-                      onClick={() => {
-                        setSelectedDuration(option.value);
-                        setValue("duration", option.value);
-                        setIsDurationOpen(false);
-                      }}
-                      className={`w-full px-3 py-2 text-left text-sm hover:bg-gray-100 ${
-                        selectedDuration === option.value
-                          ? "bg-blue-50 text-blue-700"
-                          : ""
-                      }`}
-                    >
-                      {option.label}
-                    </button>
-                  ))}
-                </div>
-              )}
+          {/* Duration + hint */}
+          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
+            <div className="space-y-1.5">
+              <label className={labelClass}>Duration</label>
+              <div className="relative">
+                <button
+                  type="button"
+                  onClick={() => setIsDurationOpen(!isDurationOpen)}
+                  className={`${fieldClass()} flex w-full appearance-none items-center justify-between text-left`}
+                >
+                  <span>
+                    {durationOptions.find((opt) => opt.value === selectedDuration)
+                      ?.label || "Custom"}
+                  </span>
+                  <LuChevronDown className="pointer-events-none h-4 w-4 shrink-0 text-gray-400" />
+                </button>
+                {isDurationOpen && (
+                  <div className="absolute z-10 mt-1 w-full rounded-md border border-gray-200 bg-white py-1 shadow-lg">
+                    {durationOptions.map((option) => (
+                      <button
+                        key={option.value}
+                        type="button"
+                        onClick={() => {
+                          setSelectedDuration(option.value);
+                          setValue("duration", option.value);
+                          setIsDurationOpen(false);
+                        }}
+                        className={`w-full px-4 py-2.5 text-left text-sm font-medium hover:bg-gray-50 ${selectedDuration === option.value
+                          ? "bg-emerald-50 text-emerald-900"
+                          : "text-gray-700"
+                          }`}
+                      >
+                        {option.label}
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </div>
+            <div className="flex items-end pb-1 sm:px-2">
+              <p className="text-xs leading-tight text-gray-500 italic">
+                Standard engineering cycle for Atelier projects is 2 weeks.
+              </p>
             </div>
           </div>
 
-          {/* Start Date */}
-          <div>
-            <label
-              htmlFor="date_started"
-              className="mb-1 block text-sm font-medium text-gray-700"
-            >
-              Start date <span className="text-red-500">*</span>
-            </label>
-            <div className="flex gap-2">
-              <div className="relative flex-1">
-                <LuCalendar className="absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 transform text-gray-400" />
+          {/* Dates */}
+          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
+            <div className="space-y-1.5">
+              <label htmlFor="date_started" className={labelClass}>
+                Start date
+              </label>
+              <div className="relative">
                 <input
                   id="date_started"
                   type="date"
                   {...register("date_started")}
-                  className={`w-full rounded border py-2 pr-3 pl-10 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500 focus:outline-none ${
-                    errors.date_started
-                      ? "border-red-300 bg-red-50"
-                      : "border-gray-300"
-                  }`}
+                  className={`${fieldClass(!!errors.date_started)} pr-10`}
                 />
+                <LuCalendar className="pointer-events-none absolute top-1/2 right-3 h-[18px] w-[18px] -translate-y-1/2 text-gray-400" />
               </div>
-              <div className="relative flex-1">
-                <LuClock className="absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 transform text-gray-400" />
-                <input
-                  type="time"
-                  defaultValue="09:00"
-                  className="w-full rounded border border-gray-300 py-2 pr-3 pl-10 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500 focus:outline-none"
-                />
-              </div>
+              {errors.date_started && (
+                <p className="text-sm text-red-600">
+                  {errors.date_started.message}
+                </p>
+              )}
             </div>
-            {errors.date_started && (
-              <p className="mt-1 text-sm text-red-600">
-                {errors.date_started.message}
-              </p>
-            )}
-          </div>
-
-          {/* End Date */}
-          <div>
-            <label
-              htmlFor="date_ended"
-              className="mb-1 block text-sm font-medium text-gray-700"
-            >
-              End date <span className="text-red-500">*</span>
-            </label>
-            <div className="flex gap-2">
-              <div className="relative flex-1">
-                <LuCalendar className="absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 transform text-gray-400" />
+            <div className="space-y-1.5">
+              <label htmlFor="date_ended" className={labelClass}>
+                End date
+              </label>
+              <div className="relative">
                 <input
                   id="date_ended"
                   type="date"
                   {...register("date_ended")}
-                  className={`w-full rounded border py-2 pr-3 pl-10 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500 focus:outline-none ${
-                    errors.date_ended
-                      ? "border-red-300 bg-red-50"
-                      : "border-gray-300"
-                  }`}
+                  className={`${fieldClass(!!errors.date_ended)} pr-10`}
                 />
+                <LuCalendar className="pointer-events-none absolute top-1/2 right-3 h-[18px] w-[18px] -translate-y-1/2 text-gray-400" />
               </div>
-              <div className="relative flex-1">
-                <LuClock className="absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 transform text-gray-400" />
-                <input
-                  type="time"
-                  defaultValue="17:00"
-                  className="w-full rounded border border-gray-300 py-2 pr-3 pl-10 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500 focus:outline-none"
-                />
-              </div>
+              {errors.date_ended && (
+                <p className="text-sm text-red-600">
+                  {errors.date_ended.message}
+                </p>
+              )}
             </div>
-            {errors.date_ended && (
-              <p className="mt-1 text-sm text-red-600">
-                {errors.date_ended.message}
-              </p>
-            )}
           </div>
 
-          {/* Sprint Goal */}
-          <div>
-            <label
-              htmlFor="goal"
-              className="mb-1 block text-sm font-medium text-gray-700"
-            >
+          {/* Goal */}
+          <div className="space-y-1.5">
+            <label htmlFor="goal" className={labelClass}>
               Sprint goal
             </label>
             <textarea
               id="goal"
-              {...register("goal")}
-              className="w-full resize-none rounded border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500 focus:outline-none"
               rows={3}
-              placeholder="What do you want to achieve in this sprint?"
+              {...register("goal")}
+              className={`${fieldClass()} resize-none`}
+              placeholder="What is the objective of this sprint cycle?"
             />
           </div>
-        </form>
-      </div>
+        </div>
+
+        {/* Footer */}
+        <div className="flex shrink-0 items-center justify-end gap-4 border-t border-gray-200 bg-gray-50/80 px-6 py-6">
+          <button
+            type="button"
+            onClick={onClose}
+            className="rounded-md px-6 py-2.5 text-sm font-semibold text-gray-600 transition-all hover:bg-gray-200 focus:outline-none"
+          >
+            Cancel
+          </button>
+          <button
+            type="submit"
+            disabled={isLoading}
+            className="rounded-md bg-emerald-900 px-8 py-2.5 text-sm font-semibold text-white transition-all hover:opacity-95 active:scale-[0.98] focus:outline-none focus:ring-2 focus:ring-emerald-900/30 disabled:cursor-not-allowed disabled:opacity-50"
+          >
+            {submitLabel}
+          </button>
+        </div>
+      </form>
     </Modal>
   );
 };

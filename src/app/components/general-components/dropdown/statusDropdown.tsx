@@ -9,10 +9,12 @@ const StatusDropdown = ({
   projectId,
   issueId,
   column,
+  size = "small",
 }: {
   projectId: string;
   issueId: string;
   column: IColumn;
+  size?: "small" | "medium" | "large";
 }) => {
   const [isOpenDropdown, setIsOpenDropdown] = useState(false);
   const { columns } = useProjectColumns(
@@ -44,7 +46,7 @@ const StatusDropdown = ({
           },
           label: (
             <div className="border-l-2 border-transparent p-2 hover:border-emerald-600 hover:bg-gray-200">
-              <StatusBadge column={column} className="p-2" />
+              <StatusBadge column={column} size={size} />
             </div>
           ),
           onClick: () => {
@@ -53,7 +55,7 @@ const StatusDropdown = ({
         };
       })}
       currentItem={undefined}
-      children={<StatusBadge column={column} />}
+      children={<StatusBadge column={column} size={size} />}
       setIsOpenDropdown={setIsOpenDropdown}
     />
   );

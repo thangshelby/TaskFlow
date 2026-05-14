@@ -41,13 +41,13 @@ const IssueCard = ({
       >
         <p className="text-xs font-normal text-gray-800">{issue.summary}</p>
         <div className="flex items-center justify-between">
-          <div className="flex items-center">
+          <div className="flex items-center gap-2">
             <TypeBadge type={issue.type} isShowLabel={false} />
-            <span className="text-sm font-semibold text-gray-800">
+            <span className="text-[11px] font-black tracking-tight text-[#064e3b]/40 font-manrope">
               {issue.key}
             </span>
           </div>
-          <div className="flex items-center gap-1">
+          <div className="flex items-center gap-2">
             <StatusBadge column={issue.column} />
             <PriorityBadge priority={issue.priority} isShowLabel={false} />
           </div>

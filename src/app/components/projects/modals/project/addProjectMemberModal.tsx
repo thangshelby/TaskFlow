@@ -9,6 +9,7 @@ import { useQueryClient, useMutation } from "@tanstack/react-query";
 import { toast } from "react-toastify";
 import { FaAngleDown } from "react-icons/fa";
 import { TeamMemberRole } from "@libs/types/projectMember";
+import "@libs/app/components/projects/modals/modal.css";
 interface AddProjectMemberModalProps {
   isOpen: boolean;
   onClose: () => void;
@@ -102,6 +103,7 @@ const AddProjectMemberModal: React.FC<AddProjectMemberModalProps> = ({
       buttonContent={addMember.isPending ? "Sending..." : "Send Invitation"}
       onSubmit={() => handleSubmit(handleFormSubmit)()}
       isLoadingButton={addMember.isPending}
+      className="rounded-xl border border-white/40 shadow-2xl glass-panel"
     >
       <div className="p-4">
         <form className="space-y-4">
@@ -131,7 +133,7 @@ const AddProjectMemberModal: React.FC<AddProjectMemberModalProps> = ({
             </label>
             <div ref={dropDownRef}>
               <Dropdown
-                dropdownRender={(menu) => (
+                popupRender={(menu) => (
                   <div
                     style={{
                       width: dropDownRef.current?.offsetWidth || "100%",
@@ -140,7 +142,7 @@ const AddProjectMemberModal: React.FC<AddProjectMemberModalProps> = ({
                     {menu}
                   </div>
                 )}
-                className="!rounded-md !p-2"
+                className="rounded-md! p-2!"
                 menu={{
                   style: {
                     padding: "12px 0px",
@@ -181,7 +183,7 @@ const AddProjectMemberModal: React.FC<AddProjectMemberModalProps> = ({
                 onOpenChange={setIsOpenSelectOption}
               >
                 <div
-                  className={`relative w-full cursor-pointer rounded-xs p-2 text-sm font-normal text-gray-500 hover:bg-gray-100 ${isOpenSelectOption ? "border-2 border-emerald-500 bg-none" : "border-1 border-gray-300"} `}
+                  className={`relative w-full cursor-pointer rounded-xs p-2 text-sm font-normal text-gray-500 hover:bg-gray-100 ${isOpenSelectOption ? "border-2 border-emerald-500 bg-none" : "border border-gray-300"} `}
                 >
                   {role}
                   <span className="absolute top-0 right-0 flex h-full items-center justify-center pr-2">

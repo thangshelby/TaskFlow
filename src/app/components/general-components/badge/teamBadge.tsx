@@ -3,69 +3,54 @@ import { Users } from "lucide-react";
 
 export const teamColors = [
   {
-    textColor: "text-blue-700",
-    dotColor: "bg-blue-500",
-    bgColor: "bg-blue-100",
-    hoverBg: "hover:bg-blue-50",
+    textColor: "text-[#064e3b]",
+    dotColor: "bg-[#064e3b]",
+    bgColor: "bg-[#f0fdf4]",
+    hoverBg: "hover:bg-[#f0fdf4]",
+    borderColor: "border-[#064e3b]/20",
   },
   {
-    textColor: "text-green-700",
-    dotColor: "bg-green-500",
-    bgColor: "bg-green-100",
-    hoverBg: "hover:bg-green-50",
+    textColor: "text-[#0369a1]",
+    dotColor: "bg-[#0ea5e9]",
+    bgColor: "bg-[#f0f9ff]",
+    hoverBg: "hover:bg-[#f0f9ff]",
+    borderColor: "border-[#0ea5e9]/20",
   },
   {
-    textColor: "text-purple-700",
-    dotColor: "bg-purple-500",
-    bgColor: "bg-purple-100",
-    hoverBg: "hover:bg-purple-50",
+    textColor: "text-[#5b21b6]",
+    dotColor: "bg-[#8b5cf6]",
+    bgColor: "bg-[#f5f3ff]",
+    hoverBg: "hover:bg-[#f5f3ff]",
+    borderColor: "border-[#8b5cf6]/20",
   },
   {
-    textColor: "text-orange-700",
-    dotColor: "bg-orange-500",
-    bgColor: "bg-orange-100",
-    hoverBg: "hover:bg-orange-50",
+    textColor: "text-[#059669]",
+    dotColor: "bg-[#10b981]",
+    bgColor: "bg-[#ecfdf5]",
+    hoverBg: "hover:bg-[#ecfdf5]",
+    borderColor: "border-[#10b981]/20",
   },
   {
-    textColor: "text-pink-700",
-    dotColor: "bg-pink-500",
-    bgColor: "bg-pink-100",
-    hoverBg: "hover:bg-pink-50",
+    textColor: "text-[#404944]",
+    dotColor: "bg-[#404944]",
+    bgColor: "bg-[#f9f9f8]",
+    hoverBg: "hover:bg-[#f9f9f8]",
+    borderColor: "border-[#e8e8e7]",
   },
   {
-    textColor: "text-indigo-700",
-    dotColor: "bg-indigo-500",
-    bgColor: "bg-indigo-100",
-    hoverBg: "hover:bg-indigo-50",
-  },
-  {
-    textColor: "text-teal-700",
-    dotColor: "bg-teal-500",
-    bgColor: "bg-teal-100",
-    hoverBg: "hover:bg-teal-50",
-  },
-  {
-    textColor: "text-cyan-700",
-    dotColor: "bg-cyan-500",
-    bgColor: "bg-cyan-100",
-    hoverBg: "hover:bg-cyan-50",
+    textColor: "text-[#b45309]",
+    dotColor: "bg-[#f59e0b]",
+    bgColor: "bg-[#fffbeb]",
+    hoverBg: "hover:bg-[#fffbeb]",
+    borderColor: "border-[#f59e0b]/20",
   },
 ];
 
-const sizeClasses = {
-  small: {
-    button: "px-2 py-0.5 text-xs",
-    icon: "w-3 h-3",
-  },
-  medium: {
-    button: "px-3 py-1 text-sm",
-    icon: "w-4 h-4",
-  },
-  large: {
-    button: "px-4 py-1.5 text-base",
-    icon: "w-5 h-5",
-  },
-};
+import {
+  UISize,
+  UI_COMMON_SIZES,
+  getBadgeSizeClass,
+} from "../constants/uiConfig";
 
 const TeamBadge = ({
   team,
@@ -74,7 +59,7 @@ const TeamBadge = ({
   isShowLabel = true,
 }: {
   team: ITeam;
-  size?: "small" | "medium" | "large";
+  size?: UISize;
   className?: string;
   isShowLabel?: boolean;
 }) => {
@@ -86,20 +71,17 @@ const TeamBadge = ({
 
   return (
     <div
-      className={`flex items-center gap-2 rounded-2xl transition-colors duration-200 ${selectedColor.hoverBg} ${className}`}
+      className={`inline-flex items-center justify-center border shadow-sm font-manrope ${selectedColor.bgColor} ${selectedColor.borderColor} ${getBadgeSizeClass(size)} ${className}`}
     >
-      <div
-        className={`rounded-2xl ${selectedColor.bgColor} flex items-center gap-1 ${sizeClasses[size].button}`}
-      >
-        <Users
-          className={`${sizeClasses[size].icon} ${selectedColor.textColor}`}
-        />
-        {isShowLabel && (
-          <p className={`truncate font-semibold ${selectedColor.textColor}`}>
-            {team.name || "Unnamed Team"}
-          </p>
-        )}
-      </div>
+      <Users
+        size={UI_COMMON_SIZES[size].iconSize}
+        className={`${selectedColor.textColor} opacity-80 shrink-0 mr-1.5`}
+      />
+      {isShowLabel && (
+        <p className={`truncate font-bold uppercase tracking-widest ${selectedColor.textColor}`}>
+          {team.name || "Unnamed Team"}
+        </p>
+      )}
     </div>
   );
 };

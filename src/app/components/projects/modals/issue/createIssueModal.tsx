@@ -6,7 +6,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "react-toastify";
 import Modal from "@libs/app/components/general-components/modal/modal";
 import DropdownAntd from "@libs/app/components/general-components/dropdown";
-import "./createIssueModal.css";
+import "@libs/app/components/projects/modals/modal.css";
 import {
   useProjectColumns,
   useUserProjects,
@@ -22,18 +22,27 @@ import { useProjectTeams } from "@libs/hooks/apis/useTeam";
 import { IssuePriority, CreateIssueParams } from "@libs/types/issue";
 import { useAuthStore } from "@libs/store/useAuthStore";
 import { IssueType } from "@libs/types/issue";
-import InputField from "@libs/app/components/general-components/inputField";
 import PriorityBadge from "@libs/app/components/general-components/badge/priorityBadge";
 import TypeBadge from "@libs/app/components/general-components/badge/typeBadge";
 import StatusBadge from "@libs/app/components/general-components/badge/statusBadge";
 import UserAvatar from "@libs/app/components/general-components/user/userAvatar";
-import { MdCloudUpload } from "react-icons/md";
-import { FaMicrophone, FaStop } from "react-icons/fa";
+import { LuCalendar, LuChevronDown, LuX, LuZap, LuPlus } from "react-icons/lu";
 import AttachmentCard from "@libs/app/components/issues/metadataSection/attachmentCard";
 import QuillEditorCreate, {
   type QuillEditorCreateRef,
 } from "@libs/app/components/issues/metadataSection/quillEditorCreate";
 import { useSpeechToText } from "@libs/hooks/common/useSpeechToText";
+
+const labelClass =
+  "block text-[11px] font-bold uppercase tracking-wider text-gray-500 mb-1.5";
+
+const fieldClass = (hasError?: boolean) =>
+  [
+    "w-full rounded border px-4 py-2.5 text-sm font-medium outline-none transition-all",
+    "bg-white text-gray-700 placeholder:text-gray-400",
+    "border-gray-200 focus:border-emerald-800 focus:ring-4 focus:ring-emerald-900/5",
+    hasError ? "border-red-300 bg-red-50" : "",
+  ].join(" ");
 
 interface CreateIssueModalProps {
   isOpen: boolean;
@@ -124,9 +133,6 @@ const CreateIssueModal: React.FC<CreateIssueModalProps> = ({
   });
 
   const isLoading = isCreating || isUpdating;
-  const { isLoading: isColumnsLoading } = useProjectColumns({
-    project_id: selectedProjectId,
-  });
 
   // Attachments stored as JSON strings (same format as metadataSection)
   const [attachments, setAttachments] = useState<string[]>([]);
@@ -286,7 +292,6 @@ const CreateIssueModal: React.FC<CreateIssueModalProps> = ({
 
   const {
     isListening,
-    interimText,
     isSupported: isSpeechSupported,
     toggleListening,
   } = useSpeechToText({
@@ -300,469 +305,405 @@ const CreateIssueModal: React.FC<CreateIssueModalProps> = ({
   if (!isOpen) return null;
   return (
     <Modal
-      title={isEditing ? "Update Issue" : "Create Issue"}
+      bare
+      title=""
+      buttonContent=""
       onClose={handleClose}
-      buttonContent={
-        isLoading || isColumnsLoading
-          ? "Loading..."
-          : isEditing
-            ? "Update Issue"
-            : "Create Issue"
-      }
-      onSubmit={onSubmit}
-      className={"w-[600px]"}
-      isLoadingButton={isLoading || isColumnsLoading}
-      isSubmitDisabled={isColumnsLoading || !columns?.length}
+      onSubmit={() => { }}
+      className="w-full max-w-xl glass-panel flex-col rounded-xl border border-white/40 shadow-2xl z-50"
     >
-      <div className="p-4">
-        <form className="flex flex-col gap-8">
-          <div className="flex w-full flex-col gap-8">
-            {/* Project Selection/Display */}
-            {projectId ? (
-              <div>
-                <label className="mb-1 block text-sm font-medium text-gray-700">
-                  Project
-                </label>
-                <div className="rounded-md bg-gray-50 px-3 py-2">
-                  <span className="text-gray-900">
+      <form
+        onSubmit={onSubmit}
+        className="flex min-h-0 flex-1 flex-col"
+      >
+        {/* Header */}
+        <div className="flex shrink-0 items-center justify-between border-b border-gray-200 bg-white/50 p-6">
+          <div className="flex items-center gap-3">
+            <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded bg-emerald-900 text-white">
+              <LuPlus className="h-4 w-4" aria-hidden />
+            </div>
+            <h2 className="text-xl font-bold tracking-tight text-emerald-900">
+              {isEditing ? "Update Issue" : "Create New Issue"}
+            </h2>
+          </div>
+          <button
+            type="button"
+            onClick={handleClose}
+            className="text-gray-400 transition-colors hover:text-gray-900 focus:outline-none"
+            aria-label="Close"
+          >
+            <LuX className="h-6 w-6" />
+          </button>
+        </div>
+
+        {/* Body */}
+        <div className="min-h-0 flex-1 space-y-6 overflow-y-auto overscroll-contain px-8 py-8">
+          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
+            {/* Project Selection */}
+            <div>
+              <label className={labelClass}>Project</label>
+              {projectId ? (
+                <div className="rounded-md bg-gray-50/50 border border-gray-100 px-4 py-2.5">
+                  <span className="text-sm font-medium text-gray-900">
                     {projects?.find((p) => p.id === watch("project_id"))?.name}
                   </span>
                 </div>
-              </div>
-            ) : (
-              //Project dropdown
-              <div className="w-full">
-                {projects?.length > 0 ? (
-                  <DropdownAntd
-                    options={
-                      projects?.map((project) => ({
+              ) : (
+                <div className="w-full">
+                  {projects?.length > 0 ? (
+                    <DropdownAntd
+                      options={projects.map((project) => ({
                         value: project.id,
                         label: project.name,
-                      })) || []
-                    }
-                    placement="bottom"
-                    rowClassName="font-semibold text-gray-700"
-                    menuClassName="min-w-[180px]"
-                    parent={
-                      <InputField
-                        label="Project"
-                        helperText="Project of the issue"
-                        field="project_id"
-                        isShowIcon={true}
-                        type="select"
-                        error={errors.project_id?.message}
-                        customRender={
-                          <div className="w-full">
-                            {
-                              projects?.find(
-                                (p) => p.id === watch("project_id"),
-                              )?.name
-                            }
-                          </div>
-                        }
-                      />
-                    }
-                    isShowIcon={false}
-                    onClickItem={(option: { value: string; label: string }) => {
-                      setSelectedProjectId(option.value);
-                      setValue("project_id", option.value as string);
-                    }}
-                  />
-                ) : (
-                  <div>
-                    <p className="text-sm text-gray-600">
-                      No projects available. Please create a project first.
-                    </p>
-                  </div>
-                )}
-              </div>
-            )}
+                      }))}
+                      placement="bottom"
+                      rowClassName="w-full"
+                      menuClassName="min-w-[200px]"
+                      parent={
+                        <button
+                          type="button"
+                          className={`${fieldClass(!!errors.project_id)} flex items-center justify-between`}
+                        >
+                          <span>
+                            {projects.find((p) => p.id === watch("project_id"))?.name || "Select Project"}
+                          </span>
+                          <LuChevronDown className="h-4 w-4 text-gray-400" />
+                        </button>
+                      }
+                      isShowIcon={false}
+                      onClickItem={(option) => {
+                        setSelectedProjectId(option.value as string);
+                        setValue("project_id", option.value as string);
+                      }}
+                    />
+                  ) : (
+                    <p className="text-xs text-gray-500">No projects available.</p>
+                  )}
+                </div>
+              )}
+              {errors.project_id && <p className="text-xs text-red-500">{errors.project_id.message}</p>}
+            </div>
 
-            {/* Sprint Selection/Display */}
-            {selectedProjectId && (
+            {/* Sprint Selection */}
+            <div>
+              <label className={labelClass}>Sprint</label>
               <div className="w-full">
                 {sprintId ? (
-                  <div>
-                    <label className="mb-1 block text-sm font-medium text-gray-700">
-                      Sprint
-                    </label>
-                    <div className="rounded-md bg-gray-50 px-3 py-2">
-                      <span className="text-gray-900">
-                        {
-                          sprints?.find((s) => s.id === watch("sprint_id"))
-                            ?.name
-                        }
-                      </span>
-                    </div>
+                  <div className="rounded-md bg-gray-50/50 border border-gray-100 px-4 py-2.5">
+                    <span className="text-sm font-medium text-gray-900">
+                      {sprints?.find((s) => s.id === watch("sprint_id"))?.name}
+                    </span>
                   </div>
                 ) : sprints?.length > 0 ? (
                   <DropdownAntd
-                    options={
-                      sprints.map((sprint) => ({
-                        value: sprint.id,
-                        label: sprint.name,
-                      }))
-                    }
+                    options={sprints.map((sprint) => ({
+                      value: sprint.id,
+                      label: sprint.name,
+                    }))}
                     placement="bottom"
-                    rowClassName="font-semibold text-gray-700"
-                    menuClassName="w-[450px]"
+                    rowClassName="w-full"
+                    menuClassName="min-w-[200px]"
                     parent={
-                      <InputField
-                        label="Sprint"
-                        helperText="Sprint of the issue"
-                        field="sprint_id"
-                        isShowIcon={true}
-                        type="select"
-                        error={errors.sprint_id?.message}
-                        customRender={
-                          <div className="w-full">
-                            {
-                              sprints.find((s) => s.id === watch("sprint_id"))
-                                ?.name
-                            }
-                          </div>
-                        }
-                      />
+                      <button
+                        type="button"
+                        className={fieldClass()}
+                        style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}
+                      >
+                        <span className="truncate">
+                          {sprints.find((s) => s.id === watch("sprint_id"))?.name || "None"}
+                        </span>
+                        <LuChevronDown className="h-4 w-4 text-gray-400" />
+                      </button>
                     }
                     isShowIcon={false}
-                    onClickItem={(option) =>
-                      setValue("sprint_id", option.value as string)
-                    }
+                    onClickItem={(option) => setValue("sprint_id", option.value as string)}
                   />
                 ) : (
-                  <div>
-                    <label className="mb-1 block text-sm font-medium text-gray-700">
-                      Sprint
-                    </label>
-                    <div className="rounded-md bg-gray-50 border border-gray-300 px-3 py-2">
-                      <span className="text-gray-500 text-sm">
-                        No active sprints available
-                      </span>
-                    </div>
+                  <div className="rounded-md bg-gray-50/50 border border-gray-100 px-4 py-2.5 italic text-gray-400 text-xs text-center">
+                    No active sprints
                   </div>
                 )}
               </div>
-            )}
+            </div>
           </div>
 
-          <DropdownAntd
-            options={["Bug", "Task", "Story", "Epic"].map((value) => ({
-              value,
-              label: value,
-              customRender: (
-                <TypeBadge className="p-0!" type={value as IssueType} />
-              ),
-            }))}
-            placement="bottom"
-            rowClassName="w-full text-[15px] border-none"
-            menuClassName="w-[180px]"
-            parent={
-              <InputField
-                label="Type"
-                helperText="Type of the issue"
-                field="type"
-                type="select"
-                error={errors.type?.message}
-                isShowIcon={true}
-                customRender={
-                  <TypeBadge
-                    className="p-0!"
-                    type={watch("type") as IssueType}
-                  />
+          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
+            {/* Type */}
+            <div>
+              <label className={labelClass}>Issue Type</label>
+              <DropdownAntd
+                options={["Bug", "Task", "Story", "Epic"].map((value) => ({
+                  value,
+                  label: value,
+                  customRender: <TypeBadge type={value as IssueType} />,
+                }))}
+                placement="bottom"
+                rowClassName="w-full"
+                parent={
+                  <button type="button" className={`${fieldClass()} flex items-center justify-between`}>
+                    <TypeBadge type={watch("type") as IssueType} />
+                    <LuChevronDown className="h-4 w-4 text-gray-400" />
+                  </button>
                 }
+                isShowIcon={false}
+                onClickItem={(option) => setValue("type", option.value as IssueType)}
               />
-            }
-            isShowIcon={false}
-            onClickItem={(option) =>
-              setValue("type", option.value as IssueType)
-            }
-          />
-
-          <DropdownAntd
-            options={[
-              { value: "Highest", label: "Highest" },
-              { value: "High", label: "High" },
-              { value: "Medium", label: "Medium" },
-              { value: "Low", label: "Low" },
-              { value: "Lowest", label: "Lowest" },
-            ].map((option) => ({
-              ...option,
-              customRender: (
-                <PriorityBadge
-                  className="p-0! hover:bg-transparent!"
-                  priority={option.value as IssuePriority}
-                  isShowLabel={true}
-                />
-              ),
-            }))}
-            placement="bottom"
-            rowClassName="w-full text-[15px]"
-            menuClassName="w-[180px]"
-            parent={
-              <InputField
-                label="Priority"
-                helperText="Priority of the issue"
-                field="priority"
-                isShowIcon={true}
-                type="select"
-                error={errors.priority?.message}
-                customRender={
-                  <PriorityBadge
-                    className="p-0! hover:bg-transparent!"
-                    priority={watch("priority") as IssuePriority}
-                    isShowLabel={true}
-                  />
-                }
-              />
-            }
-            isShowIcon={false}
-            onClickItem={(option) =>
-              setValue("priority", option.value as IssuePriority)
-            }
-          />
-
-          <InputField
-            label="Summary"
-            helperText="Brief summary of the issue"
-            field="summary"
-            type="text"
-            register={register}
-            error={errors.summary?.message}
-          />
-
-          {/* Description — Quill editor with speech-to-text */}
-          <div className="flex w-full flex-col gap-1">
-            <div className="flex items-center gap-2">
-              <p className="text-sm font-bold text-gray-600">Description</p>
-              {isSpeechSupported && (
-                <button
-                  type="button"
-                  onClick={toggleListening}
-                  className={`stt-mic-btn cursor-pointer ${isListening ? "stt-mic-btn--active" : ""
-                    }`}
-                  title={isListening ? "Stop dictation" : "Start dictation"}
-                >
-                  {isListening ? (
-                    <FaStop className="stt-mic-icon" />
-                  ) : (
-                    <FaMicrophone className="stt-mic-icon" />
-                  )}
-                </button>
-              )}
-              {isListening && (
-                <span className="stt-status-badge">
-                  <span className="stt-pulse" />
-                  Listening...
-                </span>
-              )}
             </div>
-            <div
-              className={`rounded border transition-colors ${isListening
-                  ? "border-red-400 shadow-[0_0_0_2px_rgba(248,113,113,0.2)]"
-                  : "border-gray-300 focus-within:border-emerald-500"
-                }`}
-            >
+
+            {/* Priority */}
+            <div>
+              <label className={labelClass}>Priority</label>
+              <DropdownAntd
+                options={[
+                  { value: "Highest", label: "Highest" },
+                  { value: "High", label: "High" },
+                  { value: "Medium", label: "Medium" },
+                  { value: "Low", label: "Low" },
+                  { value: "Lowest", label: "Lowest" },
+                ].map((option) => ({
+                  ...option,
+                  customRender: (
+                    <PriorityBadge
+
+                      priority={option.value as IssuePriority}
+                      isShowLabel={true}
+                    />
+                  ),
+                }))}
+                placement="bottom"
+                rowClassName="w-full"
+                parent={
+                  <button type="button" className={`${fieldClass()} flex items-center justify-between`}>
+                    <PriorityBadge
+
+                      priority={watch("priority") as IssuePriority}
+                      isShowLabel={true}
+                    />
+                    <LuChevronDown className="h-4 w-4 text-gray-400" />
+                  </button>
+                }
+                isShowIcon={false}
+                onClickItem={(option) => setValue("priority", option.value as IssuePriority)}
+              />
+            </div>
+          </div>
+
+          {/* Summary */}
+          <div>
+            <label htmlFor="summary" className={labelClass}>Summary</label>
+            <input
+              id="summary"
+              type="text"
+              {...register("summary")}
+              className={fieldClass(!!errors.summary)}
+              placeholder="What needs to be done?"
+            />
+            {errors.summary && <p className="text-xs text-red-500">{errors.summary.message}</p>}
+          </div>
+
+          {/* Description */}
+          <div className="space-y-2">
+            <div className="flex items-center justify-between">
+              <label className={labelClass}>Description</label>
+              <div className="flex items-center gap-2">
+                {isSpeechSupported && (
+                  <button
+                    type="button"
+                    onClick={toggleListening}
+                    className={`flex items-center gap-1.5 px-2 py-1 rounded text-[10px] font-bold uppercase transition-all ${isListening ? "bg-red-50 text-red-600 ring-1 ring-red-200" : "bg-gray-50 text-gray-500 hover:bg-gray-100"}`}
+                  >
+                    {isListening ? (
+                      <><div className="w-1.5 h-1.5 rounded-full bg-red-600 animate-pulse" /> Listening</>
+                    ) : (
+                      <><LuZap className="w-3 h-3" /> Dictate</>
+                    )}
+                  </button>
+                )}
+              </div>
+            </div>
+            <div className={`rounded-md border overflow-hidden transition-all ${isListening ? "border-red-300 ring-4 ring-red-50" : "border-gray-200 focus-within:border-emerald-900 focus-within:ring-2 focus-within:ring-emerald-900/15"}`}>
               <QuillEditorCreate
                 ref={quillEditorRef}
                 onChange={setDescriptionValue}
-                placeholder={
-                  isListening
-                    ? "🎤 Speak now… your words will appear here"
-                    : "Add a description..."
-                }
+                placeholder={isListening ? "Speak now... your words will appear here" : "Add more details about this issue..."}
               />
             </div>
-            {/* Interim (live) transcript preview */}
-            {isListening && interimText && (
-              <div className="stt-interim-preview">
-                <span className="stt-interim-text">{interimText}</span>
-              </div>
-            )}
           </div>
 
-          {/* Parent Field */}
-          <DropdownAntd
-            options={
-              issues?.map((issue) => ({
-                value: issue.id,
-                label: `${issue.key} - ${issue.summary}`,
-              })) || []
-            }
-            placement="bottom"
-            rowClassName="font-semibold text-gray-700"
-            menuClassName="min-w-[300px]"
-            parent={
-              <InputField
-                label="Parent"
-                helperText="Your work type hierarchy determines the work items you can select here."
-                field="parent_id"
-                isShowIcon={true}
-                type="select"
-                error={errors.parent_id?.message}
-              />
-            }
-            isShowIcon={false}
-            onClickItem={(option: { value: string; label: string }) => {
-              setValue("parent_id", option.value as string);
-            }}
-          />
-
-          {/* Due Date Field */}
-          <InputField
-            label="Due date"
-            helperText="Deadline for completing this issue"
-            field="due_date_to"
-            type="date"
-            register={register}
-            error={errors.due_date_to?.message}
-          />
-
-          {/* Team Field */}
-          <DropdownAntd
-            options={
-              teams?.map((team) => ({
-                value: team.id,
-                label: team.name,
-              })) || []
-            }
-            placement="bottom"
-            rowClassName="font-semibold text-gray-700"
-            menuClassName="min-w-[200px]"
-            parent={
-              <InputField
-                label="Team"
-                helperText="Associates a team to an issue. You can use this field to search and filter issues by team."
-                field="team_id"
-                isShowIcon={true}
-                type="select"
-                error={errors.team_id?.message}
-              />
-            }
-            isShowIcon={false}
-            onClickItem={(option: { value: string; label: string }) => {
-              setValue("team_id", option.value as string);
-            }}
-          />
-
-          {/* Start Date Field */}
-          <InputField
-            label="Start date"
-            helperText="Allows the planned start date for a piece of work to be set."
-            field="start_date"
-            type="date"
-            register={register}
-            error={errors.start_date?.message}
-          />
-
-          {/* Story Point Estimate Field */}
-          <InputField
-            label="Story point estimate"
-            helperText="Estimated effort required for this issue"
-            field="story_point"
-            type="number"
-            register={register}
-            registerOptions={{ valueAsNumber: true }}
-            error={errors.story_point?.message}
-          />
-
-          <DropdownAntd
-            options={
-              columns?.map((column) => ({
-                value: column.id,
-                label: column.name,
-                customRender: (
-                  <StatusBadge
-                    className="border-none! bg-transparent! p-0!"
-                    columnId={column.id}
-                    projectId={selectedProjectId}
-                  />
-                ),
-              })) || []
-            }
-            isShowIcon={false}
-            placement="bottom"
-            rowClassName="w-full text-[15px]"
-            menuClassName="w-[180px]"
-            parent={
-              <InputField
-                label="Status"
-                helperText="Status of the issue"
-                field="column_id"
-                isShowIcon={true}
-                type="select"
-                error={errors.column_id?.message}
-                customRender={
-                  <StatusBadge
-                    className="border-none! bg-transparent! p-0!"
-                    columnId={watch("column_id") as string}
-                    projectId={selectedProjectId}
-                  />
+          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
+            {/* Status */}
+            <div>
+              <label className={labelClass}>Status</label>
+              <DropdownAntd
+                options={columns?.map((column) => ({
+                  value: column.id,
+                  label: column.name,
+                  customRender: (
+                    <StatusBadge
+                      className="border-none! bg-transparent! p-0!"
+                      columnId={column.id}
+                      projectId={selectedProjectId}
+                    />
+                  ),
+                })) || []}
+                placement="bottom"
+                rowClassName="w-full"
+                parent={
+                  <button type="button" className={`${fieldClass(!!errors.column_id)} flex items-center justify-between`}>
+                    <StatusBadge
+                      className="border-none! bg-transparent! p-0!"
+                      columnId={watch("column_id") as string}
+                      projectId={selectedProjectId}
+                    />
+                    <LuChevronDown className="h-4 w-4 text-gray-400" />
+                  </button>
                 }
+                isShowIcon={false}
+                onClickItem={(option) => setValue("column_id", option.value)}
               />
-            }
-            onClickItem={(option) => setValue("column_id", option.value)}
-          />
-          {errors.column_id && (
-            <p className="mt-1 text-sm text-red-500">
-              {errors.column_id.message}
-            </p>
-          )}
+              {errors.column_id && <p className="text-xs text-red-500">{errors.column_id.message}</p>}
+            </div>
 
-          <DropdownAntd
-            options={
-              projectMembers?.map((member) => ({
-                value: member.user_id,
-                label: member.user_id || "", // Use a string for label
-                customRender: (
-                  <UserAvatar
-                    userId={member.user_id}
-                    isDisplayName={true}
-                    size={20}
-                  />
-                ),
-              })) || []
-            }
-            isShowIcon={false}
-            placement="bottom"
-            rowClassName="w-full text-[16px]"
-            menuClassName="min-w-[200px]"
-            parent={
-              <InputField
-                label="Assignee"
-                helperText="Assignee of the issue"
-                field="assignee_id"
-                isShowIcon={true}
-                type="select"
-                error={errors.assignee_id?.message}
-                customRender={
-                  <UserAvatar
-                    userId={watch("assignee_id") as string}
-                    isDisplayName={true}
-                    size={24}
-                  />
+            {/* Assignee */}
+            <div>
+              <label className={labelClass}>Assignee</label>
+              <DropdownAntd
+                options={projectMembers?.map((member) => ({
+                  value: member.user_id,
+                  label: member.user_id || "",
+                  customRender: (
+                    <UserAvatar userId={member.user_id} isDisplayName={true} size={20} />
+                  ),
+                })) || []}
+                placement="bottom"
+                rowClassName="w-full"
+                parent={
+                  <button type="button" className={fieldClass()}>
+                    <div className="flex items-center justify-between w-full">
+                      <UserAvatar
+                        userId={watch("assignee_id") as string}
+                        isDisplayName={true}
+                        size={20}
+                      />
+                      <LuChevronDown className="h-4 w-4 text-gray-400" />
+                    </div>
+                  </button>
                 }
+                isShowIcon={false}
+                onClickItem={(option) => setValue("assignee_id", option.value)}
               />
-            }
-            onClickItem={(option) => setValue("assignee_id", option.value)}
-          />
+            </div>
+          </div>
 
-          {/* Attachments — same flow as metadataSection */}
-          <div className="flex w-full flex-col gap-2">
-            <div className="flex flex-row items-center gap-1">
-              <p className="text-sm font-bold text-gray-600">Attachments</p>
+          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
+            {/* Parent */}
+            <div>
+              <label className={labelClass}>Parent</label>
+              <DropdownAntd
+                options={issues?.map((issue) => ({
+                  value: issue.id,
+                  label: `${issue.key} - ${issue.summary}`,
+                })) || []}
+                placement="bottom"
+                rowClassName="w-full"
+                parent={
+                  <button type="button" className={fieldClass()}>
+                    <div className="flex items-center justify-between w-full">
+                      <span className="truncate text-sm">
+                        {issues?.find(i => i.id === watch("parent_id")) ? `${issues.find(i => i.id === watch("parent_id"))?.key} - ${issues.find(i => i.id === watch("parent_id"))?.summary}` : "None"}
+                      </span>
+                      <LuChevronDown className="h-4 w-4 text-gray-400" />
+                    </div>
+                  </button>
+                }
+                isShowIcon={false}
+                onClickItem={(option) => setValue("parent_id", option.value as string)}
+              />
+            </div>
+
+            {/* Team */}
+            <div>
+              <label className={labelClass}>Team</label>
+              <DropdownAntd
+                options={teams?.map((team) => ({
+                  value: team.id,
+                  label: team.name,
+                })) || []}
+                placement="bottom"
+                rowClassName="w-full"
+                parent={
+                  <button type="button" className={fieldClass()}>
+                    <div className="flex items-center justify-between w-full">
+                      <span className="truncate">
+                        {teams?.find(t => t.id === watch("team_id"))?.name || "None"}
+                      </span>
+                      <LuChevronDown className="h-4 w-4 text-gray-400" />
+                    </div>
+                  </button>
+                }
+                isShowIcon={false}
+                onClickItem={(option) => setValue("team_id", option.value as string)}
+              />
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 gap-6 sm:grid-cols-3">
+            {/* Start Date */}
+            <div>
+              <label htmlFor="start_date" className={labelClass}>Start date</label>
+              <div className="relative">
+                <input
+                  id="start_date"
+                  type="date"
+                  {...register("start_date")}
+                  className={fieldClass()}
+                />
+                <LuCalendar className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+              </div>
+            </div>
+
+            {/* Due Date */}
+            <div>
+              <label htmlFor="due_date_to" className={labelClass}>Due date</label>
+              <div className="relative">
+                <input
+                  id="due_date_to"
+                  type="date"
+                  {...register("due_date_to")}
+                  className={fieldClass()}
+                />
+                <LuCalendar className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+              </div>
+            </div>
+
+            {/* Story Points */}
+            <div>
+              <label htmlFor="story_point" className={labelClass}>Story Points</label>
+              <input
+                id="story_point"
+                type="number"
+                {...register("story_point", { valueAsNumber: true })}
+                className={fieldClass()}
+                placeholder="0"
+                min="0"
+              />
+            </div>
+          </div>
+
+          {/* Attachments */}
+          <div className="space-y-3">
+            <div className="flex items-center gap-2">
+              <label className={labelClass}>Attachments</label>
               {attachments.length > 0 && (
-                <div className="rounded bg-gray-300 px-2 text-sm font-medium text-gray-600">
+                <span className="bg-emerald-50 text-emerald-700 text-[10px] font-bold px-1.5 py-0.5 rounded-full border border-emerald-100">
                   {attachments.length}
-                </div>
+                </span>
               )}
             </div>
 
-            {/* Drop zone */}
             <div
-              className={`flex w-full cursor-pointer items-center justify-center gap-3 rounded-md border-2 border-dashed py-4 transition-colors ${attachments.length
-                  ? "border-emerald-400 bg-emerald-50"
-                  : "border-gray-300 hover:border-emerald-400 hover:bg-emerald-50"
-                }`}
+              className={`group flex w-full cursor-pointer flex-col items-center justify-center gap-2 rounded-xl border-2 border-dashed py-8 transition-all  ${attachments.length ? "border-emerald-400 bg-emerald-50/50" : "border-gray-400 hover:border-emerald-400 hover:bg-emerald-50/50"}`}
+              onClick={() => fileInputRef.current?.click()}
               onDragOver={(e) => { e.preventDefault(); e.stopPropagation(); }}
               onDrop={async (e) => {
                 e.preventDefault();
@@ -778,41 +719,30 @@ const CreateIssueModal: React.FC<CreateIssueModalProps> = ({
                     created_at: new Date().toISOString(),
                   })]);
                 } catch {
-                  toast.error("Failed to upload attachment. Please try again.");
+                  toast.error("Failed to upload attachment");
                 }
               }}
-              onClick={() => fileInputRef?.current?.click()}
             >
-              <MdCloudUpload className="text-2xl text-gray-400" />
-              <span className="text-sm text-gray-500">
-                Drop files to attach or
-              </span>
-              <button
-                type="button"
-                className="rounded border border-gray-300 bg-white px-3 py-1 text-sm font-medium text-gray-700 hover:bg-gray-50"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  fileInputRef?.current?.click();
-                }}
-              >
-                Browse
-              </button>
+              <div className="flex h-10 w-10 items-center justify-center rounded-full bg-white shadow-sm ring-1 ring-gray-200 group-hover:ring-emerald-200">
+                <LuPlus className="text-xl text-gray-400 group-hover:text-emerald-500" />
+              </div>
+              <div className="text-center">
+                <p className="text-xs font-semibold text-gray-600">Click or drag to upload</p>
+                <p className="text-[10px] text-gray-400">Files up to 10MB</p>
+              </div>
               <input
                 type="file"
-                onChange={handleFileUpload}
-                style={{ display: "none" }}
+                className="hidden"
                 ref={fileInputRef}
+                onChange={handleFileUpload}
               />
             </div>
 
-            {/* Attachment previews */}
             {attachments.length > 0 && (
-              <div className="flex w-full flex-row gap-1 overflow-x-auto">
+              <div className="flex flex-wrap gap-3 pt-2">
                 {attachments
                   .map(safeParseAttachment)
-                  .filter(
-                    (p): p is NonNullable<ReturnType<typeof safeParseAttachment>> => p !== null
-                  )
+                  .filter((p): p is NonNullable<ReturnType<typeof safeParseAttachment>> => p !== null)
                   .map((parsed) => (
                     <AttachmentCard
                       key={parsed.url}
@@ -823,9 +753,26 @@ const CreateIssueModal: React.FC<CreateIssueModalProps> = ({
               </div>
             )}
           </div>
-        </form>
-      </div>
+        </div>
 
+        {/* Footer */}
+        <div className="flex shrink-0 items-center justify-end gap-3 border-t border-gray-100 bg-gray-50/50 px-8 py-5">
+          <button
+            type="button"
+            onClick={handleClose}
+            className="rounded-md px-6 py-2.5 text-sm font-semibold text-gray-600 transition-all hover:bg-gray-200 focus:outline-none"
+          >
+            Cancel
+          </button>
+          <button
+            type="submit"
+            disabled={isLoading}
+            className="rounded-md bg-emerald-900 px-8 py-2.5 text-sm font-semibold text-white transition-all hover:opacity-95 active:scale-[0.98] focus:outline-none focus:ring-2 focus:ring-emerald-900/30 disabled:cursor-not-allowed disabled:opacity-50"
+          >
+            {isLoading ? "Saving..." : isEditing ? "Update Issue" : "Create Issue"}
+          </button>
+        </div>
+      </form>
       {showConfirmClose && (
         <Modal
           title="Discard changes?"
@@ -837,10 +784,13 @@ const CreateIssueModal: React.FC<CreateIssueModalProps> = ({
             reset();
           }}
           buttonContent="Discard"
-          style={{ confirmButtonColor: "bg-red-600 hover:bg-red-700 focus:ring-red-500", textColor: "text-red-700" }}
-          className="w-[450px]"
+          style={{
+            confirmButtonColor: "!bg-none !bg-red-600 hover:!bg-red-700 !shadow-none",
+            textColor: "text-red-600"
+          }}
+          className="w-full max-w-sm"
         >
-          <div className="text-gray-600">
+          <div className="text-sm text-gray-500 pt-2 leading-relaxed">
             You have unsaved changes in this issue. Are you sure you want to discard them? This action cannot be undone.
           </div>
         </Modal>

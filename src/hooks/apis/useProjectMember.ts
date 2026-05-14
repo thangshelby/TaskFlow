@@ -13,7 +13,7 @@ export function useProjectMembers(
 ) {
   const queryClient = useQueryClient();
   const { data, isLoading, error } = useQuery({
-    queryKey: ["projectMembers", params.project_id, params.name, params.email],
+    queryKey: ["projectMembers", params.project_id, params.page, params.limit],
     queryFn: async () => {
       const res = await projectMembers.list(params);
       // put each user into the user cache
@@ -21,13 +21,15 @@ export function useProjectMembers(
         queryClient.setQueryData(["user", u.id], u);
       });
 
-      return res;
+      const response = res.data;
+
+      return response;
     },
     enabled: !!params.project_id && (enabled === undefined ? true : enabled),
   });
   return {
-    projectMembers: data?.data.data,
-    pagination: data?.data.pagination,
+    projectMembers: data?.data,
+    pagination: data?.pagination,
     isLoading,
     error,
   };
@@ -111,6 +113,35 @@ export function useAddProjectMemberToTeam() {
     addProjectMemberToTeamAsync,
     isLoading,
     isSuccess,
+    error,
+  };
+}
+
+export function useListProjectMembers(project_id: string) {
+  const queryClient = useQueryClient();
+  const {
+    data: projectMembersData,
+    isLoading,
+    error,
+  } = useQuery({
+    queryKey: ["projectMembers", project_id],
+    queryFn: async () => {
+      const res = await projectMembers.list({
+        project_id,
+      });
+      // put each user into the user cache
+      res.data.data.forEach((user) => {
+        queryClient.setQueryData(["user", user.id], user);
+      });
+
+      return res;
+    },
+  });
+
+  return {
+    projectMembers: projectMembersData?.data?.data || [],
+    pagination: projectMembersData?.data?.pagination,
+    isLoading,
     error,
   };
 }

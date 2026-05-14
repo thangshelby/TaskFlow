@@ -7,6 +7,7 @@ import DropdownAntd from "@libs/app/components/general-components/dropdown";
 import Modal from "@libs/app/components/general-components/modal/modal";
 import { useProjectColumns } from "@libs/hooks/apis/useProject";
 import { CreateIssueParams, IssuePriority, IssueType } from "@libs/types/issue";
+import "@libs/app/components/projects/modals/modal.css";
 
 import { useAuthStore } from "@libs/store/useAuthStore";
 
@@ -189,6 +190,7 @@ const CreateIssueModalFromSprint: React.FC<CreateIssueModalFromSprintProps> = ({
       buttonContent={isLoading ? "Creating..." : "Create Issue"}
       onSubmit={handleSubmit(handleFormSubmit)}
       isLoadingButton={isLoading}
+      className="rounded-xl border border-white/40 shadow-2xl glass-panel"
     >
       <div className="max-h-[calc(100vh-200px)] overflow-y-auto p-4">
         <form className="space-y-4">

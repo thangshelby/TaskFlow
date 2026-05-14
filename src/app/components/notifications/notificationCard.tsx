@@ -11,7 +11,12 @@ import {
   LuUser,
 } from "react-icons/lu";
 import { TbAlertTriangle } from "react-icons/tb";
-  
+
+// Theme-consistent accent colors (muted, on-brand)
+const accentText = "font-semibold text-[#064e3b]";
+const mutedText = "text-[#1a1c1c]";
+const subtleText = "text-[#404944]";
+
 const renderNotificationCard = (notification: INotification): JSX.Element => {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const refData = notification.reference_data as any;
@@ -20,14 +25,14 @@ const renderNotificationCard = (notification: INotification): JSX.Element => {
   switch (type) {
     case NotificationType.ASSIGNMENT:
       return (
-        <div>
-          <span className="font-medium text-blue-600">
+        <div className={mutedText}>
+          <span className={accentText}>
             {notification.actor?.first_name +
               " " +
               notification.actor?.last_name || "Someone"}
           </span>
           {" assigned you to "}
-          <span className="font-medium text-blue-600">
+          <span className={accentText}>
             {refData?.title || notification.reference_id}
           </span>
         </div>
@@ -35,16 +40,16 @@ const renderNotificationCard = (notification: INotification): JSX.Element => {
 
     case NotificationType.MENTION:
       return (
-        <div>
-          <span className="font-medium text-purple-600">
+        <div className={mutedText}>
+          <span className={accentText}>
             {refData?.actorName || "Someone"}
           </span>
           {" mentioned you in "}
-          <span className="font-medium text-gray-900">
+          <span className="font-medium text-[#1a1c1c]">
             {refData?.issueKey || notification.reference_id}
           </span>
           {refData?.commentText && (
-            <div className="mt-1 text-sm text-gray-600 italic">
+            <div className={`mt-1 text-xs italic ${subtleText}`}>
               "
               {refData?.commentText.length > 100
                 ? refData?.commentText.substring(0, 100) + "..."
@@ -57,16 +62,16 @@ const renderNotificationCard = (notification: INotification): JSX.Element => {
 
     case NotificationType.COMMENT:
       return (
-        <div>
-          <span className="font-medium text-green-600">
+        <div className={mutedText}>
+          <span className={accentText}>
             {refData.actorName || "Someone"}
           </span>
           {" commented on "}
-          <span className="font-medium text-gray-900">
+          <span className="font-medium text-[#1a1c1c]">
             {refData.issueKey || notification.reference_id}
           </span>
           {refData.commentText && (
-            <div className="mt-1 text-sm text-gray-600 italic">
+            <div className={`mt-1 text-xs italic ${subtleText}`}>
               "
               {refData.commentText.length > 100
                 ? refData.commentText.substring(0, 100) + "..."
@@ -79,20 +84,20 @@ const renderNotificationCard = (notification: INotification): JSX.Element => {
 
     case NotificationType.STATUS_UPDATE:
       return (
-        <div>
-          <span className="font-medium text-yellow-600">
+        <div className={mutedText}>
+          <span className={accentText}>
             {refData.actorName || "Someone"}
           </span>
           {" moved "}
-          <span className="font-medium text-gray-900">
+          <span className="font-medium text-[#1a1c1c]">
             {refData.issueKey || notification.reference_id}
           </span>
           {" from "}
-          <span className="inline-flex items-center rounded-full bg-gray-100 px-2 py-1 text-xs font-medium text-gray-800">
+          <span className="inline-flex items-center rounded bg-[#e8e8e7] px-1.5 py-0.5 text-[11px] font-medium text-[#404944]">
             {refData.oldStatus || "Unknown"}
           </span>
           {" to "}
-          <span className="inline-flex items-center rounded-full bg-blue-100 px-2 py-1 text-xs font-medium text-blue-800">
+          <span className="inline-flex items-center rounded bg-[#064e3b]/12 px-1.5 py-0.5 text-[11px] font-medium text-[#064e3b]">
             {refData.newStatus || "Unknown"}
           </span>
         </div>
@@ -102,80 +107,84 @@ const renderNotificationCard = (notification: INotification): JSX.Element => {
       const dueDate = refData.dueDate ? new Date(refData.dueDate) : null;
       const isOverdue = dueDate && dueDate < new Date();
       return (
-        <div>
-          <span className="font-medium text-red-600">
+        <div className={mutedText}>
+          <span className={`font-semibold ${isOverdue ? "text-[#ba1a1a]" : "text-[#064e3b]"}`}>
             {refData.issueKey || notification.reference_id}
           </span>
           {isOverdue ? " is overdue!" : " is due soon"}
           {dueDate && (
-            <div className="mt-1 text-sm text-gray-600">
+            <div className={`mt-0.5 text-xs ${subtleText}`}>
               Due: {dueDate.toLocaleDateString()}
             </div>
           )}
           {refData.issueTitle && (
-            <div className="text-sm text-gray-600">"{refData.issueTitle}"</div>
+            <div className={`text-xs ${subtleText}`}>"{refData.issueTitle}"</div>
           )}
         </div>
       );
     }
+
     case NotificationType.PROJECT_INVITATION:
       return (
-        <div>
-          <span className="font-medium text-indigo-600">
+        <div className={mutedText}>
+          <span className={accentText}>
             {refData.actorName || "Someone"}
           </span>
           {" invited you to join "}
-          <span className="font-medium text-gray-900">
+          <span className="font-medium text-[#1a1c1c]">
             {refData.projectName || "a project"}
           </span>
           {refData.role && (
-            <div className="mt-1 text-sm text-gray-600">
-              Role: <span className="font-medium">{refData.role}</span>
+            <div className={`mt-0.5 text-xs ${subtleText}`}>
+              Role: <span className="font-medium text-[#064e3b]">{refData.role}</span>
             </div>
           )}
         </div>
       );
+
     case NotificationType.REACTION:
       return (
-        <div>
-          <span className="font-medium text-pink-600">
+        <div className={mutedText}>
+          <span className={accentText}>
             {refData.actorName || "Someone"}
           </span>
           {" reacted "}
-          <span className="text-lg">{refData.reaction || "👍"}</span>
+          <span className="text-base">{refData.reaction || "👍"}</span>
           {" to your comment on "}
-          <span className="font-medium text-gray-900">
+          <span className="font-medium text-[#1a1c1c]">
             {refData.issueKey || notification.reference_id}
           </span>
         </div>
       );
+
     case NotificationType.SPRINT_STARTED:
       return (
-        <div>
-          <span className="font-medium text-orange-600">Sprint started:</span>{" "}
-          <span className="font-medium text-gray-900">
+        <div className={mutedText}>
+          <span className={accentText}>Sprint started:</span>{" "}
+          <span className="font-medium text-[#1a1c1c]">
             {refData.sprintName || "Sprint"}
           </span>
           {refData.projectName && (
-            <div className="mt-1 text-sm text-gray-600">
+            <div className={`mt-0.5 text-xs ${subtleText}`}>
               Project: {refData.projectName}
             </div>
           )}
         </div>
       );
+
     case NotificationType.PROJECT_ADDED:
       return (
-        <div>
-          <span className="font-medium text-teal-600">
+        <div className={mutedText}>
+          <span className={accentText}>
             {refData.actorName || "Someone"}
           </span>
           {" added you to "}
-          <span className="font-medium text-gray-900">
+          <span className="font-medium text-[#1a1c1c]">
             {refData.projectName || "a project"}
           </span>
           {refData.role && (
-            <div className="mt-1 text-sm text-gray-600">
-              Role: <span className="font-medium">{refData.role}</span>
+            <div className={`mt-0.5 text-xs ${subtleText}`}>
+              Role: <span className="font-medium text-[#064e3b]">{refData.role}</span>
             </div>
           )}
         </div>
@@ -183,12 +192,12 @@ const renderNotificationCard = (notification: INotification): JSX.Element => {
 
     case NotificationType.PROJECT_TEAM_ADDED:
       return (
-        <div>
-          <span className="font-medium text-teal-600">
+        <div className={mutedText}>
+          <span className={accentText}>
             {refData.actorName || "Someone"}
           </span>
           {" added you to the team of "}
-          <span className="font-medium text-gray-900">
+          <span className="font-medium text-[#1a1c1c]">
             {refData.projectName || "a project"}
           </span>
         </div>
@@ -196,19 +205,19 @@ const renderNotificationCard = (notification: INotification): JSX.Element => {
 
     case NotificationType.SYSTEM_ALERT:
       return (
-        <div>
-          <span className="font-medium text-gray-600">System Alert:</span>{" "}
-          <span className="text-gray-900">
+        <div className={mutedText}>
+          <span className="font-semibold text-[#404944]">System Alert:</span>{" "}
+          <span className="text-[#1a1c1c]">
             {refData.message || notification.content}
           </span>
           {refData.severity && (
             <div
-              className={`mt-1 text-sm font-medium ${
+              className={`mt-0.5 text-xs font-semibold ${
                 refData.severity === "high"
-                  ? "text-red-600"
+                  ? "text-[#ba1a1a]"
                   : refData.severity === "medium"
-                    ? "text-yellow-600"
-                    : "text-blue-600"
+                    ? "text-amber-600"
+                    : "text-[#064e3b]"
               }`}
             >
               Severity: {refData.severity.toUpperCase()}
@@ -219,9 +228,7 @@ const renderNotificationCard = (notification: INotification): JSX.Element => {
 
     default:
       return (
-        <div>
-          <span className="text-gray-900">{notification.content}</span>
-        </div>
+        <div className="text-[#1a1c1c]">{notification.content}</div>
       );
   }
 };
@@ -253,38 +260,34 @@ const getNotificationTypeLabel = (type: NotificationType) => {
   }
 };
 
+// All icons use emerald theme color
 const getNotificationIcon = (type: NotificationType) => {
-  const iconProps = { className: "w-4 h-4" };
+  const cls = "h-3.5 w-3.5 text-[#064e3b]";
   switch (type) {
     case NotificationType.ASSIGNMENT:
-      return <LuUser {...iconProps} className="h-4 w-4 text-blue-500" />;
+      return <LuUser className={cls} />;
     case NotificationType.MENTION:
-      return <LuBell {...iconProps} className="h-4 w-4 text-purple-500" />;
+      return <LuBell className={cls} />;
     case NotificationType.COMMENT:
-      return (
-        <LuMessageCircle {...iconProps} className="h-4 w-4 text-green-500" />
-      );
+      return <LuMessageCircle className={cls} />;
     case NotificationType.STATUS_UPDATE:
-      return (
-        <TbAlertTriangle {...iconProps} className="h-4 w-4 text-yellow-500" />
-      );
+      return <TbAlertTriangle className={cls} />;
     case NotificationType.DUE_DATE_REMINDER:
-      return <LuCalendar {...iconProps} className="h-4 w-4 text-red-500" />;
+      return <LuCalendar className="h-3.5 w-3.5 text-[#ba1a1a]" />;
     case NotificationType.PROJECT_INVITATION:
-      return (
-        <LuFolderOpen {...iconProps} className="h-4 w-4 text-indigo-500" />
-      );
+      return <LuFolderOpen className={cls} />;
     case NotificationType.SPRINT_STARTED:
-      return <LuRocket {...iconProps} className="h-4 w-4 text-orange-500" />;
+      return <LuRocket className={cls} />;
     case NotificationType.PROJECT_ADDED:
     case NotificationType.PROJECT_TEAM_ADDED:
-      return <LuGroup {...iconProps} className="h-4 w-4 text-teal-500" />;
+      return <LuGroup className={cls} />;
     case NotificationType.SYSTEM_ALERT:
-      return <LuSettings {...iconProps} className="h-4 w-4 text-gray-500" />;
+      return <LuSettings className="h-3.5 w-3.5 text-[#404944]" />;
     default:
-      return <LuBell {...iconProps} className="h-4 w-4 text-gray-500" />;
+      return <LuBell className={cls} />;
   }
 };
+
 export {
   renderNotificationCard,
   getNotificationIcon,

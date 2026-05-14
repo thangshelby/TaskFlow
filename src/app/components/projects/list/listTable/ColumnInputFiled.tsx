@@ -42,7 +42,8 @@ const ColumnInputFiled = ({
         }
       }}
       value={newValue?.toString()}
-      className={`whover:bg-gray-100 flex items-center gap-2 rounded border-2 border-transparent px-2 py-1 outline-none focus:border-emerald-500 ${inputType === "number" ? "text-right" : ""} w-full`}
+      className={`transition-all duration-200 hover:bg-[#f9f9f8] flex items-center gap-2 rounded border-2 border-transparent px-2 py-1 outline-none focus:border-[#064e3b] ${inputType === "number" ? "text-right" : ""} w-full`}
+
     />
   );
 };

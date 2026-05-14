@@ -1,5 +1,4 @@
-import React from "react";
-import { FaUserPlus } from "react-icons/fa";
+import { UserPlus } from "lucide-react";
 import { Popover } from "antd";
 import ProjectMemberInvitations from "./modals/project/projectMemberInvitations";
 import { useUserMemberships } from "@libs/hooks/apis/useProjectMember";
@@ -17,17 +16,20 @@ const ProjectInvitationsPopover: React.FC<ProjectInvitationsPopoverProps> = ({
   const content = <ProjectMemberInvitations userId={userId} />;
 
   return (
-    <Popover content={content} trigger="click" placement="bottom">
-      <div className="relative cursor-pointer rounded-full p-2 text-gray-600 hover:bg-gray-100">
-        <FaUserPlus />
+    <Popover content={content} trigger="click" placement="bottomRight">
+      <button 
+        aria-label="View project invitations"
+        className="relative cursor-pointer p-2.5 text-[#404944] hover:text-[#064e3b] transition-all rounded-full hover:bg-[#eeeeed] active:scale-95"
+      >
+        <UserPlus size={22} />
         {pendingInvitations.length > 0 && (
-          <span className="absolute top-0 right-0 flex h-4 w-4 items-center justify-center rounded-full bg-red-500">
-            <span className="text-xs text-white">
+          <span className="absolute top-1.5 right-1.5 flex h-4 w-4 items-center justify-center rounded-full bg-red-500 shadow-sm border border-white">
+            <span className="text-[10px] font-bold text-white">
               {pendingInvitations.length}
             </span>
           </span>
         )}
-      </div>
+      </button>
     </Popover>
   );
 };

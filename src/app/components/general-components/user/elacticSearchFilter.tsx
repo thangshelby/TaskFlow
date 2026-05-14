@@ -127,23 +127,22 @@ const ElacticSearchFilter = ({
   };
 
   return (
-    <div className="flex h-full min-h-0 flex-1 flex-col overflow-y-auto p-2 pr-4 pl-0">
+    <div className="flex h-full min-h-0 flex-1 flex-col overflow-y-auto p-2 space-y-2 custom-scrollbar">
       <FilterSection
-        title="LAST UPDATED"
+        title="Last Updated"
         section="lastUpdated"
         toggleSection={toggleSection}
       >
-        <div className="flex flex-wrap gap-2">
+        <div className="flex flex-wrap gap-2.5 pt-1">
           {lastUpdatedOptions.map((option) => (
             <button
               key={option.label}
               type="button"
               onClick={() => setValue("lastUpdated", option.value)}
-              className={`cursor-pointer rounded-xl border px-2 py-0.5 text-sm font-medium transition-colors ${
-                watch("lastUpdated") === option.value
-                  ? "border-blue-500 bg-blue-50 text-blue-700"
-                  : "border-gray-200 bg-gray-50 text-gray-700 hover:bg-gray-100"
-              }`}
+              className={`cursor-pointer rounded-md border px-2 py-0.5 text-[9px] font-black transition-all uppercase tracking-wider ${watch("lastUpdated") === option.value
+                ? "border-emerald-600 bg-emerald-600 text-white shadow-lg shadow-emerald-900/10"
+                : "border-emerald-100 bg-white text-emerald-900/40 hover:border-emerald-300 hover:bg-emerald-50/50"
+                }`}
             >
               {option.label}
             </button>
@@ -153,11 +152,11 @@ const ElacticSearchFilter = ({
 
       {projects.length > 0 && (
         <FilterSection
-          title="FILTER BY PROJECT"
+          title="Filter by Project"
           section="projects"
           toggleSection={toggleSection}
         >
-          <div className="space-y-2">
+          <div className="space-y-1.5 pt-1">
             {projects.slice(0, 4).map((project) => (
               <CheckboxItem
                 key={project.id}
@@ -172,12 +171,12 @@ const ElacticSearchFilter = ({
           {projects.length > 4 && (
             <button
               type="button"
-              className="text-sm text-blue-600 transition-colors hover:text-blue-700"
+              className="mt-1 text-[10px] font-black text-emerald-600 hover:text-emerald-700 transition-colors uppercase tracking-[0.15em] cursor-pointer"
               onClick={() =>
                 setIsShowMoreFilter({ ...isShowMoreFilter, projects: true })
               }
             >
-              Show more
+              + {projects.length - 4} more projects
             </button>
           )}
         </FilterSection>
@@ -185,16 +184,15 @@ const ElacticSearchFilter = ({
 
       {assignees && assignees.length > 0 && (
         <FilterSection
-          title="FILTER BY ASSIGNEE"
+          title="Filter by Assignee"
           section="assignees"
           toggleSection={toggleSection}
         >
-          <div className="space-y-2">
+          <div className="space-y-1.5 pt-1">
             {assignees
               .slice(0, isShowMoreFilter.assignees ? assignees.length : 4)
-              .concat()
               .map((assignee) => (
-                <div key={assignee.user_id} className="flex items-center gap-2">
+                <div key={assignee.user_id} className="flex items-center gap-2 group">
                   <CheckboxItem
                     checked={isChecked("assignees", assignee.user_id)}
                     onChange={(checked) =>
@@ -205,18 +203,20 @@ const ElacticSearchFilter = ({
                       )
                     }
                   />
-                  <UserAvatar
-                    userId={assignee.user_id}
-                    size={24}
-                    isDisplayName={true}
-                  />
+                  <div className="transition-all group-hover:translate-x-1">
+                    <UserAvatar
+                      userId={assignee.user_id}
+                      size={24}
+                      isDisplayName={true}
+                    />
+                  </div>
                 </div>
               ))}
           </div>
           {assignees && assignees.length > 4 && (
             <button
               type="button"
-              className="cursor-pointer text-sm text-blue-600 transition-colors hover:text-blue-700 hover:underline"
+              className="mt-1 cursor-pointer text-[9px] font-black text-emerald-600 hover:text-emerald-700 transition-colors uppercase tracking-[0.15em]"
               onClick={() =>
                 setIsShowMoreFilter({
                   ...isShowMoreFilter,
@@ -224,7 +224,7 @@ const ElacticSearchFilter = ({
                 })
               }
             >
-              {isShowMoreFilter.assignees ? "Show less" : "Show more"}
+              {isShowMoreFilter.assignees ? "Show less" : `+ ${assignees.length - 4} more assignees`}
             </button>
           )}
         </FilterSection>
@@ -232,13 +232,13 @@ const ElacticSearchFilter = ({
 
       {columns.length > 0 && (
         <FilterSection
-          title="FILTER BY STATUS"
+          title="Filter by Status"
           section="statuses"
           toggleSection={toggleSection}
         >
-          <div className="space-y-2">
+          <div className="space-y-1.5 pt-1">
             {columns.map((column) => (
-              <div key={column.id} className="flex items-center gap-2">
+              <div key={column.id} className="flex items-center gap-2 group">
                 <CheckboxItem
                   key={column.id}
                   checked={isChecked("statuses", column.id)}
@@ -246,7 +246,9 @@ const ElacticSearchFilter = ({
                     handleCheckboxChange("statuses", column.id, checked)
                   }
                 ></CheckboxItem>
-                <StatusBadge columnId={column.id} projectId={projectId!} />
+                <div className="transition-all group-hover:translate-x-1 scale-90 origin-left">
+                  <StatusBadge columnId={column.id} projectId={projectId!} />
+                </div>
               </div>
             ))}
           </div>
@@ -270,19 +272,21 @@ const FilterSection = ({
   toggleSection: (section: string) => void;
 }) => {
   return (
-    <div className="pb-4">
+    <div className="pb-2">
       <button
         onClick={() => toggleSection(section)}
-        className="flex w-full items-center justify-between py-2 text-sm font-semibold text-gray-700 transition-colors hover:text-blue-600"
+        className="flex w-full items-center justify-between py-1 transition-all group cursor-pointer"
       >
-        {title}
+        <span className="font-headline text-[9px] font-black text-emerald-900/30 uppercase tracking-[0.2em] group-hover:text-emerald-600 transition-colors">
+          {title}
+        </span>
         <ChevronDown
-          size={16}
-          className={`cursor-pointer transition-transform ${expandedSections[section] ? "rotate-180" : ""}`}
+          size={14}
+          className={`text-emerald-200 group-hover:text-emerald-600 transition-all ${expandedSections[section] ? "rotate-180" : ""}`}
         />
       </button>
       {expandedSections[section] && (
-        <div className="mt-1 space-y-2">{children}</div>
+        <div className="">{children}</div>
       )}
     </div>
   );
@@ -296,13 +300,31 @@ const CheckboxItem = ({
   checked: boolean;
   onChange: (checked: boolean) => void;
 }) => (
-  <label className="flex cursor-pointer items-center gap-2">
-    <input
-      type="checkbox"
-      checked={checked}
-      onChange={(e) => onChange(e.target.checked)}
-      className="border-border rounded border"
-    />
-    {label && <span className="text-foreground text-sm">{label}</span>}
+  <label className="flex cursor-pointer items-center gap-3 group">
+    <div className="relative flex items-center justify-center">
+      <input
+        type="checkbox"
+        checked={checked}
+        onChange={(e) => onChange(e.target.checked)}
+        className="peer h-4 w-4 cursor-pointer appearance-none rounded-md border-2 border-emerald-100 bg-white transition-all checked:bg-emerald-600 checked:border-emerald-600 hover:border-emerald-400 shadow-sm"
+      />
+      <svg
+        className="absolute h-3.5 w-3.5 text-white opacity-0 transition-opacity peer-checked:opacity-100 pointer-events-none"
+        fill="none"
+        viewBox="0 0 24 24"
+        stroke="currentColor"
+        strokeWidth="4"
+      >
+        <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+      </svg>
+    </div>
+    {label && (
+      <span className="text-xs font-bold text-emerald-950 group-hover:text-emerald-600 transition-colors">
+        {label}
+      </span>
+    )}
   </label>
 );
+
+
+

@@ -147,17 +147,25 @@ export const KanbanColumn = ({
     </div>
   );
   return (
-    <div ref={setNodeRef} className="mx-1 w-80 rounded bg-gray-100 py-2">
-      <div className="flex items-center justify-between p-2">
-        <div className="flex items-center gap-1">
-          <h2 className="text-sm font-medium text-gray-500">{column?.name}</h2>
-          <span className="rounded-sm bg-gray-300 px-2 text-xs font-medium text-gray-500">
-            {column?.issues?.length ?? 0}
-          </span>
-
-          {column?.name === "DONE" && (
-            <Check className="ml-2 text-emerald-500" size={20} />
-          )}
+    <div
+      ref={setNodeRef}
+      className={`mx-1 w-80 min-w-80 rounded-md bg-[#f9f9f8]/80 border border-[#e8e8e7] flex flex-col h-fit max-h-full transition-colors duration-200 ${isOver ? "bg-[#f0fdf4] border-[#064e3b]/20" : ""}`}
+    >
+      <div className="flex items-center justify-between p-4 pb-2">
+        <div className="flex items-center gap-3">
+          <div className="flex flex-row items-center gap-2">
+            <h2 className="text-[11px] font-bold text-[#064e3b] font-manrope uppercase tracking-widest leading-none">
+              {column?.name}
+            </h2>
+            <div className="flex items-center gap-2">
+              <span className="text-[9px] font-black bg-[#064e3b] text-white px-1.5 py-0.5 rounded-md min-w-[20px] text-center shadow-sm">
+                {column?.issues?.length ?? 0}
+              </span>
+              {column?.name === "DONE" && (
+                <Check className="text-[#059669]" size={12} strokeWidth={4} />
+              )}
+            </div>
+          </div>
         </div>
         <Popover
           content={content}
@@ -165,40 +173,34 @@ export const KanbanColumn = ({
           placement="bottomRight"
           open={popoverOpen}
           onOpenChange={setPopoverOpen}
+          overlayClassName="premium-popover"
         >
-          <div className="cursor-pointer rounded-md p-2 transition-all hover:bg-gray-200">
-            <LuEllipsisVertical className="text-gray-500" />
+          <div className="cursor-pointer rounded-md p-2 transition-all hover:bg-[#064e3b]/10 text-[#064e3b]/60 hover:text-[#064e3b]">
+            <LuEllipsisVertical size={18} />
           </div>
         </Popover>
       </div>
+
       <SortableContext
         strategy={horizontalListSortingStrategy}
         items={column?.issues?.map((issue) => issue?.id) || []}
       >
-        <div className="flex h-full flex-col overflow-auto p-2 px-3 pb-32">
+        <div className="flex flex-col overflow-y-auto px-3 pb-6 pt-2 custom-scrollbar min-h-[150px]">
           {column?.issues?.map((issue) => {
             const newColumn: IColumn = { ...column };
             delete (newColumn as any).issues;
             const newIssue: IIssue = { ...issue, column: newColumn };
 
             return (
-              <div key={issue?.id} className="group relative">
+              <div key={issue?.id} className="group relative mb-3">
+                {/* Drop Indicator */}
                 <div
                   style={{
                     opacity: isDragging && issue?.id === overItemId ? 1 : 0,
                   }}
-                  className="absolute top-[-2px] left-0 z-50 flex w-full flex-row items-center"
+                  className="absolute top-[-6px] left-0 z-50 flex w-full flex-row items-center transition-opacity duration-200"
                 >
-                  <div className="h-[2px] w-full bg-emerald-500" />
-                </div>
-
-                <div
-                  style={{
-                    opacity: isDragging && issue?.id === overItemId ? 1 : 0,
-                  }}
-                  className="absolute top-[-6px] left-[-10px] z-50 flex w-full flex-row items-center"
-                >
-                  <div className="z-50 rounded-[100%] border border-emerald-500 p-1" />
+                  <div className="h-[3px] w-full bg-[#064e3b] rounded-full shadow-[0_0_8px_rgba(6,78,59,0.5)]" />
                 </div>
 
                 <IssueCard issue={newIssue} />
@@ -206,27 +208,20 @@ export const KanbanColumn = ({
             );
           })}
 
-          <div className="group relative">
+          {/* Empty state or tail drop indicator */}
+          <div className="relative h-2">
             <div
               style={{
-                opacity: isDragging && isOver ? 1 : 0,
+                opacity: isDragging && isOver && column.issues.length === 0 ? 1 : 0,
               }}
-              className="absolute top-[-2px] left-0 z-50 flex w-full flex-row items-center"
+              className="absolute top-0 left-0 z-50 flex w-full flex-row items-center transition-opacity duration-200"
             >
-              <div className="h-[2px] w-full bg-emerald-500" />
-            </div>
-
-            <div
-              style={{
-                opacity: isDragging && isOver ? 1 : 0,
-              }}
-              className="absolute top-[-6px] left-[-10px] z-50 flex w-full flex-row items-center"
-            >
-              <div className="z-50 rounded-[100%] border border-emerald-500 p-1" />
+              <div className="h-[3px] w-full bg-[#064e3b] rounded-full shadow-[0_0_8px_rgba(6,78,59,0.5)]" />
             </div>
           </div>
         </div>
       </SortableContext>
+
       {showRenameColumnModal && (
         <RenameColumnModal
           onClose={() => {

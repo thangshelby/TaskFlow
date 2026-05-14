@@ -6,14 +6,14 @@ import { queryClient } from "@libs/apis/react-query";
 import { useAuthStore } from "@libs/store/useAuthStore";
 import { useUserTeamStore } from "@libs/store/useProjectStore";
 
-export const useProjectTeams = (projectId: string) => {
+export const useProjectTeams = (projectId: string, isFetch?: boolean) => {
   const { data, isLoading, error } = useQuery({
     queryKey: ["teams", projectId],
     queryFn: async () => {
       const { data } = await teams.getAll(projectId);
       return data;
     },
-    enabled: !!projectId,
+    enabled: !!projectId && (isFetch ?? true),
   });
   return {
     teams: data?.data,

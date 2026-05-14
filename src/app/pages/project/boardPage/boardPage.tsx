@@ -16,9 +16,7 @@ const SprintInsight = lazy(
 const ViewSettingsTooltip = lazy(
   () => import("@libs/app/components/projects/board/viewSettingsTooltip"),
 );
-// const CompleteSprintModal = lazy(
-//   () => import("@libs/app/components/projects/modals/completeSprintModal"),
-// );
+
 import { useParams } from "react-router-dom";
 
 const IssueDetailModal = lazy(
@@ -39,7 +37,7 @@ const BoardPage: React.FC = () => {
   const [_, startTransition] = useTransition();
   return (
     <BoardContextProvider>
-      <div className="h-full bg-white">
+      <div className="h-full">
         <Helmet>
           <title>Board - Task Flow</title>
         </Helmet>
@@ -55,50 +53,56 @@ const BoardPage: React.FC = () => {
                 } as ListProjectColumnsParams);
               }}
             />
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-3">
               <Button
-                onClick={() => {}}
+                onClick={() => { }}
                 type="button"
                 title="Complete sprint"
-                variant="secondary"
-                className="inline-flex cursor-pointer items-center gap-1 rounded-sm border border-gray-300 bg-white p-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
+                variant="primary"
+                className=""
+                size="md"
               >
                 <span>Complete sprint</span>
               </Button>
+
+              <div className="h-6 w-px bg-[#e8e8e7] mx-1" />
+
               <Button
                 type="button"
                 title="Refresh"
-                variant="secondary"
-                className="inline-flex cursor-pointer items-center gap-1 rounded-sm border border-gray-300 bg-white p-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
+                variant="outline"
+                className="p-2"
               >
-                <RefreshCcw className="text-md" size={20} fontSize={800} />
+                <RefreshCcw size={18} />
               </Button>
+
               <Button
                 title="Sprint Detail"
                 type="button"
-                variant="secondary"
-                className="inline-flex cursor-pointer items-center gap-1 rounded-sm border border-gray-300 bg-white p-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
+                variant="outline"
+                className="p-2"
                 onClick={() =>
                   startTransition(() => {
                     setIsInsightOpen(true);
                   })
                 }
               >
-                <FaChartLine className="text-md" size={20} fontSize={800} />
+                <FaChartLine size={18} />
               </Button>
+
               <div className="relative">
                 <Button
                   title="View Settings"
                   type="button"
-                  variant="secondary"
+                  variant="outline"
                   onClick={() =>
                     startTransition(() => {
                       setIsViewSettingsOpen(!isViewSettingsOpen);
                     })
                   }
-                  className="inline-flex cursor-pointer items-center gap-1 rounded-sm border border-gray-300 bg-white p-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
+                  className="p-2"
                 >
-                  <Settings className="text-md" size={20} fontSize={800} />
+                  <Settings size={18} />
                 </Button>
 
                 {/* View Settings Tooltip */}

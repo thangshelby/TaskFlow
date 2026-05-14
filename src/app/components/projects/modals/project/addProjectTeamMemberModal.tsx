@@ -2,6 +2,7 @@ import Modal from "@libs/app/components/general-components/modal/modal";
 import { useState } from "react";
 import FindUser from "@libs/app/components/general-components/findUser";
 import { useAddProjectMemberToTeam } from "@libs/hooks/apis/useProjectMember";
+import "@libs/app/components/projects/modals/modal.css";
 interface AddProjectTeamMemberModalProps {
   isOpen: boolean;
   onClose: () => void;
@@ -38,6 +39,7 @@ const AddProjectTeamMemberModal = ({
       buttonContent="Add"
       onSubmit={handleAddProjectMemberToTeam}
       isSubmitDisabled={selectedUserIds.length === 0}
+      className="rounded-xl border border-white/40 shadow-2xl glass-panel"
     >
       <div className="flex max-w-md flex-col gap-4">
         <p className="text-sm text-gray-500">

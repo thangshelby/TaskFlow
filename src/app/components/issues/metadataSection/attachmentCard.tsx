@@ -3,6 +3,7 @@ import { formatDate } from "@libs/utils/date";
 import { FaDownload } from "react-icons/fa";
 import { TbTrashXFilled } from "react-icons/tb";
 import { toast } from "react-toastify";
+import { Image } from "antd";
 
 const AttachmentCard = ({
   attachment,
@@ -47,13 +48,19 @@ const AttachmentCard = ({
 
   return (
     <div className="group relative flex h-32 w-36 cursor-pointer flex-col rounded-xs shadow-2xl">
-      <div className="relative">
-        <img
+      <div className="relative overflow-hidden rounded-t-xs">
+        <Image
           src={attachment.url}
           alt="Attachment"
-          className="h-20 w-full object-cover hover:bg-gray-100"
+          className="h-22 w-full object-cover transition-all duration-300 group-hover:scale-110"
+          preview={{
+            mask: (
+              <div className="flex h-full w-full items-center justify-center bg-black/40 text-[10px] font-black uppercase tracking-widest text-white backdrop-blur-[2px]">
+                View
+              </div>
+            ),
+          }}
         />
-        <div className="absolute top-0 right-0 z-50 h-full w-full bg-black/30 opacity-0 duration-150 group-hover:opacity-100" />
       </div>
 
       <div className="flex flex-col p-1">

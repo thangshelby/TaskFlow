@@ -5,7 +5,7 @@ import { uploadFileToCloudinary } from "@libs/utils/file";
 import { useUpdateIssue } from "@libs/hooks/apis/useIssue";
 import { useSpeechToText } from "@libs/hooks/common/useSpeechToText";
 import { FaMicrophone, FaStop } from "react-icons/fa";
-import "../../projects/modals/issue/createIssueModal.css";
+import { Image } from "antd";
 
 export default function TextEditor({
   initialDeltaString,
@@ -27,6 +27,31 @@ export default function TextEditor({
   );
 
   const { updateIssueAsync } = useUpdateIssue({ projectId });
+  const [isSaving, setIsSaving] = useState(false);
+  const [previewImage, setPreviewImage] = useState("");
+  const [previewOpen, setPreviewOpen] = useState(false);
+
+  useEffect(() => {
+    const handleImageClick = (e: MouseEvent) => {
+      const target = e.target as HTMLElement;
+      if (target.tagName === "IMG") {
+        const src = (target as HTMLImageElement).src;
+        setPreviewImage(src);
+        setPreviewOpen(true);
+      }
+    };
+
+    const editorRoot = quillRef.current?.root;
+    if (editorRoot) {
+      editorRoot.addEventListener("click", handleImageClick);
+    }
+
+    return () => {
+      if (editorRoot) {
+        editorRoot.removeEventListener("click", handleImageClick);
+      }
+    };
+  }, [quillRef.current]);
 
   useEffect(() => {
     const toolbarOptions = [
@@ -70,25 +95,32 @@ export default function TextEditor({
   }, [initialDeltaString]);
 
   const handleSaveDescription = async () => {
-    if (!quillRef.current) return;
+    if (!quillRef.current || isSaving) return;
 
-    const rawDelta: Delta = quillRef.current.getContents();
-    const { delta, updatedAttachments } = await handleProcessDelta(rawDelta);
+    try {
+      setIsSaving(true);
+      const rawDelta: Delta = quillRef.current.getContents();
+      const { delta, updatedAttachments } = await handleProcessDelta(rawDelta);
 
-    const plainText = quillRef.current.getText();
+      const plainText = quillRef.current.getText();
 
-    const description = {
-      plainText,
-      delta,
-    };
-    await updateIssueAsync({
-      id: issueId,
-      data: {
-        description: JSON.stringify(description),
-        attachments: updatedAttachments,
-      },
-    });
-    handleClose();
+      const description = {
+        plainText,
+        delta,
+      };
+      await updateIssueAsync({
+        id: issueId,
+        data: {
+          description: JSON.stringify(description),
+          attachments: updatedAttachments,
+        },
+      });
+      handleClose();
+    } catch (error) {
+      console.error("Failed to save description:", error);
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   const handleProcessDelta = async (
@@ -165,15 +197,15 @@ export default function TextEditor({
   });
 
   return (
-    <div className="flex w-full flex-col gap-2">
+    <div className="flex w-full flex-col gap-2 p-4">
       {/* Speech to text control above editor */}
       <div className="flex items-center gap-2">
-        <p className="py-1 text-sm font-bold text-gray-600">Description</p>
+        <p className="text-[11px] font-black uppercase tracking-widest text-[#064e3b]/60">Description</p>
         {isSpeechSupported && (
           <button
             type="button"
             onClick={toggleListening}
-            className={`stt-mic-btn cursor-pointer ${isListening ? "stt-mic-btn--active" : ""}`}
+            className={`stt-mic-btn cursor-pointer transition-all duration-300 hover:scale-110 active:scale-95 ${isListening ? "stt-mic-btn--active bg-red-100 text-red-500!" : "text-[#064e3b]/40 hover:text-[#064e3b]"}`}
             title={isListening ? "Stop dictation" : "Start dictation"}
           >
             {isListening ? (
@@ -184,42 +216,67 @@ export default function TextEditor({
           </button>
         )}
         {isListening && (
-          <span className="stt-status-badge">
-            <span className="stt-pulse" />
+          <span className="stt-status-badge animate-pulse bg-red-50 text-red-600 text-[10px] font-bold px-2 py-0.5 rounded-full flex items-center gap-1">
+            <span className="h-1.5 w-1.5 rounded-full bg-red-500 animate-ping" />
             Listening...
           </span>
         )}
       </div>
 
       <div
-        className={`rounded border transition-colors ${isListening
-            ? "border-red-400 shadow-[0_0_0_2px_rgba(248,113,113,0.2)]"
-            : "border-gray-300 focus-within:border-emerald-500"
-          }`}
+        className={`rounded-md border transition-all duration-300 ${isListening
+          ? "border-red-400 shadow-[0_0_0_2px_rgba(248,113,113,0.1)]"
+          : "border-[#064e3b]/10 focus-within:border-[#064e3b]/30 focus-within:ring-2 focus-within:ring-[#064e3b]/5"
+          } bg-[#fcfcfb]/30 overflow-hidden [&_.ql-toolbar]:border-none [&_.ql-toolbar]:bg-gray-50/50 [&_.ql-container]:border-none [&_.ql-editor]:min-h-[180px] [&_.ql-editor]:text-[14px] [&_.ql-editor]:font-manrope`}
       >
         <div ref={editorRef} />
       </div>
 
       {isListening && interimText && (
-        <div className="stt-interim-preview">
-          <span className="stt-interim-text">{interimText}</span>
+        <div className="stt-interim-preview bg-gray-50 border-l-2 border-red-400 p-2 rounded-r-md">
+          <span className="stt-interim-text text-sm text-gray-500 italic">{interimText}</span>
         </div>
       )}
 
-      <div className="flex flex-row gap-2 mt-2">
+      <div className="flex flex-row items-center gap-3 mt-1">
         <button
           onClick={handleSaveDescription}
-          className="cursor-pointer rounded-sm bg-emerald-500 px-[10px] py-1 text-sm font-medium text-white"
+          disabled={isSaving}
+          className="flex items-center gap-2 cursor-pointer rounded-md bg-[#064e3b] px-5 py-2 text-sm font-bold text-white transition-all hover:bg-[#053d2e] hover:shadow-md active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed group"
         >
-          Save
+          {isSaving ? (
+            <>
+              <div className="h-3.5 w-3.5 animate-spin rounded-full border-2 border-white/30 border-t-white" />
+              <span>Saving...</span>
+            </>
+          ) : (
+            <>
+              <span>Save</span>
+            </>
+          )}
         </button>
         <button
           onClick={handleClose}
-          className="cursor-pointer rounded-sm bg-transparent px-[10px] py-1 text-sm font-medium text-gray-500 hover:bg-gray-100"
+          disabled={isSaving}
+          className="cursor-pointer rounded-md bg-transparent px-4 py-2 text-sm font-bold text-[#064e3b]/60 transition-all hover:bg-[#064e3b]/5 hover:text-[#064e3b] disabled:opacity-30 disabled:cursor-not-allowed"
         >
           Cancel
         </button>
       </div>
+      
+      {/* Hidden Image for Preview */}
+      {previewImage && (
+        <div className="hidden">
+          <Image
+            src={previewImage}
+            preview={{
+              visible: previewOpen,
+              onVisibleChange: (value) => setPreviewOpen(value),
+              src: previewImage,
+            }}
+          />
+        </div>
+      )}
     </div>
   );
 }

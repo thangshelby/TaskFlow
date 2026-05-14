@@ -83,87 +83,87 @@ const IssueDetail = ({ selectedIssueId }: { selectedIssueId: string }) => {
     // <Suspense fallback={<IssueDetailSkeleton />}>
     <div
       ref={ref}
-      className="z-30 flex h-full w-full flex-1 flex-col gap-4 overflow-y-auto border-l border-gray-200 bg-white p-4 transition-all duration-300"
+      className={`z-30 flex h-full w-full flex-1 flex-col gap-0 overflow-y-auto border-l border-[#064e3b]/5 bg-white transition-all duration-300 font-manrope`}
     >
       <PermissionContext.Provider value={permissionResult}>
         {/* Header */}
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <div className="flex items-center gap-1">
+        <div className="flex items-center justify-between px-6 py-4 border-b border-[#064e3b]/5 bg-[#fcfcfb]/50">
+          <div className="flex items-center gap-3">
+            <div className="flex items-center gap-1.5 px-2 py-1 bg-[#064e3b]/5 rounded-md border border-[#064e3b]/10">
               <TypeBadge isShowLabel={false} type={selectedIssue?.type} />
-              <span className="text-xs font-thin text-gray-600">
+              <span className="text-[11px] font-black text-[#064e3b] uppercase tracking-widest">
                 {selectedIssue?.key}
               </span>
             </div>
           </div>
           <div className="flex flex-row gap-2">
             {IssueDetailHeader.map((item) => (
-              <div
+              <button
                 key={item.key}
                 onClick={item.onClick}
-                className="cursor-pointer rounded-sm border-1 border-gray-300 p-1.5 hover:bg-gray-100"
+                title={item.label}
+                className="flex h-8 w-8 items-center justify-center rounded-lg text-[#064e3b]/60 hover:bg-[#064e3b]/5 hover:text-[#064e3b] transition-all border border-transparent hover:border-[#064e3b]/10 active:scale-90"
               >
                 {item.icon}
-              </div>
+              </button>
             ))}
           </div>
         </div>
 
-        {layout === "horizontal" ? (
-          <PanelGroup
-            style={{ overflowY: "scroll" }}
-            className="overflow-hidden"
-            direction="horizontal"
-          >
-            <Panel
-              style={{ overflowY: "scroll" }}
-
+        <div className="flex flex-1 flex-col overflow-hidden">
+          {layout === "horizontal" ? (
+            <PanelGroup
+              autoSaveId="issue-detail-panels"
+              className="flex-1"
+              direction="horizontal"
             >
-              <div className="flex flex-1 flex-col gap-8 overflow-y-auto pr-2">
-                <MetadataSection
-                  selectedIssue={selectedIssue!}
-                  handleUpdateIssue={handleUpdateIssue}
-                  fileInputRef={fileInputRef}
-                />
+              <Panel defaultSize={40} minSize={30}>
+                <div className="h-full overflow-y-auto px-6 py-6 border-r border-[#064e3b]/5">
+                  <Details
+                    projectId={selectedIssue!.project_id}
+                    selectedIssue={selectedIssue!}
+                    handleUpdateIssue={handleUpdateIssue}
+                    layout={"vertical"}
+                  />
+                  <div className="mt-8 pt-8 border-t border-[#064e3b]/5">
+                    <ActivityIssue issueId={selectedIssue?.id || ""} />
+                  </div>
+                </div>
+              </Panel>
+              <PanelResizeHandle className="w-px bg-[#064e3b]/5 hover:bg-[#064e3b]/20 transition-colors cursor-col-resize" />
+              <Panel defaultSize={60} minSize={40}>
+                <div className="h-full overflow-y-auto px-8 py-6 bg-[#fcfcfb]/30">
+                  <MetadataSection
+                    selectedIssue={selectedIssue!}
+                    handleUpdateIssue={handleUpdateIssue}
+                    fileInputRef={fileInputRef}
+                  />
+                </div>
+              </Panel>
+            </PanelGroup>
+          ) : (
+            <div className="flex flex-col gap-8 px-6 py-6 overflow-y-auto">
+              <MetadataSection
+                selectedIssue={selectedIssue}
+                fileInputRef={fileInputRef}
+                handleUpdateIssue={handleUpdateIssue}
+              />
 
-                <ActivityIssue issueId={selectedIssue?.id || ""} />
-              </div>
-            </Panel>
-            <PanelResizeHandle
-              style={{
-                backgroundColor: "oklch(0.696 0.17 162.48)",
-              }}
-              className="backlog--panel-resize-handle relative w-[2px] cursor-col-resize bg-gray-300 pl-[2px] text-emerald-500 opacity-0 hover:opacity-100"
-            />
-            <Panel minSize={30} maxSize={70} defaultSize={50}>
-              <div className="flex-1 overflow-y-auto pl-2">
+              <div className="pt-4 border-t border-[#064e3b]/5">
                 <Details
-                  projectId={selectedIssue!.project_id}
-                  selectedIssue={selectedIssue!}
+                  projectId={projectId || ""}
+                  selectedIssue={selectedIssue}
                   handleUpdateIssue={handleUpdateIssue}
                   layout={"vertical"}
                 />
               </div>
-            </Panel>
-          </PanelGroup>
-        ) : (
-          <div className="flex flex-col gap-8">
-            <MetadataSection
-              selectedIssue={selectedIssue}
-              fileInputRef={fileInputRef}
-              handleUpdateIssue={handleUpdateIssue}
-            />
 
-            <Details
-              projectId={projectId || ""}
-              selectedIssue={selectedIssue}
-              handleUpdateIssue={handleUpdateIssue}
-              layout={"vertical"}
-            />
-
-            <ActivityIssue issueId={selectedIssue?.id || ""} />
-          </div>
-        )}
+              <div className="pt-8 border-t border-[#064e3b]/5">
+                <ActivityIssue issueId={selectedIssue?.id || ""} />
+              </div>
+            </div>
+          )}
+        </div>
       </PermissionContext.Provider>
     </div>
     // </Suspense>

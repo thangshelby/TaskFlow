@@ -1,5 +1,5 @@
-import React, { lazy, Suspense, useEffect } from "react";
-import { Table, Skeleton } from "antd";
+import React, { lazy, Suspense, useEffect, useMemo } from "react";
+import Table from "antd/es/table";
 import { IIssue } from "@libs/types/issue";
 import { PaginationRes } from "@libs/apis/api";
 import { PermissionContext } from "@libs/app/context/permission.context";
@@ -10,7 +10,7 @@ import { PERMISSIONS_CONFIG } from "@libs/config/permissons.config";
 import { issues as issuesApi } from "@libs/apis/issue";
 import { useQueryClient } from "@tanstack/react-query";
 import { TableRowSelection } from "antd/es/table/interface";
-import { useTableColumns } from "./listTable/tableColumns";
+import { useTableColumns } from "@libs/hooks/pages/useTableColumns";
 import TableFooter from "./listTable/tableFooter";
 import { useIssueStore } from "@libs/store/useIssueStore";
 
@@ -28,6 +28,49 @@ interface ListTableProps {
   projectId: string;
   maxHeightListTable: number;
 }
+
+const MemoizedTableRow = React.memo(({
+  issue,
+  user,
+  userTeams,
+  rowProps
+}: {
+  issue: IIssue;
+  user: any;
+  userTeams: any;
+  rowProps: any
+}) => {
+  const permissionResult = usePermission({
+    user: user,
+    action: PERMISSIONS_CONFIG.issue.update,
+    resource: {
+      issue: {
+        issue: issue,
+        teams: userTeams,
+      },
+    },
+  });
+
+  const { children, ...rest } = rowProps;
+
+  return (
+    <PermissionContext.Provider value={permissionResult}>
+      <tr
+        {...rest}
+        onClick={(e) => {
+          e.preventDefault();
+          e.stopPropagation();
+        }}
+        className={`transition-colors duration-200 ${permissionResult.isAllow
+          ? "cursor-pointer hover:bg-[#f0fdf4]"
+          : "cursor-not-allowed"
+          }`}
+      >
+        {children}
+      </tr>
+    </PermissionContext.Provider>
+  );
+});
 
 const ListTable = ({
   isFetching,
@@ -96,10 +139,69 @@ const ListTable = ({
     });
     return response.data;
   };
-  type DataTypeWithKey = IIssue & { key: React.Key };
 
+  const components = useMemo(() => ({
+    body: {
+      row: (props: any) => {
+        const issueId = props["data-row-key"];
+        const issue = issues.find((i: IIssue) => i.id === issueId);
+
+        if (!issue) return <tr {...props} />;
+
+        return (
+          <MemoizedTableRow
+            issue={issue}
+            user={user}
+            userTeams={userTeams}
+            rowProps={props}
+          />
+        );
+      },
+    },
+  }), [issues, user, userTeams]);
+
+  if (issues.length === 0 || dataSource.length === 0) {
+    return null
+  }
   return (
-    <div>
+    <>
+      <Table
+        loading={isFetching}
+        columns={tableColumns}
+        dataSource={dataSource}
+        bordered={true}
+        className="premium-table"
+        scroll={{ y: maxHeightListTable || 1000, x: 1000 }}
+        rowSelection={{
+          ...rowSelection,
+        }}
+        rowKey="id"
+        expandable={{
+          childrenColumnName: "children",
+          expandedRowKeys: expandedRowKeys,
+          onExpand: (isExpanded, record) => {
+            if (isExpanded) {
+              handleGetEpicIssueChildren(record);
+              setExpandedRowKeys((prev) => [...prev, record.id]);
+            } else {
+              setExpandedRowKeys((prev) =>
+                prev.filter((key) => key !== record.id),
+              );
+            }
+          },
+          fixed: "right",
+        }}
+        footer={() => (
+          <TableFooter
+            selectedRowKeys={selectedRowKeys}
+            onCreateClick={() => setIsCreateOpen(true)}
+            visibleCount={dataSource?.length || 0}
+            totalCount={pagination?.total_items || 0}
+          />
+        )}
+        pagination={false}
+        components={components}
+      />
       <Suspense fallback={null}>
         {isCreateOpen && (
           <CreateIssueModal
@@ -110,102 +212,7 @@ const ListTable = ({
         )}
         <IssueDetailModal />
       </Suspense>
-      {isFetching || !user || !userTeams ? (
-        //  TABLE SKELETON
-        <Table
-          loading={isFetching}
-          rowKey="key"
-          pagination={false}
-          bordered={true}
-          scroll={{ y: maxHeightListTable || 700, x: 1000 }}
-          dataSource={
-            [...Array(8)].map((_, index) => ({
-              key: `key${index}`,
-            })) as DataTypeWithKey[]
-          }
-          rowSelection={{ ...rowSelection }}
-          columns={tableColumns.map((column) => ({
-            ...column,
-            render: function renderPlaceholder() {
-              return (
-                <div className="flex items-center justify-center p-2">
-                  <Skeleton active={true} title paragraph={false} />
-                </div>
-              );
-            },
-          }))}
-        />
-      ) : (
-        //  TABLE
-        <Table
-          loading={isFetching}
-          columns={tableColumns}
-          dataSource={dataSource}
-          bordered={true}
-          scroll={{ y: maxHeightListTable || 1000, x: 1000 }}
-          rowSelection={{ ...rowSelection }}
-          rowKey="id"
-          expandable={{
-            childrenColumnName: "children",
-            expandedRowKeys: expandedRowKeys,
-            onExpand: (isExpanded, record) => {
-              if (isExpanded) {
-                handleGetEpicIssueChildren(record);
-                setExpandedRowKeys((prev) => [...prev, record.id]);
-              } else {
-                setExpandedRowKeys((prev) =>
-                  prev.filter((key) => key !== record.id),
-                );
-              }
-            },
-            fixed: "right",
-          }}
-          footer={() => (
-            <TableFooter
-              selectedRowKeys={selectedRowKeys}
-              onCreateClick={() => setIsCreateOpen(true)}
-              visibleCount={dataSource?.length || 0}
-              totalCount={pagination?.total_items || 0}
-            />
-          )}
-          pagination={false}
-          components={{
-            body: {
-              row: (props: any) => {
-                const issue = issues.find(
-                  (i) => i.id === props["data-row-key"],
-                );
-                const permissionResult = usePermission({
-                  user: user,
-                  action: PERMISSIONS_CONFIG.issue.update,
-                  resource: {
-                    issue: {
-                      issue: issue!,
-                      teams: userTeams!,
-                    },
-                  },
-                });
-                const { children, ...rest } = props;
-                return (
-                  <PermissionContext.Provider value={permissionResult}>
-                    <tr
-                      {...rest}
-                      onClick={(e) => {
-                        e.preventDefault();
-                        e.stopPropagation();
-                      }}
-                      className={`hover:bg-gray-100 ${permissionResult.isAllow ? "cursor-pointer" : "cursor-not-allowed"}`}
-                    >
-                      {children}
-                    </tr>
-                  </PermissionContext.Provider>
-                );
-              },
-            },
-          }}
-        />
-      )}
-    </div>
+    </>
   );
 };
 

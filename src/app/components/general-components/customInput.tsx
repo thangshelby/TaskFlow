@@ -46,7 +46,7 @@ const CustomInput = ({
   }, [show]);
 
   return (
-    <div className={`relative w-full ${containerClassName}`}>
+    <div className={`relative w-full z-50 ${containerClassName}`}>
       {show ? (
         <input
           autoFocus
@@ -58,7 +58,7 @@ const CustomInput = ({
           }}
           value={updatedValue ? updatedValue : value}
           onChange={(e) => setUpdatedValue(e.target.value)}
-          className={`w-full rounded-md border-2 border-green-500 p-1 outline-none ${contentClassName}`}
+          className={`w-full rounded-sm border-2 border-[#064e3b] bg-white p-1 text-sm font-semibold text-[#064e3b] font-manrope outline-none shadow-[0_0_15px_rgba(6,78,59,0.1)] transition-all ${contentClassName}`}
           onKeyDown={(e) => {
             if (e.key === "Enter") {
               handleClose();
@@ -73,7 +73,7 @@ const CustomInput = ({
       ) : (
         <div className="group relative flex w-full flex-row items-center justify-start gap-1">
           <span
-            className={`inline-block cursor-pointer text-sm ${value ? "rounded-sm bg-gray-200 px-2 py-0.5 font-thin text-gray-900" : "font-semibold text-gray-500"} ${contentClassName}`}
+            className={`inline-block cursor-pointer text-sm font-semibold transition-colors ${value ? "text-[#064e3b]" : "text-[#064e3b]/40"} hover:text-[#064e3b] ${contentClassName}`}
             onClick={() => handleShow()}
           >
             {value ? value : "None"}
@@ -81,12 +81,13 @@ const CustomInput = ({
           {field == "summary" && (
             <Tooltip title="Edit summary">
               <button
-                className="opacity-0 group-hover:opacity-100"
-                onClick={() => {
+                className="opacity-0 group-hover:opacity-100 transition-opacity p-1.5 rounded-lg hover:bg-[#064e3b]/5 text-[#064e3b]/30 hover:text-[#064e3b]"
+                onClick={(e) => {
+                  e.stopPropagation();
                   handleShow();
                 }}
               >
-                <Edit size={16} className="font-bold text-gray-700" />
+                <Edit size={14} className="font-bold" />
               </button>
             </Tooltip>
           )}
@@ -94,32 +95,26 @@ const CustomInput = ({
       )}
 
       {show && (
-        <div className="absolute top-full right-0 z-50 flex translate-y-1 gap-1">
+        <div className="absolute top-full right-0 z-100 flex translate-y-2 gap-2 animate-in fade-in slide-in-from-top-1 duration-200">
           <button
             onMouseDown={(e) => e.preventDefault()}
-            style={{
-              boxShadow: "4px 8px 16px rgba(0,0,0,0.2)",
-            }}
             onClick={() => {
               handleClose();
               handleUpdateIssue(field, updatedValue);
             }}
-            className="z-50 flex cursor-pointer items-center justify-center rounded-md bg-white p-2 shadow-2xl hover:bg-gray-200"
+            className="flex h-7 w-7 cursor-pointer items-center justify-center rounded-md bg-[#064e3b] text-white shadow-lg hover:bg-[#059669] transition-all active:scale-90"
           >
-            <Check size={18} className="text-gray-900" />
+            <Check size={18} />
           </button>
           <button
             onMouseDown={(e) => e.preventDefault()}
-            style={{
-              boxShadow: "-4px 8px 16px rgba(0,0,0,0.2)",
-            }}
             onClick={() => {
               setUpdatedValue(value);
               handleClose();
             }}
-            className="z-50 flex cursor-pointer items-center justify-center rounded-md bg-white p-2 shadow-md hover:bg-gray-200"
+            className="flex h-7 w-7 cursor-pointer items-center justify-center rounded-md bg-white text-[#064e3b] border border-[#064e3b]/10 shadow-md hover:bg-red-50 hover:text-red-500 hover:border-red-200 transition-all active:scale-90"
           >
-            <X size={18} className="text-gray-900" />
+            <X size={18} />
           </button>
         </div>
       )}

@@ -32,9 +32,9 @@ export default function WhyChoose() {
       <div className="mx-auto max-w-7xl">
         <div className="mb-12 text-center">
           <h2 className="mb-2 text-4xl font-bold text-gray-800">
-            Why Choose My-Task
+            Why Choose Taskflow
           </h2>
-          <p className="text-gray-600">Best Feature Available in My-Task App</p>
+          <p className="text-gray-600">Best Feature Available in Taskflow App</p>
         </div>
 
         <div className="grid grid-cols-2 gap-10 md:grid-cols-4 lg:grid-cols-6">
@@ -129,7 +129,7 @@ function IconItem({
 }) {
   return (
     <div className="flex flex-col items-center gap-3">
-      <div className="flex h-20 w-20 items-center justify-center rounded-lg bg-gray-100">
+      <div className="flex h-20 w-20 items-center justify-center rounded-lg bg-[#f0f9f0]">
         {children}
       </div>
       <span className="text-center text-sm font-medium text-gray-700">

@@ -1,5 +1,6 @@
 import Modal from "@libs/app/components/general-components/modal/modal";
 import { useState } from "react";
+import "@libs/app/components/projects/modals/modal.css";
 
 const RenameColumnModal = ({ onClose, onSubmit }: { onClose: () => void; onSubmit: (newName: string) => void }) => {
   const [newName, setNewName] = useState("");
@@ -14,7 +15,14 @@ const RenameColumnModal = ({ onClose, onSubmit }: { onClose: () => void; onSubmi
   };
 
   return (
-    <Modal title={"Update column name"} onClose={onClose} buttonContent={"Update"} onSubmit={handleSubmit} isLoadingButton={false}>
+    <Modal
+      title={"Update column name"}
+      onClose={onClose}
+      buttonContent={"Update"}
+      onSubmit={handleSubmit}
+      isLoadingButton={false}
+      className="rounded-xl border border-white/40 shadow-2xl glass-panel"
+    >
       <div>
         <input
           id="title"
