@@ -36,11 +36,11 @@ const RoadmapPage: React.FC = () => {
   } = useRoadmapPage({ projectId: projectId || "" });
 
   return (
-    <div className="flex h-full w-full flex-col gap-6 bg-white pb-32">
+    <div className="flex h-full w-full flex-col gap-6 -m-6">
       <Helmet>
         <title>Roadmap - Task Flow</title>
       </Helmet>
-      <h1 className="text-2xl font-bold text-gray-700">Roadmap Page</h1>
+
 
       <div className="flex flex-1 overflow-auto">
         <DndContext
@@ -67,7 +67,7 @@ const RoadmapPage: React.FC = () => {
                 minSize={60}
                 maxSize={100}
               >
-                <div className="flex h-full flex-col gap-6 pr-4">
+                <div className="flex h-full flex-col gap-6 pr-4 p-6 mr-2">
                   <RoadmapFilter
                     initialFilters={filters}
                     setSearchParams={setFilters}
@@ -93,6 +93,7 @@ const RoadmapPage: React.FC = () => {
                   }}
                   className="backlog--panel-resize-handle relative w-[2px] cursor-col-resize bg-gray-300 pl-[2px] text-emerald-500 opacity-0 hover:opacity-100"
                 />
+
               )}
 
               {isOpenUnscheduledWork && (
@@ -103,7 +104,7 @@ const RoadmapPage: React.FC = () => {
                   maxSize={40}
                   minSize={20}
                 >
-                  <div className="h-full overflow-y-auto p-1">
+                  <div className="h-full overflow-y-auto p-1 ml-2">
                     <UnscheduledWork
                       handleToggleUnscheduledWork={handleToggleUnscheduledWork}
                       projectId={projectId || ""}

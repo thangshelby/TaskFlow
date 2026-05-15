@@ -1,11 +1,12 @@
 import { useState, useEffect } from "react";
 import ProjectTable from "@libs/app/components/admin/projects/ProjectTable";
-import CreateProjectModal from "@libs/app/components/projects/modals/createProjectModal";
+import CreateProjectModal from "@libs/app/components/projects/modals/project/createProjectModal";
 import SearchFilters from "@libs/app/components/admin/common/SearchFilters";
 import { IProject } from "@libs/types/project";
 import { useListUser } from "@libs/hooks/apis/useUser";
 import { useProjects } from "@libs/hooks/apis/useProject";
 import { useDebounce } from "@libs/hooks/common/useDebounce";
+import LoadingFallback from "@libs/app/components/general-components/loadingFallback";
 
 export type ProjectSortField =
   | "name"
@@ -104,7 +105,7 @@ const ProjectsPage = () => {
   };
 
   if (isLoading) {
-    return <div className="flex justify-center p-6">Loading...</div>;
+    return <LoadingFallback />;
   }
 
   return (

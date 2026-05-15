@@ -51,13 +51,16 @@ const ListPage = () => {
     localStorage.setItem(LOCAL_STORAGE_KEY, mode);
   };
   return (
-    <div className="flex flex-1 flex-col overflow-y-hidden">
+    <div className="flex flex-1 flex-col overflow-y-hidden h-full">
       <Helmet>
         <title>List - Task Flow</title>
       </Helmet>
 
-      <div className="flex flex-1 flex-col gap-2 overflow-y-hidden">
-        <h1 className="p-2 text-2xl font-bold text-gray-700">List Issues</h1>
+      <div className="flex flex-1 flex-col gap-4 overflow-y-hidden px-1">
+        <h1 className="p-2 text-2xl font-bold tracking-tight text-[#064e3b] font-manrope">
+          List Issues
+        </h1>
+
         <ListPageHeader
           filters={filters}
           setFilter={setFilter}

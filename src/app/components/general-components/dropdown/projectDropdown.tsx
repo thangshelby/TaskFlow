@@ -9,8 +9,8 @@ const ProjectDropdown = () => {
   const { projects } = useUserProjects({ enabled: open });
 
   const options = (projects || []).map((project) => ({
-    value: project.id,
-    label: project.name,
+    value: project?.id,
+    label: project?.name,
   }));
 
   return (

@@ -14,9 +14,9 @@ export default function Footer() {
         <div className="mb-8 grid gap-8 md:grid-cols-4">
           <div>
             <div className="mb-4 flex items-center gap-2">
-              <ClipboardCheck className="h-8 w-8 text-emerald-600" />
+              <ClipboardCheck className="h-8 w-8 text-[#064e3b]" />
               <span className="text-xl font-semibold text-gray-800">
-                My-Task
+                Taskflow
               </span>
             </div>
             <p className="mb-4 text-sm leading-relaxed text-gray-600">
@@ -40,13 +40,13 @@ export default function Footer() {
             <div className="flex gap-3">
               <a
                 href="#"
-                className="flex h-8 w-8 items-center justify-center rounded bg-gray-200 transition-colors hover:bg-emerald-600 hover:text-white"
+                className="flex h-8 w-8 items-center justify-center rounded bg-gray-200 transition-colors hover:bg-[#064e3b] hover:text-white"
               >
                 <Globe className="h-4 w-4" />
               </a>
               <a
                 href="#"
-                className="flex h-8 w-8 items-center justify-center rounded bg-gray-200 transition-colors hover:bg-emerald-600 hover:text-white"
+                className="flex h-8 w-8 items-center justify-center rounded bg-gray-200 transition-colors hover:bg-[#064e3b] hover:text-white"
               >
                 <svg
                   className="h-4 w-4"
@@ -58,7 +58,7 @@ export default function Footer() {
               </a>
               <a
                 href="#"
-                className="flex h-8 w-8 items-center justify-center rounded bg-gray-200 transition-colors hover:bg-emerald-600 hover:text-white"
+                className="flex h-8 w-8 items-center justify-center rounded bg-gray-200 transition-colors hover:bg-[#064e3b] hover:text-white"
               >
                 <svg
                   className="h-4 w-4"
@@ -70,7 +70,7 @@ export default function Footer() {
               </a>
               <a
                 href="#"
-                className="flex h-8 w-8 items-center justify-center rounded bg-gray-200 transition-colors hover:bg-emerald-600 hover:text-white"
+                className="flex h-8 w-8 items-center justify-center rounded bg-gray-200 transition-colors hover:bg-[#064e3b] hover:text-white"
               >
                 <svg
                   className="h-4 w-4"
@@ -96,7 +96,7 @@ export default function Footer() {
                 <li key={label}>
                   <a
                     href="#"
-                    className="text-sm text-gray-600 transition-colors hover:text-emerald-600"
+                    className="text-sm text-gray-600 transition-colors hover:text-[#064e3b]"
                   >
                     {label}
                   </a>
@@ -118,7 +118,7 @@ export default function Footer() {
                 <li key={label}>
                   <a
                     href="#"
-                    className="text-sm text-gray-600 transition-colors hover:text-emerald-600"
+                    className="text-sm text-gray-600 transition-colors hover:text-[#064e3b]"
                   >
                     {label}
                   </a>
@@ -141,7 +141,7 @@ export default function Footer() {
                 <li key={label}>
                   <a
                     href="#"
-                    className="text-sm text-gray-600 transition-colors hover:text-emerald-600"
+                    className="text-sm text-gray-600 transition-colors hover:text-[#064e3b]"
                   >
                     {label}
                   </a>
@@ -158,13 +158,13 @@ export default function Footer() {
           <div className="flex gap-6">
             <a
               href="#"
-              className="text-sm text-gray-600 transition-colors hover:text-emerald-600"
+              className="text-sm text-gray-600 transition-colors hover:text-[#064e3b]"
             >
               Terms of use
             </a>
             <a
               href="#"
-              className="text-sm text-gray-600 transition-colors hover:text-emerald-600"
+              className="text-sm text-gray-600 transition-colors hover:text-[#064e3b]"
             >
               Privacy Policy
             </a>

@@ -36,23 +36,24 @@ const DropdownFilter = ({
   });
   const { columns } = useProjectColumns({ project_id: projectId as string });
   return (
-    <div className="w-[500px] rounded-lg bg-white shadow-lg">
-      <div className="flex items-center justify-between border-b-[1px] border-gray-200 px-4 py-2">
-        <span className="text-[15px] font-bold text-gray-600">FILTERS</span>
+    <div className="w-[520px] rounded-xl bg-white shadow-2xl font-manrope overflow-hidden border border-[#e8e8e7]">
+      <div className="flex items-center justify-between bg-[#f9f9f8] px-5 py-4 border-b border-[#e8e8e7]">
+        <span className="text-[11px] font-bold text-[#064e3b] uppercase tracking-[0.2em]">FILTERS</span>
         <button
           onClick={handleClearFilters}
-          className="text-sm text-blue-600 hover:text-blue-800"
+          className="text-xs font-bold text-[#059669] hover:text-[#064e3b] hover:underline transition-colors"
         >
           Clear all
         </button>
       </div>
 
-      <div className="flex max-h-[400px] flex-col gap-4 overflow-y-auto px-4 py-4">
+      <div className="flex max-h-[500px] flex-col gap-6 overflow-y-auto px-5 py-6 custom-scrollbar">
         {/* Due Date */}
-        <div className="flex flex-col gap-1">
-          <p className="font-semibold text-gray-700">Due date</p>
+        <div className="flex flex-col gap-2">
+          <p className="text-[10px] font-bold uppercase tracking-widest text-[#064e3b]/60">Due date range</p>
           <RangePicker
-            className="w-full"
+            className="w-full premium-datepicker"
+            separator={<span className="text-[#064e3b]/30">→</span>}
             value={
               filters.due_date_from && filters.due_date_to
                 ? [dayjs(filters.due_date_from), dayjs(filters.due_date_to)]
@@ -65,13 +66,20 @@ const DropdownFilter = ({
                 due_date_to: dates?.[1]?.format("YYYY-MM-DD"),
               });
             }}
+            placeholder={["START DATE", "END DATE"]}
+            style={{
+              height: "36px",
+              borderRadius: "8px",
+              border: "1px solid #e8e8e7",
+              fontFamily: "Manrope, sans-serif"
+            }}
           />
         </div>
 
         {/* Status */}
-        <div className="flex flex-col gap-1">
-          <p className="font-semibold text-gray-700">Status</p>
-          <div className="flex flex-wrap gap-2">
+        <div className="flex flex-col gap-2">
+          <p className="text-[10px] font-bold uppercase tracking-widest text-[#064e3b]/60">Filter by Status</p>
+          <div className="flex flex-wrap gap-2.5">
             {columns.map((column) => (
               <div
                 onClick={() => {
@@ -91,17 +99,22 @@ const DropdownFilter = ({
                   }
                 }}
                 key={column.id}
-                className={`flex items-center rounded-2xl border-[2px] ${filters?.column_ids?.includes(column.id) ? "border-blue-500" : "border-transparent"}`}
+                className={`flex items-center cursor-pointer rounded-2xl transition-all duration-200 border-2 ${
+                  filters?.column_ids?.includes(column.id) 
+                  ? "border-[#064e3b] scale-105 shadow-sm" 
+                  : "border-transparent hover:scale-105"
+                }`}
               >
-                <StatusBadge column={column} size="medium" />
+                <StatusBadge column={column} />
               </div>
             ))}
           </div>
         </div>
+
         {/* Priority */}
-        <div className="flex flex-col gap-1">
-          <p className="font-semibold text-gray-700">Priority</p>
-          <div className="flex flex-row items-center gap-4">
+        <div className="flex flex-col gap-2">
+          <p className="text-[10px] font-bold uppercase tracking-widest text-[#064e3b]/60">Priority Level</p>
+          <div className="flex flex-row items-center gap-3">
             {priorityOptions.map((priority) => (
               <div
                 onClick={() => {
@@ -112,7 +125,11 @@ const DropdownFilter = ({
                   setFilters({ ...filters, priorities: newIds });
                 }}
                 key={priority.name}
-                className={`flex items-center rounded-2xl border-[2px] ${filters?.priorities?.includes(priority.name) ? "border-blue-500" : "border-transparent"}`}
+                className={`flex items-center cursor-pointer rounded-2xl transition-all duration-200 border-2 ${
+                  filters?.priorities?.includes(priority.name) 
+                  ? "border-[#064e3b] scale-110 shadow-sm" 
+                  : "border-transparent hover:scale-110"
+                }`}
               >
                 <PriorityBadge priority={priority.name} isShowLabel={false} />
               </div>
@@ -121,10 +138,11 @@ const DropdownFilter = ({
         </div>
 
         {/* Created at */}
-        <div className="flex flex-col gap-1">
-          <p className="font-semibold text-gray-700">Created at</p>
+        <div className="flex flex-col gap-2">
+          <p className="text-[10px] font-bold uppercase tracking-widest text-[#064e3b]/60">Creation Period</p>
           <RangePicker
-            className="w-full"
+            className="w-full premium-datepicker"
+            separator={<span className="text-[#064e3b]/30">→</span>}
             value={
               filters.created_at_from && filters.created_at_to
                 ? [dayjs(filters.created_at_from), dayjs(filters.created_at_to)]
@@ -137,25 +155,36 @@ const DropdownFilter = ({
                 created_at_to: dates?.[1]?.format("YYYY-MM-DD"),
               });
             }}
+            placeholder={["START DATE", "END DATE"]}
+            style={{
+              height: "36px",
+              borderRadius: "8px",
+              border: "1px solid #e8e8e7",
+              fontFamily: "Manrope, sans-serif"
+            }}
           />
         </div>
 
         {/* Work Type */}
-        <div className="flex flex-col gap-1">
-          <p className="font-semibold text-gray-700">Work type</p>
-          <div className="flex flex-row flex-wrap gap-3">
+        <div className="flex flex-col gap-2">
+          <p className="text-[10px] font-bold uppercase tracking-widest text-[#064e3b]/60">Work Category</p>
+          <div className="flex flex-row flex-wrap gap-4">
             {typeOptions.map((workType) => (
-              <div key={workType.id} className="flex items-center gap-1">
+              <div 
+                key={workType.id} 
+                className="flex items-center gap-2 group cursor-pointer"
+                onClick={() => {
+                  const currentIds = filters.types || [];
+                  const newIds = currentIds.includes(workType.id)
+                    ? currentIds.filter((id: string) => id !== workType.id)
+                    : [...currentIds, workType.id];
+                  setFilters({ ...filters, types: newIds });
+                }}
+              >
                 <Checkbox
                   checked={filters.types?.includes(workType.id)}
-                  onChange={(e) => {
-                    const currentIds = filters.types || [];
-                    const newIds = e.target.checked
-                      ? [...currentIds, workType.id]
-                      : currentIds.filter((id: string) => id !== workType.id);
-                    setFilters({ ...filters, types: newIds });
-                  }}
-                ></Checkbox>
+                  className="premium-checkbox"
+                />
                 <TypeBadge type={workType.id} />
               </div>
             ))}
@@ -163,9 +192,9 @@ const DropdownFilter = ({
         </div>
 
         {/* Assignee */}
-        <div className="flex flex-col gap-1">
-          <p className="font-semibold text-gray-700">Assignee</p>
-          <div className="flex flex-row gap-2">
+        <div className="flex flex-col gap-2">
+          <p className="text-[10px] font-bold uppercase tracking-widest text-[#064e3b]/60">Assigned To</p>
+          <div className="flex flex-row flex-wrap gap-3">
             {projectMembers?.map((assignee) => (
               <div
                 key={assignee.id}
@@ -176,10 +205,14 @@ const DropdownFilter = ({
                     : [...currentIds, assignee.id];
                   setFilters({ ...filters, assignee_ids: newIds });
                 }}
-                className={`flex items-center rounded-full border-[2px] ${filters?.assignee_ids?.includes(assignee.id) ? "border-blue-500" : "border-transparent"}`}
+                className={`flex items-center cursor-pointer rounded-full transition-all duration-200 border-2 ${
+                  filters?.assignee_ids?.includes(assignee.id) 
+                  ? "border-[#064e3b] scale-110 shadow-md" 
+                  : "border-transparent hover:scale-110"
+                }`}
               >
                 <UserAvatar
-                  size={40}
+                  size={36}
                   isDisplayName={false}
                   userId={assignee.user_id}
                 />
@@ -189,17 +222,16 @@ const DropdownFilter = ({
         </div>
       </div>
 
-      <div className="flex justify-end gap-2 border-t border-gray-200 px-4 py-3">
+      <div className="flex justify-end gap-3 bg-[#f9f9f8] border-t border-[#e8e8e7] px-5 py-4">
         <Button
           onClick={() => setIsPopoverOpen(false)}
-          variant="outline"
-          className="bg-gray-100 text-gray-700 hover:bg-gray-200"
+          className="bg-white text-[#064e3b] border border-[#e8e8e7] hover:bg-gray-50 px-6 h-[36px] text-[12px] font-bold uppercase tracking-wider"
         >
           Cancel
         </Button>
         <Button
           onClick={handleSaveFilters}
-          className="bg-blue-600 text-white hover:bg-blue-700"
+          className="bg-[#064e3b] text-white hover:bg-[#059669] shadow-md px-8 h-[36px] text-[12px] font-bold uppercase tracking-wider"
         >
           Apply Filters
         </Button>

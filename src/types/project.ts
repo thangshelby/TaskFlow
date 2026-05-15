@@ -3,12 +3,18 @@ import { IProjectMember } from "@libs/types/projectMember";
 export interface IProject {
   id: string;
   name: string;
+  description?: string;
   key: string;
   access: string;
   type: "Kanban" | "Scrum";
   owner_id: string;
   created_at: string;
   updated_at: string;
+  issues_count?: number;
+  members_count?: number;
+  due_date_from?: string;
+  due_date_to?: string;
+  background_img?: string;
   project_members: IProjectMember[];
 }
 export interface IColumn {
@@ -74,6 +80,40 @@ export interface UserStats {
   by_type: TypeCount[];
   new_issues_count: number;
   recently_updated_count: number;
+}
+
+export interface ProjectSummaryContributor {
+  user_id: string;
+  display_name: string;
+  avatar: string;
+  resolved_count: number;
+  contribution_percent: number;
+}
+
+export interface ProjectSummaryTimelinePoint {
+  date: string;
+  done_issues: number;
+  remaining_scope: number;
+  added_scope: number;
+}
+
+export interface ProjectSummary {
+  by_status: StatusCount[];
+  by_priority: PriorityCount[];
+  by_type: TypeCount[];
+  top_contributors: ProjectSummaryContributor[];
+  timeline: ProjectSummaryTimelinePoint[];
+  total_issues: number;
+  done_issues: number;
+  new_issues_count: number;
+  recently_updated_count: number;
+}
+
+export interface GetProjectSummaryParams {
+  project_id: string;
+  sprint_id?: string;
+  date_from?: string;
+  date_to?: string;
 }
 
 export interface IPermission {

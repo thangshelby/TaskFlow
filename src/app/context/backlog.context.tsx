@@ -18,6 +18,9 @@ interface BacklogContextType {
 
   scrollTop: number;
   setScrollTop: (scrollTop: number) => void;
+
+  editingIssueId: string | null;
+  setEditingIssueId: (id: string | null) => void;
 }
 
 const BacklogContext = createContext<BacklogContextType | undefined>(undefined);
@@ -58,6 +61,14 @@ export const useScrollTop = () => {
   return context;
 };
 
+export const useEditingIssue = () => {
+  const context = useContext(BacklogContext);
+  if (context === undefined) {
+    throw new Error("useEditingIssue must be used within a BacklogProvider");
+  }
+  return context;
+};
+
 interface BacklogProviderProps {
   children: ReactNode;
 }
@@ -75,6 +86,8 @@ export const BacklogProvider: React.FC<BacklogProviderProps> = ({
     height: number;
   }>({ width: 0, height: 0 });
   const [scrollTop, setScrollTop] = useState(0);
+  const [editingIssueId, setEditingIssueId] = useState<string | null>(null);
+
   return (
     <BacklogContext.Provider
       value={{
@@ -86,6 +99,8 @@ export const BacklogProvider: React.FC<BacklogProviderProps> = ({
         setIssueCardSize,
         scrollTop,
         setScrollTop,
+        editingIssueId,
+        setEditingIssueId,
       }}
     >
       {children}

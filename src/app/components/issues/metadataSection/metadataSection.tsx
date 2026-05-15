@@ -58,82 +58,92 @@ const MetadataSection = ({
     });
   };
   return (
-    <div className="flex w-full flex-1 flex-col gap-2">
+    <div className="flex w-full flex-1 flex-col gap-6 font-manrope">
       {/* Summary */}
-      <CustomInput
-        field="summary"
-        value={selectedIssue?.summary || ""}
-        inputType="text"
-        handleUpdateIssue={handleUpdateIssue}
-        containerClassName="flex items-center w-full justify-between"
-        contentClassName="text-sm font-medium! px-1 w-full text-gray-500"
-      />
+      <div className="w-full">
+        <CustomInput
+          field="summary"
+          value={selectedIssue?.summary || ""}
+          inputType="text"
+          handleUpdateIssue={handleUpdateIssue}
+          containerClassName="flex items-center w-full justify-between"
+          contentClassName="text-2xl font-black! text-[#064e3b] px-0 w-full bg-transparent!"
+        />
+      </div>
 
       {/* Description */}
-      <div className="flex w-full flex-col items-start gap-1">
-        <p className="py-1 text-sm font-bold text-gray-600">Description</p>
+      <div className="flex w-full flex-col items-start gap-3 mt-2">
+        {!isShowingTextEditor && (
+          <h3 className="text-[11px] font-black text-[#064e3b]/60 uppercase tracking-widest">
+            Description
+          </h3>
+        )}
 
         {isShowingTextEditor ? (
-          <TextEditor
-            initialDeltaString={selectedIssue?.description || ""}
-            issueId={selectedIssue?.id || ""}
-            projectId={selectedIssue?.project_id || ""}
-            attachments={selectedIssue?.attachments || []}
-            handleClose={() => {
-              setIsShowingTextEditor(false);
-            }}
-          />
+          <div className="w-full rounded-md border border-[#064e3b]/10 bg-white shadow-sm overflow-hidden animate-in fade-in zoom-in-95 duration-200">
+            <TextEditor
+              initialDeltaString={selectedIssue?.description || ""}
+              issueId={selectedIssue?.id || ""}
+              projectId={selectedIssue?.project_id || ""}
+              attachments={selectedIssue?.attachments || []}
+              handleClose={() => {
+                setIsShowingTextEditor(false);
+              }}
+            />
+          </div>
         ) : (
-          <input
-            onChange={() => {}}
-            value={
-              selectedIssue?.description &&
-              selectedIssue!.description[0] === "{"
-                ? JSON.parse(selectedIssue?.description || "{}")?.plainText
-                : selectedIssue?.description
-            }
+          <div 
             onClick={() => {
               startTransition(() => {
                 setIsShowingTextEditor(true);
               });
             }}
-            placeholder="Add a description"
-            className="w-full rounded border border-gray-300 p-2 text-sm outline-none hover:bg-gray-100 focus:border-emerald-500"
-          />
+            className="w-full min-h-[100px] rounded-md border border-[#064e3b]/5 bg-[#fcfcfb]/50 p-4 text-[13px] text-[#064e3b]/90 font-medium cursor-pointer hover:bg-white hover:border-[#064e3b]/20 hover:shadow-sm transition-all group"
+          >
+            {selectedIssue?.description && selectedIssue!.description[0] === "{" 
+              ? JSON.parse(selectedIssue?.description || "{}")?.plainText || <span className="text-[#064e3b]/40 italic">Add a description...</span>
+              : selectedIssue?.description || <span className="text-[#064e3b]/40 italic">Add a description...</span>
+            }
+          </div>
         )}
       </div>
 
       {/* Attachments */}
-      {selectedIssue!.attachments.length ? (
-        <div className="flex w-full flex-col gap-2">
-          <div className="flex flex-row items-center justify-between">
-            <div className="flex flex-row gap-1">
-              <p className="text-sm font-bold text-gray-600">Attachments</p>
-              <div className="bg-gray-300 px-2 text-sm font-medium text-gray-600">
+      <div className="flex w-full flex-col gap-4 mt-2">
+        <div className="flex flex-row items-center justify-between">
+          <div className="flex flex-row items-center gap-2">
+            <h3 className="text-[11px] font-black text-[#064e3b]/60 uppercase tracking-widest">
+              Attachments
+            </h3>
+            {selectedIssue!.attachments.length > 0 && (
+              <span className="flex h-5 items-center justify-center rounded-md bg-[#064e3b]/10 px-2 text-[10px] font-black text-[#064e3b]">
                 {selectedIssue!.attachments.length}
-              </div>
-            </div>
-            <div className="flex flex-row items-center gap-1">
-              <button
-                className="relative cursor-pointer rounded-xs p-1 text-xs text-gray-800 hover:bg-gray-200"
-                onClick={() => fileInputRef?.current?.click()}
-              >
-                <FaPlus />
-                <input
-                  type="file"
-                  onChange={handleFileUpload}
-                  className="absolute top-0 right-0"
-                  multiple
-                  style={{ display: "none" }}
-                  ref={fileInputRef}
-                />
-              </button>
-              <button className="cursor-pointer rounded-xs p-1 text-xs text-gray-800 hover:bg-gray-200">
-                <BsThreeDots />
-              </button>
-            </div>
+              </span>
+            )}
           </div>
-          <div className="flex w-full flex-row gap-1 overflow-x-auto">
+          <div className="flex flex-row items-center gap-1">
+            <button
+              title="Add attachment"
+              className="flex h-7 w-7 items-center justify-center rounded-lg text-[#064e3b]/60 hover:bg-[#064e3b]/5 hover:text-[#064e3b] transition-all border border-transparent hover:border-[#064e3b]/10 active:scale-90"
+              onClick={() => fileInputRef?.current?.click()}
+            >
+              <FaPlus size={10} />
+              <input
+                type="file"
+                onChange={handleFileUpload}
+                className="hidden"
+                multiple
+                ref={fileInputRef}
+              />
+            </button>
+            <button className="flex h-7 w-7 items-center justify-center rounded-lg text-[#064e3b]/40 hover:bg-[#064e3b]/5 hover:text-[#064e3b] transition-all border border-transparent hover:border-[#064e3b]/10 active:scale-90">
+              <BsThreeDots size={14} />
+            </button>
+          </div>
+        </div>
+        
+        {selectedIssue!.attachments.length > 0 ? (
+          <div className="flex w-full flex-row gap-3 overflow-x-auto pb-2 custom-scrollbar">
             {selectedIssue!.attachments.map((attachment, index) => (
               <AttachmentCard
                 key={index}
@@ -142,8 +152,18 @@ const MetadataSection = ({
               />
             ))}
           </div>
-        </div>
-      ) : null}
+        ) : !isShowingTextEditor && (
+           <div 
+             onClick={() => fileInputRef?.current?.click()}
+             className="flex items-center gap-3 p-4 rounded-md border border-dashed border-[#064e3b]/20 bg-[#fcfcfb]/30 text-[#064e3b]/60 hover:bg-[#064e3b]/5 hover:border-[#064e3b]/30 cursor-pointer transition-all group"
+           >
+             <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-white shadow-sm border border-[#064e3b]/10 text-[#064e3b]/40 group-hover:text-[#064e3b] transition-colors">
+               <FaPlus size={12} />
+             </div>
+             <span className="text-xs font-bold font-manrope uppercase tracking-tight">Drop files or click to upload</span>
+           </div>
+        )}
+      </div>
     </div>
   );
 };

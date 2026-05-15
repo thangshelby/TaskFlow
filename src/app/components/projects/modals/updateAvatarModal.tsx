@@ -8,6 +8,7 @@ import { RotationSlider, ZoomSlider } from "../../cropper/slider";
 import { useUpdateUser } from "@libs/hooks/apis/useUser";
 import Modal from "../../general-components/modal/modal";
 import { IUser } from "@libs/types/user";
+import "@libs/app/components/projects/modals/modal.css";
 
 const UpdateAvatarModal = ({
   isOpen,
@@ -60,6 +61,7 @@ const UpdateAvatarModal = ({
       onSubmit={handleUpdateAvatar}
       isLoadingButton={isUploadLoading || isPending}
       buttonContent="Cập nhật ảnh"
+      className="rounded-xl border border-white/40 shadow-2xl glass-panel"
     >
       <div className="relative text-center">
         <h5 className="mb-4 text-gray-800">Edit profile picture</h5>

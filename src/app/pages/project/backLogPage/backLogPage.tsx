@@ -1,4 +1,4 @@
-import React, { useState, lazy, Suspense, useTransition, useRef } from "react";
+import React, { useState, lazy, Suspense, useTransition, useRef, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
 import { Panel, PanelGroup, PanelResizeHandle } from "react-resizable-panels";
@@ -15,12 +15,14 @@ const BacklogEpic = lazy(
 import IssueDetail from "@libs/app/components/issues/IssueDetail";
 import IssueDetailSkeleton from "@libs/app/components/skeleton/issueDetailSkeleton";
 const CreateSprintModal = lazy(
-  () => import("@libs/app/components/projects/modals/createSprintModal"),
+  () => import("@libs/app/components/projects/modals/sprint/createSprintModal"),
 );
 import TypeBadge from "@libs/app/components/general-components/badge/typeBadge";
 import { useBackLogPage } from "@libs/hooks/pages/useBacklogPage";
 import ScrumSprint from "@libs/app/components/projects/backlog/scrumSprint";
 import { ISprint } from "@libs/types/sprint";
+import { Layers } from "lucide-react";
+import LoadingFallback from "@libs/app/components/general-components/loadingFallback";
 
 interface ISprintIssues extends ISprint {
   issues: IIssue[];
@@ -34,6 +36,7 @@ const BackLogPageContent: React.FC = () => {
     limit: 100,
     is_fetch: false,
   });
+  const [isEpicVisible, setIsEpicVisible] = useState(localStorage.getItem("isEpicVisible") === "true" || false);
 
   const [_, startTransition] = useTransition();
 
@@ -49,39 +52,36 @@ const BackLogPageContent: React.FC = () => {
     setIsCreateSprintModalOpen,
     selectedIssueId,
     sensors,
+    isLoadingSprints,
+    isLoadingIssues,
   } = useBackLogPage(projectId);
 
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "e") {
+        handleToggleEpic();
+      }
+    }
+
+    document.addEventListener("keydown", handleKeyDown);
+
+    return () => {
+      document.removeEventListener("keydown", handleKeyDown);
+    }
+
+  }, [isEpicVisible])
+
+  const handleToggleEpic = () => {
+    setIsEpicVisible(!isEpicVisible);
+    localStorage.setItem("isEpicVisible", (!isEpicVisible).toString());
+  }
+
   return (
-    <div ref={containerRef} className="flex h-full flex-col gap-4">
+    <div ref={containerRef} className="flex h-full flex-1 min-h-0 flex-col overflow-hidden -m-6 bg-[#fcfcfb]">
       <Helmet>
         <title>Backlog - Task Flow</title>
       </Helmet>
-      <div className="flex items-center justify-between">
-        <h1 className="p-2 text-2xl font-bold text-gray-700">Backlog Page</h1>
-
-        <Button
-          onClick={() => {
-            startTransition(() => {
-              setIsCreateSprintModalOpen({
-                isOpen: true,
-                sprint: null,
-              });
-            });
-          }}
-          variant="primary"
-          className="font-semibold"
-        >
-          Create Sprint
-        </Button>
-      </div>
-
-      <PageFilter
-        initialFilters={filters}
-        onFiltersChange={(filter) => {
-          setFilters(filter as GetIssuesParams);
-        }}
-      />
-      {!sprintIssues.length ? (
+      {isLoadingSprints || isLoadingIssues ? (
         <BacklogSkeleton />
       ) : (
         <DndContext
@@ -90,7 +90,8 @@ const BackLogPageContent: React.FC = () => {
           onDragOver={handleDragOver}
           onDragEnd={handleDragEnd}
         >
-          <div className="flex flex-1 gap-4 overflow-auto">
+
+          <div className="flex h-full overflow-hidden">
             <SortableContext
               items={sprintIssues
                 .map((sprint) => sprint.id)
@@ -101,85 +102,177 @@ const BackLogPageContent: React.FC = () => {
                 )
                 .concat("no-epic")}
             >
-              <div className="w-[20%]">
-                <BacklogEpic issues={issues} />
-              </div>
-
               <PanelGroup
-                className="flex w-full flex-1"
+                className="flex w-full"
                 autoSaveId="backlog-panel-group"
                 direction="horizontal"
               >
+                {/* Panel Backlog Section */}
                 <Panel
-                  id="backlog-panel"
-                  order={1}
-                  defaultSize={selectedIssueId ? 60 : 100}
+                  id="group-panel"
+                  order={0}
+                  defaultSize={100}
                   minSize={50}
                   maxSize={100}
+                  className="flex flex-col min-w-0"
                 >
-                  <div className="h-full overflow-auto pr-4">
-                    <ul className="flex min-w-[550px] flex-col gap-2 overflow-x-auto">
-                      {sprintIssues?.map((sprint: ISprintIssues) => (
-                        <div key={sprint.id}>
-                          <ScrumSprint
-                            sprint={sprint}
-                            projectId={projectId}
-                            isDragging={isDragging}
-                            setIsCreateSprintModalOpen={(data: {
-                              isOpen: boolean;
-                              sprint?: ISprintIssues | ISprint | null;
-                            }) => {
-                              setIsCreateSprintModalOpen(
-                                data as {
-                                  isOpen: boolean;
-                                  sprint: ISprint | null;
-                                },
-                              );
-                            }}
+                  <div className="flex flex-col gap-4 p-6 pb-0">
+                    <div className="flex justify-between items-center w-full min-w-0">
+                      <div className="flex flex-col">
+                        <h1 className="text-2xl font-black text-[#064e3b] font-manrope uppercase tracking-tight">
+                          Backlog
+                        </h1>
+                        <p className="text-[10px] font-black text-[#064e3b]/90 font-manrope uppercase tracking-widest mt-1">
+                          {sprintIssues.reduce((acc, s) => acc + (s.issues?.length || 0), 0)} ACTIVE TASKS ACROSS {sprintIssues.length} SPRINTS
+                        </p>
+                      </div>
+
+                      <div className="flex items-center gap-3">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          className={`${isEpicVisible ? "bg-[#064e3b]/10 border-[#064e3b] text-[#064e3b]" : ""}`}
+                          onClick={handleToggleEpic}
+                        >
+                          <Layers className="h-4 w-4 mr-2" />
+                          Epics
+                        </Button>
+                        <Button
+                          onClick={() => {
+                            startTransition(() => {
+                              setIsCreateSprintModalOpen({
+                                isOpen: true,
+                                sprint: null,
+                              });
+                            });
+                          }}
+                          variant="primary"
+                          size="sm"
+                        >
+                          Create Sprint
+                        </Button>
+                      </div>
+                    </div>
+
+                    <div className="flex items-center justify-between">
+                      <PageFilter
+                        initialFilters={filters}
+                        onFiltersChange={(filter) => {
+                          setFilters(filter as GetIssuesParams);
+                        }}
+                      />
+                    </div>
+                  </div>
+
+
+                  <div className="flex flex-1 min-h-0 min-w-0 p-6">
+                    <PanelGroup
+                      autoSaveId="backlog-panel-grouped"
+                      className="flex w-full flex-1"
+                      direction="horizontal"
+                    >
+                      {isEpicVisible && (
+                        <>
+                          <Panel
+                            id="epic-panel"
+                            order={0}
+                            defaultSize={15}
+                            minSize={10}
+                            maxSize={35}
+                          >
+                            <div className="h-full overflow-y-auto pr-2">
+                              <Suspense fallback={<LoadingFallback fullPage={false} message="Loading Epics..." />}>
+                                <BacklogEpic issues={issues}
+                                  handleToggleEpic={handleToggleEpic}
+                                />
+                              </Suspense>
+                            </div>
+                          </Panel>
+                          <PanelResizeHandle
+                            className="relative w-[3px] cursor-col-resize bg-[#064e3b]/2 hover:bg-[#064e3b]/10 transition-all mx-1 rounded-full"
                           />
+                        </>
+                      )}
+
+                      <Panel
+                        id="backlog-panel"
+                        order={1}
+                        defaultSize={selectedIssueId ? 65 : 100}
+                        minSize={65}
+                        maxSize={100}
+                      >
+                        <div className="h-full min-w-0 overflow-auto">
+                          <ul className="flex min-w-0 flex-col gap-2">
+                            {sprintIssues?.map((sprint: ISprintIssues) => (
+                              <li list-style="none" key={sprint.id}>
+                                <ScrumSprint
+                                  sprint={sprint}
+                                  projectId={projectId}
+                                  isDragging={isDragging}
+                                  setIsCreateSprintModalOpen={(data: {
+                                    isOpen: boolean;
+                                    sprint?: ISprintIssues | ISprint | null;
+                                  }) => {
+                                    setIsCreateSprintModalOpen(
+                                      data as {
+                                        isOpen: boolean;
+                                        sprint: ISprint | null;
+                                      },
+                                    );
+                                  }}
+                                />
+                              </li>
+                            ))}
+                          </ul>
                         </div>
-                      ))}
-                    </ul>
+                      </Panel>
+                    </PanelGroup>
                   </div>
                 </Panel>
 
+                {/* Panel Issue Detail Section */}
                 {selectedIssueId && (
-                  <PanelResizeHandle
-                    style={{
-                      backgroundColor: "oklch(0.696 0.17 162.48)",
-                    }}
-                    className="backlog--panel-resize-handle relative w-[2px] cursor-col-resize bg-gray-300 pl-[2px] text-emerald-500 opacity-0 hover:opacity-100"
-                  />
+                  <>
+                    <PanelResizeHandle
+                      className="relative w-[3px] cursor-col-resize bg-[#064e3b]/2 hover:bg-[#064e3b]/10 transition-all mx-1 rounded-full"
+                    />
+                    <Panel
+                      id="issue-side-bar-panel"
+                      order={1}
+                      defaultSize={30}
+                      minSize={20}
+                      maxSize={50}
+                    >
+                      <div className="h-full overflow-auto pr-4">
+                        <Suspense fallback={<IssueDetailSkeleton />}>
+                          <IssueDetail selectedIssueId={selectedIssueId} />
+                        </Suspense>
+                      </div>
+                    </Panel>
+                  </>
                 )}
-                <Panel
-                  id="issue-side-bar-panel"
-                  order={2}
-                  defaultSize={selectedIssueId ? 40 : 0}
-                  maxSize={selectedIssueId ? 50 : 0}
-                  minSize={selectedIssueId ? 30 : 0}
-                >
-                  <div className="h-full overflow-y-auto pr-4">
-                    <Suspense fallback={<IssueDetailSkeleton />}>
-                      <IssueDetail selectedIssueId={selectedIssueId || ""} />
-                    </Suspense>
-                  </div>
-                </Panel>
               </PanelGroup>
             </SortableContext>
             <DragOverlay>
               {activeIssue && (
-                <div className="inline-block rounded-md border border-gray-500 shadow-2xl">
-                  <div className="flex flex-row items-center gap-3 rounded-md bg-white px-2 py-1 opacity-70">
-                    <div className="flex flex-row items-center gap-1">
+                <div className="z-1000 rotate-3 cursor-grabbing">
+                  <div className="flex w-[280px] items-center gap-3 rounded-2xl border border-[#064e3b]/20 bg-white p-3 shadow-2xl ring-4 ring-[#064e3b]/5">
+                    <div className="flex shrink-0 items-center gap-2">
                       <TypeBadge isShowLabel={false} type={activeIssue.type} />
-                      <span className="text-xs">{activeIssue.key}</span>
+                      <span className="font-manrope text-[11px] font-black tracking-wider text-[#064e3b]/60">
+                        {activeIssue.key}
+                      </span>
                     </div>
-                    <span className="text-xs">{activeIssue.summary}</span>
+                    <span className="min-w-0 flex-1 truncate font-manrope text-[13px] font-bold text-[#064e3b]">
+                      {activeIssue.summary}
+                    </span>
                   </div>
                 </div>
               )}
             </DragOverlay>
           </div>
+
+
         </DndContext>
       )}
 

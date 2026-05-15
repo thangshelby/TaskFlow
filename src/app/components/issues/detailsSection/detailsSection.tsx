@@ -1,12 +1,9 @@
-import { useState } from "react";
-import { FaChevronRight, FaChevronDown } from "react-icons/fa";
 import { IIssue } from "@libs/types/issue";
 import { formatDate } from "@libs/utils/date";
-import { CiSettings } from "react-icons/ci";
 import {
   StatusDropdown,
   PriorityDropdown,
-  // TypeDropdown,
+  TypeDropdown,
   SprintDropdown,
   ParentDropdown,
 } from "../../general-components/dropdown/index";
@@ -32,7 +29,7 @@ const DetailRow = ({
         layout === "horizontal" ? "flex-col gap-4" : "flex-row items-center"
       }`}
     >
-      <span className="min-w-[35%] text-xs font-semibold text-gray-700">
+      <span className="min-w-[35%] text-xs font-semibold text-[#064e3b]/70">
         {label}
       </span>
       <div className={layout === "horizontal" ? "w-full" : "w-2/3"}>
@@ -53,116 +50,123 @@ const Details = ({
   selectedIssue: IIssue;
   handleUpdateIssue: (key: string, value: any) => void;
 }) => {
-  const [isDetailsOpen, setIsDetailsOpen] = useState(true);
   const { issue } = useIssue(projectId, selectedIssue.id);
   return (
-    <div className="flex h-full flex-col gap-4">
-      <div className="h-full overflow-y-auto rounded-xs border border-gray-300">
-        <div
-          className="flex cursor-pointer items-center rounded-xs border-2 border-transparent p-2 hover:bg-gray-200 active:border-emerald-500"
-          onClick={() => setIsDetailsOpen(!isDetailsOpen)}
-        >
-          <div className="flex items-center gap-4">
-            <div className="text-gray-500 hover:text-gray-700">
-              {isDetailsOpen ? <FaChevronDown /> : <FaChevronRight />}
-            </div>
-            <p className="text-sm font-bold text-gray-600">Details</p>
+    <div className="flex h-full flex-col gap-6 font-manrope">
+      <div className="flex flex-col space-y-5">
+        <DetailRow label="Assignee" layout={layout}>
+          <UserDropdown
+            projectId={projectId}
+            issueId={selectedIssue.id}
+            selectedUserId={selectedIssue.assignee_id || ""}
+            columnField="assignee_id"
+            isDisplayname={true}
+          />
+        </DetailRow>
+        
+        <DetailRow label="Reporter" layout={layout}>
+          <div className="bg-[#fcfcfb]/50 p-1.5 rounded-md border border-[#064e3b]/5 flex items-center gap-2">
+            <UserAvatar
+              userId={selectedIssue?.reporter_id || ""}
+              size={24}
+              isDisplayName={true}
+            />
           </div>
-          <div className="ml-auto flex items-center gap-2">
-            <div className="text-gray-500 hover:text-gray-700">
-              <CiSettings className="text-xl" />
-            </div>
-          </div>
-        </div>
-        {isDetailsOpen && (
-          <div className="flex flex-col space-y-4 overflow-auto p-4">
-            <DetailRow label="Assignee" layout={layout}>
-              <UserDropdown
-                projectId={projectId}
-                issueId={selectedIssue.id}
-                selectedUserId={selectedIssue.assignee_id || ""}
-                columnField="assignee_id"
-                isDisplayname={true}
-              />
-            </DetailRow>
-            <DetailRow label="Sprint" layout={layout}>
-              <SprintDropdown
-                projectId={projectId}
-                issueId={selectedIssue.id}
-                sprintId={selectedIssue.sprint_id || ""}
-              />
-            </DetailRow>
-            <DetailRow label="Parent" layout={layout}>
-              <ParentDropdown
-                projectId={projectId}
-                issue={selectedIssue}
-                currentParentId={selectedIssue.parent_id}
-                isShowIcon={true}
-              />
-            </DetailRow>
-            <DetailRow label="Priority" layout={layout}>
-              <PriorityDropdown
-                projectId={projectId}
-                issueId={selectedIssue.id}
-                priority={selectedIssue.priority}
-                isShowLabel={true}
-              />
-            </DetailRow>
-            {/* <DetailRow label="Type" layout={layout}>
-              <TypeDropdown
-                projectId={projectId}
-                issueId={selectedIssue.id}
-                type={selectedIssue.type}
-              />
-            </DetailRow> */}
-            <DetailRow label="Team" layout={layout}>
-              <TeamDropdown
-                projectId={projectId}
-                issueId={selectedIssue.id}
-                selectedTeamId={selectedIssue.team_id || ""}
-                columnField="team_id"
-                isDisplayName={true}
-              />
-            </DetailRow>
-            <DetailRow label="Status" layout={layout}>
-              <StatusDropdown
-                projectId={projectId}
-                issueId={selectedIssue.id}
-                column={issue!.column}
-              />
-            </DetailRow>
-            <DetailRow label="Story Points" layout={layout}>
+        </DetailRow>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-5 py-4 border-y border-[#064e3b]/5">
+          <DetailRow label="Status" layout={layout}>
+            <StatusDropdown
+              projectId={projectId}
+              issueId={selectedIssue.id}
+              column={issue!.column}
+            />
+          </DetailRow>
+          
+          <DetailRow label="Priority" layout={layout}>
+            <PriorityDropdown
+              projectId={projectId}
+              issueId={selectedIssue.id}
+              priority={selectedIssue.priority}
+              isShowLabel={true}
+            />
+          </DetailRow>
+
+          <DetailRow label="Sprint" layout={layout}>
+            <SprintDropdown
+              projectId={projectId}
+              issueId={selectedIssue.id}
+              sprintId={selectedIssue.sprint_id || ""}
+            />
+          </DetailRow>
+
+          <DetailRow label="Story Points" layout={layout}>
+            <div className="space-y-1 rounded-md border border-[#064e3b]/5 bg-[#fcfcfb]/30 p-2 shadow-inner-sm">
               <CustomInput
                 field="story_point"
                 value={selectedIssue.story_point}
                 handleUpdateIssue={handleUpdateIssue}
+                containerClassName="flex items-center"
+                contentClassName="text-sm font-black! text-[#064e3b] p-0"
               />
-            </DetailRow>
-            <DetailRow label="Reporter" layout={layout}>
-              <UserAvatar
-                userId={selectedIssue?.reporter_id || ""}
-                size={24}
-                isDisplayName={true}
-              />
-            </DetailRow>
-            <DetailRow label="Start Date" layout={layout}>
+            </div>
+          </DetailRow>
+
+          <DetailRow label="Type" layout={layout}>
+            <TypeDropdown
+              projectId={projectId}
+              issueId={selectedIssue.id}
+              type={selectedIssue.type}
+            />
+          </DetailRow>
+
+          <DetailRow label="Parent" layout={layout}>
+            <ParentDropdown
+              projectId={projectId}
+              issue={selectedIssue}
+              currentParentId={selectedIssue.parent_id}
+              isShowIcon={true}
+            />
+          </DetailRow>
+        </div>
+
+        <div className="space-y-4 pt-2">
+          <DetailRow label="Team" layout={layout}>
+            <TeamDropdown
+              projectId={projectId}
+              issueId={selectedIssue.id}
+              selectedTeamId={selectedIssue.team_id || ""}
+              columnField="team_id"
+              isDisplayName={true}
+            />
+          </DetailRow>
+
+          <DetailRow label="Dates" layout={layout}>
+            <div className="flex items-center gap-2 bg-[#fcfcfb]/50 p-1 rounded-md border border-[#064e3b]/5">
               <CustomDatePicker
                 field="due_date_from"
                 projectId={projectId}
-                className="px-2"
                 issueId={selectedIssue.id}
+                className="flex-1"
               />
-            </DetailRow>
-          </div>
-        )}
+              <span className="text-[#064e3b]/40 text-xs">→</span>
+              <CustomDatePicker
+                field="due_date_to"
+                projectId={projectId}
+                issueId={selectedIssue.id}
+                className="flex-1"
+              />
+            </div>
+          </DetailRow>
+        </div>
       </div>
 
-      {/* Date Section */}
-      <div className="mb-4">
-        <p className="text-sm text-gray-600">
+      {/* Audit Section */}
+      <div className="mt-4 flex flex-col gap-1 px-1">
+        <p className="text-[10px] font-black text-[#064e3b]/50 uppercase tracking-widest">
           Created {formatDate(selectedIssue.created_at)}
         </p>
-        <p className="text-sm text-gray-600">
+        <p className="text-[10px] font-black text-[#064e3b]/50 uppercase tracking-widest">
           Updated {formatDate(selectedIssue.updated_at)}
         </p>
       </div>

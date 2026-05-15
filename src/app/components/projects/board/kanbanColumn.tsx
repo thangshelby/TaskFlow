@@ -2,8 +2,8 @@ import {
   horizontalListSortingStrategy,
   SortableContext,
 } from "@dnd-kit/sortable";
-import DeleteColumnModal from "@libs/app/components/projects/modals/deleteColumnModal";
-import RenameColumnModal from "@libs/app/components/projects/modals/renameColumnModal";
+import DeleteColumnModal from "@libs/app/components/projects/modals/column/deleteColumnModal";
+import RenameColumnModal from "@libs/app/components/projects/modals/column/renameColumnModal";
 import {
   useDeleteColumn,
   useUpdateColumn,
@@ -32,7 +32,7 @@ export const KanbanColumn = ({
   isDragging: boolean;
 }) => {
   const { setNodeRef, isOver } = useDroppable({
-    id: column.id,
+    id: column?.id,
     data: {
       type: "Column",
       column,
@@ -46,7 +46,7 @@ export const KanbanColumn = ({
   const { deleteColumn } = useDeleteColumn((deletedColumnId) => {
     // Xử lý sau khi xóa thành công
     const newColumns = columns
-      .filter((col) => col.id !== deletedColumnId)
+      .filter((col) => col?.id !== deletedColumnId)
       .map((col, index) => ({
         ...col,
         order: index,
@@ -55,35 +55,41 @@ export const KanbanColumn = ({
     setColumns(newColumns);
   });
   const { overItemId } = useOverItem();
-  const handleMove = useCallback((direction: "left" | "right") => {
-    const currentIndex = columns.findIndex((c) => c.id === column.id);
-    const targetIndex =
-      direction === "left" ? currentIndex - 1 : currentIndex + 1;
+  const handleMove = useCallback(
+    (direction: "left" | "right") => {
+      const currentIndex = columns.findIndex((c) => c?.id === column?.id);
+      const targetIndex =
+        direction === "left" ? currentIndex - 1 : currentIndex + 1;
 
-    if (targetIndex < 0 || targetIndex >= columns.length) return;
+      if (targetIndex < 0 || targetIndex >= columns.length) return;
 
-    const newColumns = [...columns];
-    [newColumns[currentIndex], newColumns[targetIndex]] = [
-      newColumns[targetIndex],
-      newColumns[currentIndex],
-    ];
+      const newColumns = [...columns];
+      [newColumns[currentIndex], newColumns[targetIndex]] = [
+        newColumns[targetIndex],
+        newColumns[currentIndex],
+      ];
 
-    const reordered = newColumns.map((col, index) => ({
-      ...col,
-      order: index,
-    }));
+      const reordered = newColumns.map((col, index) => ({
+        ...col,
+        order: index,
+      }));
 
-    setColumns(reordered);
+      setColumns(reordered);
 
-    updateOrderColumn({
-      projectId: projectId || "",
-      columns: reordered.map((col) => ({ id: col.id, order: col.order + 1 })),
-    });
-    setPopoverOpen(false);
-  }, []);
+      updateOrderColumn({
+        projectId: projectId || "",
+        columns: reordered.map((col) => ({
+          id: col?.id,
+          order: col?.order + 1,
+        })),
+      });
+      setPopoverOpen(false);
+    },
+    [columns, column?.id, projectId, updateOrderColumn],
+  );
   const handleRenameColumn = useCallback((newName: string) => {
     const newColumns = columns.map((col) => {
-      if (col.id === column.id) {
+      if (col?.id === column?.id) {
         return { ...col, name: newName };
       }
       return col;
@@ -92,7 +98,7 @@ export const KanbanColumn = ({
     setShowRenameColumnModal(false);
     if (projectId) {
       updateColumn({
-        column_id: column.id,
+        column_id: column?.id,
         name: newName,
         projectId: projectId,
       });
@@ -103,7 +109,7 @@ export const KanbanColumn = ({
     setShowDeleteColumnModal(false);
 
     if (projectId) {
-      deleteColumn({ column_id: column.id });
+      deleteColumn({ column_id: column?.id });
     }
   };
   const content: ReactNode = (
@@ -141,17 +147,25 @@ export const KanbanColumn = ({
     </div>
   );
   return (
-    <div ref={setNodeRef} className="mx-1 w-80 rounded bg-gray-100 py-2">
-      <div className="flex items-center justify-between p-2">
-        <div className="flex items-center gap-1">
-          <h2 className="text-sm font-medium text-gray-500">{column.name}</h2>
-          <span className="rounded-sm bg-gray-300 px-2 text-xs font-medium text-gray-500">
-            {column.issues.length}
-          </span>
-
-          {column.name === "DONE" && (
-            <Check className="ml-2 text-emerald-500" size={20} />
-          )}
+    <div
+      ref={setNodeRef}
+      className={`mx-1 w-80 min-w-80 rounded-md bg-[#f9f9f8]/80 border border-[#e8e8e7] flex flex-col h-fit max-h-full transition-colors duration-200 ${isOver ? "bg-[#f0fdf4] border-[#064e3b]/20" : ""}`}
+    >
+      <div className="flex items-center justify-between p-4 pb-2">
+        <div className="flex items-center gap-3">
+          <div className="flex flex-row items-center gap-2">
+            <h2 className="text-[11px] font-bold text-[#064e3b] font-manrope uppercase tracking-widest leading-none">
+              {column?.name}
+            </h2>
+            <div className="flex items-center gap-2">
+              <span className="text-[9px] font-black bg-[#064e3b] text-white px-1.5 py-0.5 rounded-md min-w-[20px] text-center shadow-sm">
+                {column?.issues?.length ?? 0}
+              </span>
+              {column?.name === "DONE" && (
+                <Check className="text-[#059669]" size={12} strokeWidth={4} />
+              )}
+            </div>
+          </div>
         </div>
         <Popover
           content={content}
@@ -159,40 +173,34 @@ export const KanbanColumn = ({
           placement="bottomRight"
           open={popoverOpen}
           onOpenChange={setPopoverOpen}
+          overlayClassName="premium-popover"
         >
-          <div className="cursor-pointer rounded-md p-2 transition-all hover:bg-gray-200">
-            <LuEllipsisVertical className="text-gray-500" />
+          <div className="cursor-pointer rounded-md p-2 transition-all hover:bg-[#064e3b]/10 text-[#064e3b]/60 hover:text-[#064e3b]">
+            <LuEllipsisVertical size={18} />
           </div>
         </Popover>
       </div>
+
       <SortableContext
         strategy={horizontalListSortingStrategy}
-        items={column.issues.map((issue) => issue.id)}
+        items={column?.issues?.map((issue) => issue?.id) || []}
       >
-        <div className="flex h-full flex-col overflow-auto p-2 px-3 pb-32">
-          {column.issues.map((issue) => {
+        <div className="flex flex-col overflow-y-auto px-3 pb-6 pt-2 custom-scrollbar min-h-[150px]">
+          {column?.issues?.map((issue) => {
             const newColumn: IColumn = { ...column };
             delete (newColumn as any).issues;
             const newIssue: IIssue = { ...issue, column: newColumn };
 
             return (
-              <div key={issue.id} className="group relative">
+              <div key={issue?.id} className="group relative mb-3">
+                {/* Drop Indicator */}
                 <div
                   style={{
-                    opacity: isDragging && issue.id === overItemId ? 1 : 0,
+                    opacity: isDragging && issue?.id === overItemId ? 1 : 0,
                   }}
-                  className="absolute top-[-2px] left-0 z-50 flex w-full flex-row items-center"
+                  className="absolute top-[-6px] left-0 z-50 flex w-full flex-row items-center transition-opacity duration-200"
                 >
-                  <div className="h-[2px] w-full bg-emerald-500" />
-                </div>
-
-                <div
-                  style={{
-                    opacity: isDragging && issue.id === overItemId ? 1 : 0,
-                  }}
-                  className="absolute top-[-6px] left-[-10px] z-50 flex w-full flex-row items-center"
-                >
-                  <div className="z-50 rounded-[100%] border-1 border-emerald-500 p-1" />
+                  <div className="h-[3px] w-full bg-[#064e3b] rounded-full shadow-[0_0_8px_rgba(6,78,59,0.5)]" />
                 </div>
 
                 <IssueCard issue={newIssue} />
@@ -200,27 +208,20 @@ export const KanbanColumn = ({
             );
           })}
 
-          <div className="group relative">
+          {/* Empty state or tail drop indicator */}
+          <div className="relative h-2">
             <div
               style={{
-                opacity: isDragging && isOver ? 1 : 0,
+                opacity: isDragging && isOver && column.issues.length === 0 ? 1 : 0,
               }}
-              className="absolute top-[-2px] left-0 z-50 flex w-full flex-row items-center"
+              className="absolute top-0 left-0 z-50 flex w-full flex-row items-center transition-opacity duration-200"
             >
-              <div className="h-[2px] w-full bg-emerald-500" />
-            </div>
-
-            <div
-              style={{
-                opacity: isDragging && isOver ? 1 : 0,
-              }}
-              className="absolute top-[-6px] left-[-10px] z-50 flex w-full flex-row items-center"
-            >
-              <div className="z-50 rounded-[100%] border-1 border-emerald-500 p-1" />
+              <div className="h-[3px] w-full bg-[#064e3b] rounded-full shadow-[0_0_8px_rgba(6,78,59,0.5)]" />
             </div>
           </div>
         </div>
       </SortableContext>
+
       {showRenameColumnModal && (
         <RenameColumnModal
           onClose={() => {

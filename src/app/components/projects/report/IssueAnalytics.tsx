@@ -1,18 +1,9 @@
-import { UserStats } from "@libs/types/project";
-import React, { useMemo, useState } from "react";
-import SectionContainer from "./sectionHeader";
+import { UserStats, ProjectSummary } from "@libs/types/project";
+import React, { useMemo } from "react";
 import { typeOptions } from "@libs/app/components/general-components/badge/typeBadge";
 import { priorityOptions } from "@libs/app/components/general-components/badge/priorityBadge";
-import {
-  Bar,
-  BarChart,
-  CartesianGrid,
-  Tooltip,
-  XAxis,
-  YAxis,
-  ResponsiveContainer,
-  Cell,
-} from "recharts";
+import SectionContainer from "./sectionHeader";
+
 interface IssueCount {
   label: string;
   value: number;
@@ -20,46 +11,82 @@ interface IssueCount {
   color?: string;
 }
 
-const IssueAnalytics = ({ data }: { data: UserStats }) => {
+const IssueAnalytics = ({ data }: { data: UserStats | ProjectSummary }) => {
   const typeData = useMemo<IssueCount[]>(
     () =>
       data.by_type
-        .map((item) => ({
-          label: item.type,
-          value: item.count,
-          icon: typeOptions.find(
-            (option) => option.name.toLowerCase() === item.type.toLowerCase(),
-          )?.icon,
-        }))
+        .map((item) => {
+          const config = typeOptions.find(
+            (opt) => opt.name.toLowerCase() === item.type.toLowerCase(),
+          );
+          return {
+            label: item.type,
+            value: item.count,
+            icon: config?.icon,
+            color: "#064e3b",
+          };
+        })
         .sort((a, b) => b.value - a.value),
     [data.by_type],
   );
 
-  const maxTypeValue = Math.max(
-    typeData.map((d) => d.value).reduce((a, b) => a + b, 0),
-    1,
-  );
-
   return (
-    <div className="animate-fade-in grid grid-cols-1 gap-7 lg:grid-cols-2">
+    <div className="animate-fade-in grid grid-cols-1 gap-8 lg:grid-cols-2 font-manrope">
       {/* Priority Distribution */}
-      <PriorityChart data={data} />
-
       <SectionContainer
-        title="Work Type Breakdown"
-        description="Issues categorized by work type text-gray-500"
-        link="View all issues"
+        title="Priority Distribution"
+        description="Task urgency breakdown"
+        linkText="Analyze"
+        href="../list"
       >
-        <div className="space-y-4">
-          {typeData.map((item, index) => (
-            <ProgressBar
-              key={index}
-              item={item}
-              maxValue={maxTypeValue}
-              category="type"
-              icon={item.icon}
-            />
-          ))}
+        <PriorityChart data={data} />
+      </SectionContainer>
+
+      {/* Work Type Distribution */}
+      <SectionContainer
+        title="Work Type Distribution"
+        description="Issue category classification"
+        linkText="Analyze"
+        href="../list"
+      >
+        <div className="space-y-6">
+          {typeData.map((item, index) => {
+            const total = typeData.reduce((sum, d) => sum + d.value, 0);
+            const percentage = total === 0 ? 0 : Math.round((item.value / total) * 100);
+
+            // Using premium teal shades for work types instead of random colors
+            const barColors = ["#064e3b", "#0f766e", "#14b8a6", "#2dd4bf"];
+            const barColor = barColors[index % barColors.length];
+
+            return (
+              <div key={index} className="group cursor-default">
+                <div className="flex justify-between mb-2 items-center">
+                  <div className="flex items-center gap-2.5">
+                    {item.icon && <span className="scale-90 origin-left opacity-90">{item.icon}</span>}
+                    <span className="text-xs font-bold uppercase tracking-widest text-[#064e3b]">{item.label}S</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <span className="text-xs font-bold text-[#064e3b]">{item.value}</span>
+                    <span className="text-[10px] font-bold text-[#404944] opacity-40">({percentage}%)</span>
+                  </div>
+                </div>
+                <div className="h-1.5 bg-[#f3f4f3] rounded-full overflow-hidden">
+                  <div
+                    className="h-full transition-all duration-1000 ease-out rounded-full"
+                    style={{
+                      width: `${percentage}%`,
+                      backgroundColor: barColor,
+                    }}
+                  />
+                </div>
+              </div>
+            );
+          })}
+          {typeData.length === 0 && (
+            <div className="py-12 text-center text-xs font-medium text-[#404944] opacity-40 italic">
+              No work items categorized yet.
+            </div>
+          )}
         </div>
       </SectionContainer>
     </div>
@@ -68,192 +95,75 @@ const IssueAnalytics = ({ data }: { data: UserStats }) => {
 
 export default IssueAnalytics;
 
-const ProgressBar = ({
-  item,
-  maxValue,
-  category,
-  icon,
-}: {
-  item: IssueCount;
-  maxValue: number;
-  category: string;
-  icon: React.ReactNode;
-}) => {
-  const [hoveredItem, setHoveredItem] = useState<string | null>(null);
-  const percentage = (item.value / maxValue) * 100;
-  const itemKey = `${category}-${item.label}`;
-  const isHovered = hoveredItem === itemKey;
-
-  return (
-    <div
-      className="group flex cursor-pointer flex-row p-2 transition-all duration-300 ease-out hover:bg-gray-100"
-      onMouseEnter={() => setHoveredItem(itemKey)}
-      onMouseLeave={() => setHoveredItem(null)}
-    >
-      <div className="flex w-1/6 items-center gap-2">
-        {icon}
-        <span
-          className={`text-sm font-medium transition-all duration-300 ${
-            isHovered ? "scale-105 text-gray-900" : "text-gray-600"
-          }`}
-        >
-          {item.label}
-        </span>
-      </div>
-      <div className="relative h-5 w-full flex-1 overflow-hidden bg-gray-300 shadow-inner">
-        <div
-          className={`absolute top-0 left-0 h-full origin-left transform bg-gray-500 transition-all duration-700 ease-out ${
-            isHovered
-              ? "shadow-opacity-30 scale-y-110 shadow-lg"
-              : "scale-y-100"
-          }`}
-          style={{
-            width: `${percentage}%`,
-          }}
-        />
-        <div className="absolute top-0 left-5 hidden h-full items-center gap-2 group-hover:block group-hover:scale-105">
-          <div className="flex h-full items-center gap-2">
-            <span
-              className={`text-xs font-semibold transition-all duration-300 ${
-                isHovered ? "scale-110 text-gray-900" : "text-gray-900"
-              }`}
-            >
-              {percentage.toFixed(1)}%
-            </span>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-};
-
-const PriorityChart = ({ data }: { data: UserStats }) => {
-  const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
+const PriorityChart = ({ data }: { data: UserStats | ProjectSummary }) => {
   const priorityData: IssueCount[] = useMemo(
     () =>
       data.by_priority
         .map((item) => {
-          const match = priorityOptions.find(
+          const config = priorityOptions.find(
             (opt) => opt.name.toLowerCase() === item.priority.toLowerCase(),
           );
+
+          // Use monochromatic teal scale for bars while keeping icons colorful
+          let color = "#064e3b";
+          const label = item.priority.toLowerCase();
+          if (label === "highest") color = "#064e3b"; // Primary
+          else if (label === "high") color = "#0f766e"; 
+          else if (label === "medium") color = "#14b8a6";
+          else if (label === "low") color = "#2dd4bf";
+          else if (label === "lowest") color = "#99f6e4";
+
           return {
             label: item.priority,
             value: item.count,
-            color: "#6A7280", // fallback màu xanh
-            icon: match?.icon, // bạn đã có icon sẵn ở đây
+            color,
+            icon: config?.icon,
           };
         })
-        .sort((a, b) => b.value - a.value),
+        .sort((a, b) => {
+          const order = ["highest", "high", "medium", "low", "lowest"];
+          return order.indexOf(a.label.toLowerCase()) - order.indexOf(b.label.toLowerCase());
+        }),
     [data.by_priority],
   );
 
+  const total = priorityData.reduce((sum, item) => sum + item.value, 0);
+
   return (
-    <SectionContainer
-      title="Priority breakdown"
-      description="Get a holistic view of how work is being prioritized."
-      link="How to manage priorities for spaces"
-    >
-      <div className="h-64 w-full">
-        <ResponsiveContainer width="100%" height="100%">
-          <BarChart
-            data={priorityData}
-            margin={{ top: 10, right: 10, left: 0, bottom: 30 }} // tăng bottom cho icon
-            barSize={26} // 👈 thu nhỏ width của bar
-            barGap={8}
-          >
-            <CartesianGrid
-              strokeDasharray="3 3"
-              vertical={false}
-              stroke="#E5E7EB"
-            />
-            <XAxis
-              dataKey="label"
-              tickLine={false}
-              axisLine={{ stroke: "#D1D5DB" }}
-              tick={({ x, y, payload }) => {
-                const current = priorityData.find(
-                  (p) => p.label === payload.value,
-                );
-                return (
-                  <g transform={`translate(${x},${y + 10})`}>
-                    {current?.icon && (
-                      <foreignObject
-                        x={-36}
-                        y={0}
-                        width={50}
-                        height={50}
-                        style={{ overflow: "visible" }}
-                      >
-                        <div className="flex items-center justify-center gap-1">
-                          <div
-                            style={{
-                              display: "flex",
-                              justifyContent: "center",
-                              alignItems: "center",
-                              width: "16px",
-                              height: "16px",
-                            }}
-                          >
-                            {current.icon}
-                          </div>
-                          <p className="text-sm font-medium text-gray-700">
-                            {current.label}
-                          </p>
-                        </div>
-                      </foreignObject>
-                    )}
-                  </g>
-                );
-              }}
-            />
-            <YAxis
-              tickLine={false}
-              axisLine={false}
-              tick={{ fill: "#6B7280", fontSize: 12 }}
-            />
-            <Tooltip
-              cursor={{ fill: "transparent" }}
-              contentStyle={{
-                borderRadius: "8px",
-                border: "1px solid #E5E7EB",
-                backgroundColor: "#FFFFFF",
-                fontSize: "12px",
-              }}
-            />
-            <Bar
-              dataKey="value"
-              radius={[4, 4, 0, 0]}
-              isAnimationActive={true}
-              animationDuration={800}
-              barSize={40}
-            >
-              {priorityData.map((entry, index) => (
-                <Cell
-                  key={`cell-${index}`}
-                  fill={entry.color || "#3B82F6"}
-                  stroke="#ffffff"
-                  strokeWidth={1}
-                  onMouseEnter={() => setHoveredIndex(index)}
-                  onMouseLeave={() => setHoveredIndex(null)}
-                  style={{
-                    opacity:
-                      hoveredIndex === null
-                        ? 1
-                        : hoveredIndex === index
-                          ? 1
-                          : 0.4,
-                    transform:
-                      hoveredIndex === index ? "scale(1.05)" : "scale(1)",
-                    transformOrigin: "center",
-                    transition: "all 0.2s ease",
-                    cursor: "pointer",
-                  }}
-                />
-              ))}
-            </Bar>
-          </BarChart>
-        </ResponsiveContainer>
-      </div>
-    </SectionContainer>
+    <div className="flex-1 space-y-6">
+      {priorityData.map((item, index) => {
+        const percentage = total === 0 ? 0 : Math.round((item.value / total) * 100);
+        return (
+          <div key={index} className="group">
+            <div className="flex justify-between items-center mb-2">
+              <div className="flex items-center gap-2.5">
+                <span className="scale-90 origin-left opacity-90">{item.icon}</span>
+                <span className="text-xs font-bold uppercase tracking-widest text-[#064e3b]">{item.label}</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="text-xs font-bold text-[#064e3b]">{item.value}</span>
+                <span className="text-[10px] font-bold text-[#404944] opacity-40">({percentage}%)</span>
+              </div>
+            </div>
+            <div className="w-full bg-[#f3f4f3] h-1.5 rounded-full overflow-hidden">
+              <div
+                className="h-full rounded-full transition-all duration-1000 ease-out"
+                style={{
+                  width: `${percentage}%`,
+                  backgroundColor: item.color,
+                }}
+              />
+            </div>
+          </div>
+        );
+      })}
+      {priorityData.length === 0 && (
+        <div className="py-12 text-center text-xs font-medium text-[#404944] opacity-40 italic">
+          No priority data available.
+        </div>
+      )}
+    </div>
   );
 };
+
+

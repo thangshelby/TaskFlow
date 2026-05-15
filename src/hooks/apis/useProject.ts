@@ -9,6 +9,7 @@ import {
   ListProjectColumnsParams,
   UpdateColumnOrderParams,
   UpdateColumnProjectParams,
+  GetProjectSummaryParams,
 } from "@libs/types/project";
 import { Dispatch, SetStateAction } from "react";
 import { AxiosError } from "axios";
@@ -25,7 +26,7 @@ export function useUserProjects(options?: { enabled?: boolean }) {
 
   // Filter out pending memberships and map to project info
   const validMemberships = memberships.filter(
-    (membership) => !membership.is_pending,
+    (membership) => !membership.is_pending && membership.project,
   );
 
   const projects = validMemberships.map((membership) => membership.project);
@@ -145,8 +146,8 @@ export function useDeleteProject({ onClose }: { onClose?: () => void }) {
     error,
   };
 }
-export function useProject(projectId: string) {
-  const queryClient = useQueryClient();
+
+export function useProjectByID(projectId: string) {
   const { user, setUser } = useAuthStore();
   const {
     data: project,
@@ -156,11 +157,7 @@ export function useProject(projectId: string) {
     queryKey: ["project", projectId],
     queryFn: async () => {
       const { data } = await projects.getById(projectId);
-      queryClient.setQueryData(
-        ["projectMembers", projectId],
-        data.project_members,
-      );
-      data.project_members.forEach((member) => {
+      data.data.project_members.forEach((member) => {
         if (user?.id === member.user_id) {
           setUser({
             ...user,
@@ -175,7 +172,7 @@ export function useProject(projectId: string) {
   });
 
   return {
-    project,
+    project: project?.data,
     isLoading,
     error,
   };
@@ -358,4 +355,39 @@ export function usePermissions() {
     },
   });
   return { permissions, isLoadingPermissions, errorPermissions };
+}
+
+export function useProjectSummary(data: GetProjectSummaryParams) {
+  const {
+    data: summaryData,
+    isLoading,
+    error,
+    isSuccess,
+    refetch,
+  } = useQuery({
+    queryKey: [
+      "projectSummary",
+      data.project_id,
+      data.sprint_id,
+      data.date_from,
+      data.date_to,
+    ],
+    queryFn: async () => {
+      if (!data.project_id) {
+        throw new Error("Project ID is required");
+      }
+      const response = await projects.getProjectSummary(data);
+      return response.data;
+    },
+    enabled: !!data.project_id,
+    refetchOnWindowFocus: false,
+  });
+
+  return {
+    summary: summaryData?.data,
+    isLoading,
+    isSuccess,
+    error,
+    refetch,
+  };
 }

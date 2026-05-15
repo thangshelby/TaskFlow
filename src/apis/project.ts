@@ -7,6 +7,8 @@ import {
   UpdateColumnOrderParams,
   UpdateColumnProjectParams,
   IPermission,
+  ProjectSummary,
+  GetProjectSummaryParams,
 } from "@libs/types/project";
 
 interface ListProjectsParams {
@@ -24,7 +26,8 @@ const config = {
 // Projects endpoints
 export const projects = {
   getAll: () => api.get<IProject[]>("/projects", config),
-  getById: (id: string) => api.get<IProject>(`/projects/${id}`, config),
+  getById: (id: string) =>
+    api.get<ResponseApi<IProject>>(`/projects/${id}`, config),
   create: (data: Partial<IProject>) =>
     api.post<IProject>("/projects", data, config),
   update: (id: string, data: Partial<IProject>) =>
@@ -69,4 +72,10 @@ export const projects = {
 
   getPermissions: () =>
     api.get<{ permissions: IPermission[] }>(`/projects/permissions`, config),
+  getProjectSummary: (body: GetProjectSummaryParams) =>
+    api.post<ResponseApi<ProjectSummary>>(
+      `/projects/${body.project_id}/summary`,
+      body,
+      config,
+    ),
 };

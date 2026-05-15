@@ -117,23 +117,25 @@ const PageFilter = memo(
     };
 
     return (
-      <div className="space-y-4">
+      <div className="space-y-4 font-manrope">
         <div className="flex items-center gap-4">
-          <Search
-            size="large"
-            className="max-w-md flex-1"
-            placeholder="Search issues..."
-            value={filters.keyword}
-            onChange={(e) =>
-              setFilters({
-                ...filters,
-                ...initialFilters,
-                keyword: e.target.value,
-              })
-            }
-            onSearch={handleKeywordSearch}
-            allowClear
-          />
+          <div className="relative flex-1 max-w-md group">
+            <Search
+              size="middle"
+              placeholder="Search issues..."
+              value={filters.keyword}
+              onChange={(e) =>
+                setFilters({
+                  ...filters,
+                  ...initialFilters,
+                  keyword: e.target.value,
+                })
+              }
+              onSearch={handleKeywordSearch}
+              allowClear
+              className="premium-search rounded-sm"
+            />
+          </div>
 
           <Popover
             content={
@@ -157,11 +159,17 @@ const PageFilter = memo(
             }}
           >
             <div>
-              <Button className="relative">
-                <span className="text-base font-semibold">Filter</span>
-                <ChevronDown className="ml-1" />
+              <Button
+                variant={isPopoverOpen || getActiveFilterCount() > 0 ? "primary" : "outline"}
+                className={`relative  px-6 transition-all duration-200 shadow-sm hover:shadow-md ${!(isPopoverOpen || getActiveFilterCount() > 0) && "bg-[#f1f5f3] border-[#d1d5d3]"
+                  }`}
+              >
+                <div className="flex items-center gap-2">
+                  <span className="text-[13px] font-bold uppercase tracking-wider">Filters</span>
+                  <ChevronDown size={14} className={`transition-transform duration-200 ${isPopoverOpen ? "rotate-180" : ""}`} />
+                </div>
                 {getActiveFilterCount() > 0 && (
-                  <span className="absolute -top-2 -right-2 flex h-5 w-5 items-center justify-center rounded-full bg-blue-600 text-xs text-white">
+                  <span className="absolute -top-1.5 -right-1.5 flex h-5 w-5 items-center justify-center rounded-full bg-[#10b981] text-[10px] font-bold text-white border-2 border-white shadow-sm animate-scale-in">
                     {getActiveFilterCount()}
                   </span>
                 )}
@@ -173,5 +181,10 @@ const PageFilter = memo(
     );
   },
 );
+
+
+
+
+
 
 export default PageFilter;

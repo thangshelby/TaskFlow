@@ -36,73 +36,80 @@ const NotificationList: React.FC = () => {
   }, []);
 
   return (
-    <div className="m-[-8px] max-h-[600px] w-[450px] rounded-lg border border-gray-200 bg-white shadow-lg">
+    <div className="m-[-8px] max-h-[580px] w-[420px] overflow-hidden rounded-lg border border-[#e8e8e7] bg-[#f9f9f8] shadow-xl">
       {/* Header */}
-      <div className="flex items-center justify-between border-b border-gray-200 bg-gray-50 p-4">
+      <div className="flex items-center justify-between border-b border-[#e8e8e7] bg-white px-4 py-3">
         <div className="flex items-center gap-2">
-          <LuBell className="h-5 w-5 text-gray-600" />
-          <h3 className="font-semibold text-gray-900">Notifications</h3>
+          <LuBell className="h-4 w-4 text-[#064e3b]" />
+          <h3 className="font-semibold text-[#1a1c1c]" style={{ fontFamily: "Manrope, sans-serif" }}>
+            Notifications
+          </h3>
           {unreadCount > 0 && (
-            <span className="rounded-full bg-red-500 px-2 py-1 text-xs font-bold text-white">
+            <span className="rounded-full bg-[#064e3b] px-2 py-0.5 text-[11px] font-bold text-white">
               {unreadCount}
             </span>
           )}
         </div>
         {unreadCount > 0 && (
-          <div
+          <button
             onClick={() => markAsReadAll()}
-            className="cursor-pointer text-gray-600 hover:text-gray-700"
+            className="cursor-pointer rounded px-2 py-1 text-xs font-medium text-[#064e3b] transition-colors hover:bg-[#064e3b]/8 hover:text-[#003527]"
           >
             Mark all as read
-          </div>
+          </button>
         )}
       </div>
 
       {/* Notifications List */}
-      <div className="max-h-[500px] overflow-y-auto">
+      <div className="custom-scrollbar max-h-[500px] overflow-y-auto">
         {notifications.length === 0 ? (
-          <div className="p-8 text-center text-gray-500">
-            <LuBell className="mx-auto mb-3 h-12 w-12 text-gray-300" />
-            <p className="text-sm">No notifications yet</p>
+          <div className="flex flex-col items-center justify-center py-12 text-center">
+            <div className="mb-3 flex h-14 w-14 items-center justify-center rounded-full bg-[#064e3b]/8">
+              <LuBell className="h-7 w-7 text-[#064e3b]/50" />
+            </div>
+            <p className="text-sm font-medium text-[#1a1c1c]/60">No notifications yet</p>
+            <p className="mt-1 text-xs text-[#404944]/60">You're all caught up!</p>
           </div>
         ) : (
-          <div className="divide-y divide-gray-100">
-            {notifications.map((notification) => (
+          <div>
+            {notifications.map((notification, idx) => (
               <div
                 key={notification.id}
-                className={`group relative cursor-pointer p-4 transition-colors hover:bg-gray-50 ${
+                className={`group relative cursor-pointer transition-colors duration-150 ${
                   !notification.is_read
-                    ? "border-l-4 border-l-blue-500 bg-blue-50"
-                    : ""
-                }`}
+                    ? "border-l-[3px] border-l-[#064e3b] bg-[#064e3b]/5 hover:bg-[#064e3b]/8"
+                    : "border-l-[3px] border-l-transparent hover:bg-[#e8e8e7]/60"
+                } ${idx !== 0 ? "border-t border-t-[#e8e8e7]" : ""}`}
                 onClick={() => markAsRead(notification.id)}
               >
-                <div className="flex items-start gap-3">
+                <div className="flex items-start gap-3 px-4 py-3">
                   {/* Icon */}
-                  <div className="mt-1 flex-shrink-0">
+                  <div className="mt-0.5 flex-shrink-0 rounded-full bg-white p-1.5 shadow-sm ring-1 ring-[#e8e8e7]">
                     {getNotificationIcon(notification.type)}
                   </div>
 
                   {/* Content */}
                   <div className="min-w-0 flex-1">
-                    <div className="mb-1 flex items-center justify-between">
-                      <span className="text-xs font-semibold tracking-wide text-gray-800 uppercase">
+                    <div className="mb-0.5">
+                      <span className="text-[10px] font-semibold tracking-widest text-[#064e3b] uppercase">
                         {getNotificationTypeLabel(notification.type)}
                       </span>
                     </div>
 
                     <div
-                      className={`mb-2 text-sm ${!notification.is_read ? "font-medium" : ""}`}
+                      className={`mb-1 text-[13px] leading-snug text-[#1a1c1c] ${
+                        !notification.is_read ? "font-medium" : "font-normal"
+                      }`}
                     >
                       {renderNotificationCard(notification)}
                     </div>
 
                     <div className="flex items-center justify-between">
-                      <span className="text-xs text-gray-500">
+                      <span className="text-[11px] text-[#404944]/70">
                         {formatDate(notification.created_at)}
                       </span>
                       {!notification.is_read && (
-                        <div className="h-2 w-2 rounded-full bg-blue-500"></div>
+                        <div className="h-1.5 w-1.5 rounded-full bg-[#064e3b]" />
                       )}
                     </div>
                   </div>
@@ -115,7 +122,11 @@ const NotificationList: React.FC = () => {
 
       {/* Footer */}
       {notifications.length > 0 && (
-        <div className="border-t border-gray-200 bg-gray-50 p-3"></div>
+        <div className="border-t border-[#e8e8e7] bg-white px-4 py-2 text-center">
+          <span className="text-[11px] text-[#404944]/60">
+            {notifications.length} notification{notifications.length !== 1 ? "s" : ""} total
+          </span>
+        </div>
       )}
     </div>
   );

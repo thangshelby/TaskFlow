@@ -37,21 +37,21 @@ export default function Home() {
     <AnimatePresence>
       <div className="min-h-screen">
         <div className="fixed top-0 left-0 z-50 w-full">
-          <div className="flex w-full items-center justify-between bg-[#262626] p-4">
+          <div className="flex w-full items-center justify-between bg-[#002117] p-4">
             <div className="py-0.5">
               <Image src={logo} className="h-9 w-32" />
             </div>
             <div className="flex items-center gap-2">
               <Button
                 onClick={() => navigate("/auth/login")}
-                className="bg-emerald-600 px-6 text-white hover:bg-emerald-700"
+                className="bg-[#064e3b] px-6 text-white hover:bg-[#0b513d]"
                 title="Login"
               >
                 Login
               </Button>
               <Button
                 onClick={() => navigate("/auth/register")}
-                className="bg-emerald-600 px-6 text-white hover:bg-emerald-700"
+                className="bg-[#064e3b] px-6 text-white hover:bg-[#0b513d]"
                 title="Register"
               >
                 Register

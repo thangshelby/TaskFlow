@@ -1,38 +1,33 @@
 import React from "react";
-import logo from "@libs/assets/taskflow.png";
-import Image from "@libs/app/components/general-components/image";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-import OrthersLogin from "@libs/app/components/general-components/orthersLogin";
 import { Link } from "react-router-dom";
 import { useAuth } from "@libs/hooks/apis/useAuth";
-import { useNavigate } from "react-router-dom";
 import Button from "@libs/app/components/general-components/button";
+import { Lock, Mail } from "lucide-react";
+import { AuthScaffold } from "@libs/app/components/auth/auth-scaffold";
+
 // Schema definition with Zod
 const loginSchema = z.object({
-  email: z.string().email({ message: "Email không hợp lệ" }),
-  password: z.string().min(1, { message: "Mật khẩu không được để trống" }),
-  rememberMe: z.boolean().optional(),
+  email: z.string().email({ message: "Invalid email address" }),
+  password: z.string().min(1, { message: "Password is required" }),
 });
 
 type LoginFormData = z.infer<typeof loginSchema>;
 
 const LoginPage: React.FC = () => {
   const { login } = useAuth();
-  const navigate = useNavigate();
   const isLoading = login.isPending;
   const {
     register,
     handleSubmit,
-    setValue,
     formState: { errors },
   } = useForm<LoginFormData>({
     resolver: zodResolver(loginSchema),
     defaultValues: {
       email: "",
       password: "",
-      rememberMe: false,
     },
   });
 
@@ -44,119 +39,102 @@ const LoginPage: React.FC = () => {
   };
 
   return (
-    <div className="flex w-full items-center justify-center px-4 sm:px-6 md:w-1/2 lg:px-8">
-      <div className="w-full max-w-md space-y-8">
-        <div>
-          <div className="flex justify-center">
-            <Link to={"/"} className="cursor-pointer">
-              <Image src={logo} className="h-[40px] w-[200px]" />
-            </Link>
-          </div>
-          <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
-            Đăng nhập vào TaskFlow
-          </h2>
-          <p className="mt-2 text-center text-sm text-gray-600">
-            Hoặc{" "}
-            <Link
-              to="/register"
-              className="font-medium text-green-600 hover:text-green-500"
+    <AuthScaffold
+      title="Welcome back"
+      subtitle="Enter your credentials to access your workspace."
+      bottom={
+        <p className="text-center text-sm text-slate-600">
+          Don't have an account?{" "}
+          <Link
+            to="/auth/register"
+            className="font-semibold text-emerald-800 hover:underline"
+          >
+            Sign up
+          </Link>
+        </p>
+      }
+    >
+      <form className="space-y-6" onSubmit={handleSubmit(onSubmit)}>
+        <div className="space-y-4">
+          <div className="space-y-1.5">
+            <label
+              htmlFor="email-address"
+              className="block text-[10px] font-semibold uppercase tracking-[0.22em] text-slate-500"
             >
-              đăng ký ngay nếu bạn chưa có tài khoản
-            </Link>
-          </p>
-        </div>
-        <form className="mt-8 space-y-6" onSubmit={handleSubmit(onSubmit)}>
-          <div className="flex flex-col gap-2 rounded-md">
-            <div>
+              Email
+            </label>
+            <div className="relative">
+              <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-slate-400">
+                <Mail className="h-[18px] w-[18px]" aria-hidden="true" />
+              </span>
               <input
                 {...register("email")}
                 id="email-address"
                 type="email"
                 autoComplete="email"
-                onChange={() => {
-                  // setValue("email", "");
-                }}
-                placeholder="Email"
-                className={`relative block w-full appearance-none border px-3 py-2 ${
-                  errors.email ? "border-red-500" : "border-gray-300"
-                } rounded-md text-gray-900 placeholder-gray-500 shadow-md focus:border-green-500 focus:ring-green-500 focus:outline-none sm:text-sm`}
+                placeholder="name@company.com"
+                className={`w-full rounded-sm bg-white py-3 pl-10 pr-3 text-sm text-slate-900 shadow-sm ring-1 transition placeholder:text-slate-400 focus:outline-none focus:ring-2 ${errors.email
+                  ? "ring-red-300 focus:ring-red-400"
+                  : "ring-slate-200 focus:ring-emerald-500"
+                  }`}
               />
-              {errors.email && (
-                <p className="mt-1 text-sm text-red-500">
-                  {errors.email.message}
-                </p>
-              )}
             </div>
+            {errors.email && (
+              <p className="text-sm text-red-500">{errors.email.message}</p>
+            )}
+          </div>
 
-            <div>
+          <div className="space-y-1.5">
+            <div className="flex items-center justify-between">
+              <label
+                htmlFor="password"
+                className="block text-[10px] font-semibold uppercase tracking-[0.22em] text-slate-500"
+              >
+                Password
+              </label>
+              <button
+                type="button"
+                disabled
+                title="Coming soon"
+                className="text-[11px] font-semibold text-emerald-800/60 hover:underline disabled:cursor-not-allowed disabled:no-underline"
+              >
+                Forgot password?
+              </button>
+            </div>
+            <div className="relative">
+              <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-slate-400">
+                <Lock className="h-[18px] w-[18px]" aria-hidden="true" />
+              </span>
               <input
                 {...register("password")}
                 id="password"
                 type="password"
                 autoComplete="current-password"
-                onChange={(e) => {
-                  setValue("password", e.target.value);
-                }}
-                placeholder="Mật khẩu"
-                className={`relative block w-full appearance-none border px-3 py-2 ${
-                  errors.password ? "border-red-500" : "border-gray-300"
-                } rounded-md text-gray-900 placeholder-gray-500 shadow-md focus:border-green-500 focus:ring-green-500 focus:outline-none sm:text-sm`}
+                placeholder="••••••••"
+                className={`w-full rounded-sm bg-white py-3 pl-10 pr-3 text-sm text-slate-900 shadow-sm ring-1 transition placeholder:text-slate-400 focus:outline-none focus:ring-2 ${errors.password
+                  ? "ring-red-300 focus:ring-red-400"
+                  : "ring-slate-200 focus:ring-emerald-500"
+                  }`}
               />
-              {errors.password && (
-                <p className="mt-1 text-sm text-red-500">
-                  {errors.password.message}
-                </p>
-              )}
             </div>
-            {/* {error && <p className="text-red-500 text-sm mt-1">{error}</p>} */}
+            {errors.password && (
+              <p className="text-sm text-red-500">{errors.password.message}</p>
+            )}
           </div>
-          <div className="flex items-center justify-between">
-            <div className="flex items-center">
-              <input
-                {...register("rememberMe")}
-                id="remember-me"
-                type="checkbox"
-                className="h-4 w-4 rounded border-gray-300 text-green-600 focus:ring-green-500"
-              />
-              <label
-                htmlFor="remember-me"
-                className="ml-2 block text-sm text-gray-900"
-              >
-                Ghi nhớ đăng nhập
-              </label>
-            </div>
-
-            <div className="text-sm">
-              <a
-                href="#"
-                className="font-medium text-green-600 hover:text-green-500"
-              >
-                Quên mật khẩu?
-              </a>
-            </div>
-          </div>
-
-          <div>
-            <Button
-              variant="primary"
-              isLoading={isLoading}
-              type="submit"
-              className="w-full"
-            >
-              Đăng nhập
-            </Button>
-          </div>
-        </form>
-
-        <div
-          onClick={() => {
-            navigate("/auth/register");
-          }}
-        >
-          <OrthersLogin />
         </div>
-      </div>
-    </div>
+
+        <div className="pt-1">
+          <Button
+            variant="primary"
+            isLoading={isLoading}
+            type="submit"
+            className="w-full rounded-sm! bg-linear-to-br from-emerald-950 to-emerald-800 py-3 font-semibold uppercase tracking-wide shadow-lg shadow-emerald-900/10 hover:opacity-95"
+          >
+            Sign in to workspace
+          </Button>
+        </div>
+      </form>
+    </AuthScaffold>
   );
 };
 

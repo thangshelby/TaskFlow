@@ -55,7 +55,7 @@ export const useBackLogPage = (projectId: string) => {
   const [sprintIssues, setSprintIssues] = useState<ISprintIssues[]>([]);
 
   useEffect(() => {
-    if (sprints.length && issues.length) {
+    if (!isLoadingSprints && !isLoadingIssues) {
       const issuesNotEpic = getIssuesNotEpic(issues);
       setSprintIssues(
         [...sprints, backLogSprint].map((sprint: ISprint) => ({

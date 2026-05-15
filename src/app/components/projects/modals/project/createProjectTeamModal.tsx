@@ -3,13 +3,17 @@ import Modal from "@libs/app/components/general-components/modal/modal";
 import FindUser from "@libs/app/components/general-components/findUser";
 import { useCreateTeam } from "@libs/hooks/apis/useTeam";
 import { useParams } from "react-router-dom";
+import "@libs/app/components/projects/modals/modal.css";
 
-interface AddProjectTeamModalProps {
+interface CreateProjectTeamModalProps {
   isOpen: boolean;
   onClose: () => void;
 }
 
-const AddProjectTeamModal = ({ isOpen, onClose }: AddProjectTeamModalProps) => {
+const CreateProjectTeamModal = ({
+  isOpen,
+  onClose,
+}: CreateProjectTeamModalProps) => {
   const [name, setName] = useState("");
   const [memberIds, setMemberIds] = useState<string[]>([]);
   const [anyoneCanJoin, setAnyoneCanJoin] = useState(false);
@@ -36,7 +40,8 @@ const AddProjectTeamModal = ({ isOpen, onClose }: AddProjectTeamModalProps) => {
       isLoadingButton={isLoading}
       buttonContent="Create"
       onSubmit={handleCreateTeam}
-      isSubmitDisabled={!name.trim() || memberIds.length === 0}
+      isSubmitDisabled={!name.trim()}
+      className="rounded-xl border border-white/40 shadow-2xl glass-panel"
     >
       <div className="space-y-4" ref={wrapperRef}>
         {/* Name */}
@@ -81,4 +86,4 @@ const AddProjectTeamModal = ({ isOpen, onClose }: AddProjectTeamModalProps) => {
   );
 };
 
-export default AddProjectTeamModal;
+export default CreateProjectTeamModal;

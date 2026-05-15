@@ -3,7 +3,7 @@ import { IIssue } from "@libs/types/issue";
 import { type TableColumnType } from "antd";
 import { get } from "lodash";
 import React from "react";
-import { FaPlus, FaListUl } from "react-icons/fa";
+import { FaPlus } from "react-icons/fa";
 import { ITableColumn } from "@libs/constants/list";
 
 const fixedField = ["title", "type"];
@@ -18,20 +18,17 @@ const TableColumn = (
     title: (
       <div
         id={key}
-        className="group item flex items-center justify-between gap-2"
+        className="group item flex items-center justify-between gap-2 font-manrope"
       >
         <div className="flex items-center gap-2">
-          <div className="hidden rounded-md p-1 group-hover:block">
-            <FaListUl className="h-3 w-3 text-[#6c757d]" />
-          </div>
-          <div className="rounded-md p-1 group-hover:hidden">
+          <div className="rounded-md p-1 opacity-50 group-hover:opacity-100 transition-opacity">
             {key in columnsIcon ? (
               columnsIcon[key as ITableColumn]
             ) : (
-              <FaPlus className="h-3 w-3 text-[#6c757d]" /> 
+              <FaPlus size={12} className="text-[#064e3b]" /> 
             )}
           </div>
-          <span className="text-xs font-bold text-[#6c757d]">{title}</span>
+          <span className="text-[10px] font-bold uppercase tracking-widest text-[#404944]">{title}</span>
         </div>
       </div>
     ),

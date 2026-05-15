@@ -1,4 +1,8 @@
 import { IColumn } from "@libs/types/project";
+import { ISprint } from "@libs/types/sprint";
+import { IUser } from "@libs/types/user";
+import { ITeam } from "@libs/types/team"
+
 export interface IIssue {
   id: string;
   key: string;
@@ -6,10 +10,10 @@ export interface IIssue {
   project_id: string;
   sprint_id?: string;
   assignee_id: string;
+  column_id?: string;
   parent_id?: string;
   reporter_id?: string;
   type: IssueType;
-  column: IColumn;
   priority: IssuePriority;
   summary: string;
   description: string;
@@ -23,6 +27,11 @@ export interface IIssue {
   // labels?: string[];
   team_id?: string;
   children?: IIssue[];
+  column: IColumn;
+  sprint?: ISprint
+  assignee?: IUser
+  reporter?: IUser
+  team?: ITeam
 }
 export type IIssueWithoutCoulumn = Omit<IIssue, "column">;
 
@@ -51,7 +60,7 @@ export interface GetIssuesParams {
 
 export interface CreateIssueParams {
   // Required fields from proto definition
-  title: string;
+  title?: string;
   summary: string; // Required per proto
   type: IssueType;
   column_id: string;
@@ -67,6 +76,8 @@ export interface CreateIssueParams {
   story_point?: number;
   attachments?: string[];
   due_date_to?: string;
+  start_date?: string;
+  team_id?: string;
 }
 
 export interface GetActivitiesParams {

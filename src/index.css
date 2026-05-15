@@ -1,20 +1,31 @@
 @import "tailwindcss";
+@theme {
+  --font-manrope: "Manrope", sans-serif;
+}
 
+body {
+  font-family: "Manrope", sans-serif;
+}
 /* Thanh cuộn chung */
 ::-webkit-scrollbar {
-  width: 4px;   /* độ rộng scrollbar dọc */
-  height: 4px;  /* độ cao scrollbar ngang */
+  width: 4px;
+  /* độ rộng scrollbar dọc */
+  height: 4px;
+  /* độ cao scrollbar ngang */
 }
 
 /* Phần rãnh của scrollbar */
 ::-webkit-scrollbar-track {
-  background: transparent;  /* hoặc #f1f1f1 nếu muốn có màu nền */
+  background: transparent;
+  /* hoặc #f1f1f1 nếu muốn có màu nền */
 }
 
 /* Thanh kéo (thumb) */
 ::-webkit-scrollbar-thumb {
-  background: #c1c1c1;   /* màu thanh kéo */
-  border-radius: 4px;    /* bo tròn */
+  background: #c1c1c1;
+  /* màu thanh kéo */
+  border-radius: 4px;
+  /* bo tròn */
 }
 
 /* Hover vào thanh kéo */
@@ -26,6 +37,7 @@
 .ant-popover-inner {
   @apply !p-0;
 }
+
 /* .ant-table-cell {
   padding: 0px 0px !important;
 }
@@ -33,15 +45,18 @@
   padding: 0px 0px !important;
 } */
 
-.ant-table-tbody > tr > td {
+.ant-table-tbody>tr>td {
   padding: 0px 0px !important;
 }
+
 .ant-table-column-sorters {
   padding: 8px 0px !important;
 }
+
 .ant-table-cell {
   padding: 0px 4px !important;
 }
+
 .ant-dropdown-trigger {
   padding: 0px 0px !important;
 }
@@ -56,12 +71,21 @@
   background-color: transparent;
   /* background-color: oklch(0.696 0.17 162.48); */
 }
-.relative.pointer-events-auto{
+
+.relative.pointer-events-auto {
   z-index: 10;
   width: 100%;
 }
 
 
+.ant-card-extra {
+  width: 100% !important;
+  margin-left: 0 !important;
+}
+
+.ant-input-wrapper {
+  border-radius: 4px;
+}
 
 .crop-container {
   position: relative;
@@ -80,25 +104,28 @@
   background-repeat: no-repeat;
   background-size: 70px 70px;
 }
+
 .reactEasyCrop_CropArea {
   color: rgba(255, 255, 255, 0.8) !important;
 }
 
-.ant-skeleton-content{
+.ant-skeleton-content {
   height: 100%;
   display: flex;
   justify-content: center;
   align-items: center;
 }
-.ant-skeleton-title{
-  width:100% !important;
+
+.ant-skeleton-title {
+  width: 100% !important;
   height: 40px !important;
 }
 
-.ant-select-selector{
-  padding:6px  !important;
+.ant-select-selector {
+  padding: 6px !important;
   border-radius: 8px !important;
 }
+
 /* Căn giữa icon expand trong bảng AntD */
 .ant-table-row-expand-icon {
   display: flex !important;
@@ -106,19 +133,19 @@
   justify-content: center !important;
 }
 
-.ant-table-row-expand-icon-collapsed{
-  margin-top: 10px!important;
-  margin-left: 8px!important;
-  margin-right: 0px!important;
+.ant-table-row-expand-icon-collapsed {
+  margin-top: 10px !important;
+  margin-left: 8px !important;
+  margin-right: 0px !important;
 }
 
-.ant-table-row-expand-icon-expanded{
-  margin-top: 10px!important;
-  margin-left: 8px!important;
-  margin-right: 0px!important;
+.ant-table-row-expand-icon-expanded {
+  margin-top: 10px !important;
+  margin-left: 8px !important;
+  margin-right: 0px !important;
 }
 
-.ant-table-footer{
+.ant-table-footer {
   padding: 0px 0px !important;
 }
 
@@ -128,6 +155,7 @@
     opacity: 0;
     transform: translateY(10px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
@@ -143,9 +171,164 @@
   0% {
     transform: translateX(-100%);
   }
+
   100% {
     transform: translateX(100%);
   }
 }
 
+/* Sidebar animations */
+@keyframes slideInLeft {
+  from {
+    opacity: 0;
+    transform: translateX(-10px);
+  }
 
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.animate-slide-in-left {
+  animation: slideInLeft 0.3s ease-out forwards;
+}
+
+@keyframes scaleIn {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.animate-scale-in {
+  animation: scaleIn 0.2s ease-out forwards;
+}
+
+/* Custom scrollbar for sidebar */
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  /* IE and Edge */
+  scrollbar-width: none;
+  /* Firefox */
+}
+
+/* Premium DatePicker Styles */
+.premium-datepicker .ant-picker-input>input {
+  font-size: 11px !important;
+  font-weight: 700 !important;
+  color: inherit !important;
+  letter-spacing: -0.01em;
+  font-family: 'Manrope', sans-serif !important;
+}
+
+.premium-datepicker .ant-picker-input>input::placeholder {
+  color: #404944 !important;
+  opacity: 0.3;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.premium-datepicker:hover {
+  border-color: #064e3b60 !important;
+  background-color: #f9f9f8 !important;
+}
+
+.premium-datepicker.ant-picker-focused {
+  border-color: #064e3b !important;
+  box-shadow: 0 0 0 2px rgba(6, 78, 59, 0.1) !important;
+  background-color: white !important;
+}
+
+.premium-datepicker.is-expired:hover {
+  border-color: #f87171 !important;
+}
+
+/* Premium Search & Popover */
+.premium-search .ant-input-wrapper {
+  background-color: #fcfcfb;
+  border-radius: 4px;
+  overflow: hidden;
+  border: 1px solid #c0c0c0;
+  transition: all 0.2s ease;
+}
+
+.premium-search .ant-input-wrapper:hover {
+  border-color: #064e3b;
+  background-color: white;
+}
+
+.premium-search .ant-input {
+  font-family: 'Manrope', sans-serif !important;
+  font-size: 13px !important;
+  color: #064e3b !important;
+  background-color: transparent !important;
+}
+
+.premium-search .ant-input::placeholder {
+  color: #064e3b/40 !important;
+  font-weight: 500;
+}
+
+.premium-search .ant-input-search-button {
+  background-color: transparent !important;
+  border: none !important;
+  padding: 0 12px !important;
+}
+
+.premium-search .ant-input-search-button .anticon {
+  color: #064e3b !important;
+  font-size: 16px !important;
+  font-weight: bold;
+}
+
+.premium-search .ant-input-search-button:hover {
+  color: #059669 !important;
+}
+
+.premium-popover .ant-popover-inner {
+  padding: 0;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+}
+
+.premium-checkbox .ant-checkbox-checked .ant-checkbox-inner {
+  background-color: #064e3b !important;
+  border-color: #064e3b !important;
+}
+
+.premium-checkbox .ant-checkbox-inner {
+  border-radius: 4px !important;
+  border-color: #e8e8e7 !important;
+}
+
+.premium-checkbox:hover .ant-checkbox-inner {
+  border-color: #064e3b !important;
+}
+
+.custom-scrollbar::-webkit-scrollbar {
+  width: 6px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: #f9f9f8;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: #e8e8e7;
+  border-radius: 10px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: #d1d1d0;
+}

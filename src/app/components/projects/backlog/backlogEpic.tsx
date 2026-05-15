@@ -27,41 +27,51 @@ const EpicIssueCardWrapper = ({
   return <div ref={setNodeRef}>{children}</div>;
 };
 
-const BacklogEpic = ({ issues }: { issues: IIssue[] }) => {
+const BacklogEpic = ({ issues, handleToggleEpic }: { issues: IIssue[], handleToggleEpic: () => void }) => {
   const epicIssues = React.useMemo(() => getIssuesEpic(issues), [issues]);
   const issuesByEpic = React.useMemo(() => getIssuesByEpic(issues), [issues]);
   const { overItemId } = useOverItem();
   return (
-    <div className="flex w-full flex-col gap-3 bg-[#f8f8f8] p-4">
+    <div className="flex w-full flex-col gap-6 bg-white p-5 rounded-md border border-[#064e3b]/10 shadow-sm animate-in slide-in-from-left duration-300">
       <div className="flex items-center justify-between">
-        <h1 className="text-sm font-semibold text-gray-900">Epic</h1>
+        <h2 className="text-[13px] font-black text-[#064e3b] font-manrope uppercase tracking-widest leading-none">
+          Epics
+        </h2>
         <button
           aria-label="Close Epic panel"
-          className="rounded p-1 hover:bg-gray-200"
+          className="group flex h-8 w-8 items-center justify-center rounded-md bg-gray-50 text-gray-400 hover:bg-red-50 hover:text-red-500 transition-all"
+          onClick={handleToggleEpic}
         >
-          <IoClose className="text-gray-500" size={16} />
+          <IoClose size={16} />
         </button>
       </div>
-      <div className="flex flex-col gap-2">
+
+      <div className="flex flex-col gap-3">
         <EpicIssueCardWrapper epicIssueId="no-epic">
           <div
-            className={`flex gap-2 rounded-sm px-4 py-3 transition-shadow hover:border-gray-300 hover:bg-gray-200 hover:shadow-sm ${overItemId === "no-epic" ? "bg-green-200!" : ""}`}
+            className={`flex items-center gap-3 rounded-md border px-4 py-3.5 transition-all cursor-pointer group ${overItemId === "no-epic"
+              ? "bg-[#d1fae5] border-[#064e3b] shadow-md"
+              : "bg-[#f9f9f8] border-transparent hover:border-[#064e3b]/20 hover:shadow-sm"
+              }`}
           >
-            <CopyCheck className="text-gray-500" size={16} />
-            <span className="truncate text-sm font-medium text-gray-900">
+            <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-white text-gray-400 group-hover:text-[#064e3b] transition-colors shadow-sm">
+              <CopyCheck size={16} />
+            </div>
+            <span className="text-[13px] font-bold text-[#064e3b] font-manrope">
               No Epic
             </span>
           </div>
         </EpicIssueCardWrapper>
-        {epicIssues.map((epicIssue) => {
-          return (
+
+        <div className="flex flex-col gap-3">
+          {epicIssues.map((epicIssue) => (
             <EpicIssueCard
               key={epicIssue.id}
               epicIssue={epicIssue}
               issuesByEpic={issuesByEpic}
             />
-          );
-        })}
+          ))}
+        </div>
       </div>
     </div>
   );
@@ -77,118 +87,116 @@ const EpicIssueCard = ({
   issuesByEpic: { [epicId: string]: IIssue[] };
 }) => {
   const { overItemId } = useOverItem();
-
   const [isExpanded, setIsExpanded] = React.useState(false);
   const { openIssueDetail } = useIssueStore();
   const epicIssues = issuesByEpic[epicIssue.id] || [];
 
   const getIssueCountByColumn = () => {
-    const columnCounts: { [columnName: string]: number } = {};
-    columnCounts["TODO"] = epicIssues.filter(
-      (issue) => issue.column?.name === "TODO",
-    ).length;
-    columnCounts["IN PROGRESS"] = epicIssues.filter(
-      (issue) =>
-        issue.column?.name === "IN PROGRESS" ||
-        !["DONE", "In Progress"].includes(issue.column?.name || ""),
-    ).length;
-    columnCounts["DONE"] = epicIssues.filter(
-      (issue) => issue.column?.name === "DONE",
-    ).length;
+    const columnCounts: { [columnName: string]: number } = {
+      TODO: 0,
+      "IN PROGRESS": 0,
+      DONE: 0,
+    };
+    epicIssues.forEach((issue) => {
+      const status = issue.column?.name?.toUpperCase() || "TODO";
+      if (status === "DONE") columnCounts["DONE"]++;
+      else if (status === "IN PROGRESS" || status === "IN REVIEW") columnCounts["IN PROGRESS"]++;
+      else columnCounts["TODO"]++;
+    });
     return columnCounts;
   };
 
   const columnCounts = getIssueCountByColumn();
   const totalIssues = epicIssues.length;
+
   return (
     <EpicIssueCardWrapper epicIssueId={epicIssue.id}>
       <div
-        className={`flex flex-col rounded-md border bg-white px-4 py-3 transition-shadow hover:border-gray-300 hover:bg-gray-200 hover:shadow-sm ${
-          isExpanded ? "border-gray-300" : "border-transparent"
-        } ${overItemId === epicIssue.id ? "bg-green-200!" : ""}`}
+        className={`flex flex-col rounded-md border p-4 transition-all duration-300 ${overItemId === epicIssue.id
+          ? "border-[#064e3b] scale-[1.02] bg-[#d1fae5]"
+          : isExpanded
+            ? "bg-white border-[#064e3b]/20 shadow-lg"
+            : "border-transparent bg-[#f9f9f8]"
+          }`}
       >
-        <div className="flex flex-row items-center justify-between">
-          <div className="flex flex-row items-center space-x-2">
+        <div
+          className="flex flex-row items-center justify-between gap-2 cursor-pointer group"
+          onClick={() => setIsExpanded(!isExpanded)}
+        >
+          <div className="flex min-w-0 flex-1 flex-row items-center gap-3">
             <FaChevronRight
-              size={12}
-              className={`mr-2 inline-block text-gray-500 ${isExpanded ? "rotate-90" : ""}`}
-              onClick={(e) => {
-                e.stopPropagation();
-                setIsExpanded(!isExpanded);
-              }}
+              size={10}
+              className={`text-[#064e3b]/70 transition-transform duration-300 ${isExpanded ? "rotate-90 text-[#064e3b]" : "group-hover:text-[#064e3b]"}`}
             />
-            <div className="h-3 w-3 rounded-sm bg-purple-500"></div>
+            <div className="h-4 w-4 rounded-md bg-[#8465cb] shadow-sm shrink-0"></div>
             <span
-              className="truncate text-sm font-medium text-gray-900"
+              className="truncate text-[13px] font-bold text-[#064e3b] font-manrope"
               title={epicIssue.summary}
             >
               {epicIssue.summary}
             </span>
           </div>
-          <IoIosMore className="text-gray-500" size={20} />
+          <button
+            aria-label="More options"
+            className="h-7 w-7 text-gray-400 hover:text-[#064e3b] transition-colors rounded-lg flex items-center justify-center hover:bg-white"
+          >
+            <IoIosMore size={18} />
+          </button>
         </div>
 
         {totalIssues > 0 && (
-          <div className="mt-2">
-            <div className="h-1 w-full rounded-full bg-gray-200">
-              <div className="flex h-full space-x-[1px] overflow-hidden rounded-full">
-                {Object.entries(columnCounts).map(([columnName, count]) => {
-                  const percentage = (count / totalIssues) * 100;
-                  return (
-                    <div
-                      key={columnName}
-                      className={`h-full rounded-2xl ${getColorByColumnName(columnName) || "bg-gray-400"}`}
-                      style={{ width: `${percentage}%` }}
-                      title={`${columnName}: ${count} issues (${percentage.toFixed(1)}%)`}
-                    />
-                  );
-                })}
-              </div>
+          <div className="mt-4">
+            <div className="h-1.5 w-full rounded-full bg-gray-100 overflow-hidden flex">
+              {Object.entries(columnCounts).map(([columnName, count]) => {
+                if (count === 0) return null;
+                const percentage = (count / totalIssues) * 100;
+                return (
+                  <div
+                    key={columnName}
+                    className={`h-full transition-all duration-500 ${getColorByColumnName(columnName)}`}
+                    style={{ width: `${percentage}%` }}
+                  />
+                );
+              })}
             </div>
-            <div className="mt-1 flex items-center justify-between text-xs text-gray-600">
-              <span>
-                {columnCounts["DONE"] || columnCounts["Done"] || 0} of{" "}
-                {totalIssues} done
-              </span>
-              <span className="text-gray-500">
-                {Object.values(columnCounts).reduce((a, b) => a + b, 0)} issues
+            <div className="mt-2.5 flex items-center justify-between">
+              <span className="text-[11px] font-bold text-[#064e3b]/90 font-manrope uppercase tracking-tight truncate">
+                {columnCounts["DONE"]} of {totalIssues} completed
               </span>
             </div>
           </div>
         )}
 
         {isExpanded && (
-          <div className="mt-3 grid grid-cols-2 gap-4">
-            <div className="flex flex-col">
-              <span className="text-xs font-medium text-gray-800">
-                Start date
-              </span>
-              <span className="text-xs text-gray-600">
-                {epicIssue.due_date_from
-                  ? formatSprintDate(epicIssue.due_date_from)
-                  : "None"}
-              </span>
+          <div className="mt-5 space-y-5 animate-in fade-in slide-in-from-top-2 duration-300">
+            <div className="grid grid-cols-2 gap-4">
+              <div className="flex flex-col gap-1">
+                <span className="text-[9px] font-black text-[#064e3b]/80 uppercase tracking-widest font-manrope">
+                  Start Date
+                </span>
+                <span className="text-[11px] font-bold text-[#064e3b] font-manrope">
+                  {epicIssue.due_date_from ? formatSprintDate(epicIssue.due_date_from) : "Not set"}
+                </span>
+              </div>
+              <div className="flex flex-col gap-1">
+                <span className="text-[9px] font-black text-[#064e3b]/80 uppercase tracking-widest font-manrope">
+                  Due Date
+                </span>
+                <span className="text-[11px] font-bold text-[#064e3b] font-manrope">
+                  {epicIssue.due_date_to ? formatSprintDate(epicIssue.due_date_to) : "Not set"}
+                </span>
+              </div>
             </div>
 
-            <div className="flex flex-col">
-              <span className="text-xs font-medium text-gray-800">
-                Due date
-              </span>
-              <span className="text-xs text-gray-600">
-                {epicIssue.due_date_to
-                  ? formatSprintDate(epicIssue.due_date_to)
-                  : "None"}
-              </span>
-            </div>
-
-            <div className="col-span-2">
-              <button
-                className="bgg- w-full cursor-pointer rounded border border-gray-300 bg-transparent py-1 text-center text-sm font-semibold text-gray-700 hover:bg-gray-300"
-                onClick={() => openIssueDetail(epicIssue.id)}
-              >
-                View all details
-              </button>
-            </div>
+            <button
+              className="w-full h-6 rounded-sm bg-[#064e3b] text-white text-[10px] font-black uppercase tracking-widest font-manrope hover:bg-[#059669] transition-all shadow-md active:scale-95 hover:cursor-pointer"
+              onClick={(e) => {
+                e.stopPropagation();
+                openIssueDetail(epicIssue.id);
+              }}
+            >
+              View Full Details
+            </button>
           </div>
         )}
       </div>
@@ -198,8 +206,8 @@ const EpicIssueCard = ({
 
 function getColorByColumnName(columnName: string) {
   const name = columnName.toUpperCase();
-  if (name === "TO DO" || name === "TODO") return "bg-gray-500";
-  if (name === "IN PROGRESS") return "bg-blue-500";
-  if (name === "DONE") return "bg-green-500";
-  return "bg-blue-500";
+  if (name === "DONE") return "bg-[#064e3b]";
+  if (name === "IN PROGRESS") return "bg-[#059669]";
+  return "bg-gray-300";
 }
+

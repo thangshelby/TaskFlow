@@ -2,10 +2,11 @@ import { io, Socket } from "socket.io-client";
 import axios from "axios";
 
 const NOTIFICATION_URL_API =
-  import.meta.env.VITE_NOTISERVICE_API_URL || "http://localhost:8082/api/v1/";
+  import.meta.env.VITE_NOTISERVICE_API_URL || "http://localhost:5002/notification-service/api/v1/";
+
 const NOTIFICATION_URL_WEBSOCKET =
-  import.meta.env.VITE_NOTISERVICE_API_URL?.replace("/api/v1/", "") ||
-  "http://localhost:8082";
+  import.meta.env.VITE_NOTISERVICE_SOCKET_URL ||
+  "http://localhost:5002";
 
 const notiApi = axios.create({
   baseURL: NOTIFICATION_URL_API,
@@ -28,7 +29,7 @@ notiApi.interceptors.response.use(
   async (error) => {
     if (error.response?.status === 401) {
       localStorage.removeItem("token");
-      // window.location.href = "/login";
+      // window.location.href = "/auth/login";
     }
     return Promise.reject(error);
   },
@@ -38,7 +39,7 @@ export const connectSocket = (userId: string): Socket => {
   const socket = io(NOTIFICATION_URL_WEBSOCKET, {
     query: { userId },
     transports: ["websocket"],
-    path: "/socket.io",
+    path: "/notification-service/socket.io",
   });
 
   socket.on("connect", () => {

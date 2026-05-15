@@ -6,6 +6,7 @@ import { useProjectSprints } from "@libs/hooks/apis/useSprint";
 import { useUpdateIssue } from "@libs/hooks/apis/useIssue";
 import { ISprint } from "@libs/types/sprint";
 import { IIssue } from "@libs/types/issue";
+import "@libs/app/components/projects/modals/modal.css";
 
 interface CompleteSprintModalProps {
   isOpen: boolean;
@@ -55,7 +56,7 @@ const CompleteSprintModal: React.FC<CompleteSprintModalProps> = ({
       buttonContent={isLoading ? "Completing..." : "Complete Sprint"}
       isLoadingButton={isLoading}
       onSubmit={handleComplete}
-      className="max-w-lg"
+      className="max-w-lg rounded-xl border border-white/40 shadow-2xl glass-panel"
     >
       <div className="space-y-6">
         {/* Summary */}

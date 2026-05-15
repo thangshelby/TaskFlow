@@ -22,8 +22,8 @@ export default function FeaturesList() {
           <p className="text-gray-600">All Our work in one place</p>
         </div>
 
-        <div className="grid items-start gap-12 md:grid-cols-2">
-          <div className="space-y-1">
+        <div className="flex w-full items-center justify-center gap-12">
+          <div className="w-[40%] space-y-1">
             {[
               "Projects Management",
               "Task Management",
@@ -42,17 +42,17 @@ export default function FeaturesList() {
                   setActiveFeature(label);
                 }}
                 key={label}
-                className={`flex cursor-pointer items-center gap-4 rounded-lg p-4 py-2 transition-colors ${activeFeature === label ? "bg-emerald-50" : ""}`}
+                className={`flex cursor-pointer items-center gap-4 rounded-lg p-4 py-2 transition-colors ${activeFeature === label ? "bg-[#f0f9f0]" : ""}`}
               >
                 <span
-                  className={`text-lg font-bold hover:text-emerald-600 ${activeFeature === label ? "text-emerald-600" : "text-gray-500"}`}
+                  className={`text-lg font-bold hover:text-[#064e3b] ${activeFeature === label ? "text-[#064e3b]" : "text-gray-500"}`}
                 >
                   {String(index + 1).padStart(2, "0")} :
                 </span>
                 <span
-                  className={`font-bold hover:text-emerald-600 ${
+                  className={`font-bold hover:text-[#064e3b] ${
                     activeFeature === label
-                      ? "text-emerald-600"
+                      ? "text-[#064e3b]"
                       : "text-gray-600"
                   }`}
                 >
@@ -62,7 +62,7 @@ export default function FeaturesList() {
             ))}
           </div>
 
-          <div className="relative flex-1">
+          <div className="relative flex h-full w-full flex-1 items-center justify-center">
             <img
               src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/image-HK9l9065mPN1Q20nC7eN4LIzNBeHg4.png"
               alt="Projects Management Interface"

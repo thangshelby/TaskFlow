@@ -5,6 +5,7 @@ import SearchFilters from "@libs/app/components/admin/common/SearchFilters";
 import { useListUser } from "@libs/hooks/apis/useUser";
 import { IUser } from "@libs/types/user";
 import { useDebounce } from "@libs/hooks/common/useDebounce";
+import LoadingFallback from "@libs/app/components/general-components/loadingFallback";
 
 export type UserSortField = "name" | "email" | "role" | "created_at";
 export type SortOrder = "asc" | "desc";
@@ -73,7 +74,7 @@ const UsersPage = () => {
   };
 
   if (isLoading) {
-    return <div className="flex justify-center p-6">Loading...</div>;
+    return <LoadingFallback />;
   }
 
   return (

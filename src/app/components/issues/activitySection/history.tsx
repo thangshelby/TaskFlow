@@ -13,14 +13,15 @@ export default function History({
     page: 1,
     limit: 10,
   });
+
   if (!activities) return null;
   const getActivityIcon = (actionType: string) => {
     switch (actionType) {
       case "ISSUE_UPDATED":
         return (
-          <div className="flex h-8 w-8 items-center justify-center rounded-full bg-blue-100">
+          <div className="flex h-8 w-8 items-center justify-center rounded-full bg-[#f0fdf4] text-[#064e3b] border border-[#064e3b]/10 shadow-sm">
             <svg
-              className="h-4 w-4 text-blue-600"
+              className="h-4 w-4"
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
@@ -36,9 +37,9 @@ export default function History({
         );
       case "COMMENT_ADDED":
         return (
-          <div className="flex h-8 w-8 items-center justify-center rounded-full bg-green-100">
+          <div className="flex h-8 w-8 items-center justify-center rounded-full bg-[#ecfdf5] text-[#059669] border border-[#059669]/10 shadow-sm">
             <svg
-              className="h-4 w-4 text-green-600"
+              className="h-4 w-4"
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
@@ -54,9 +55,9 @@ export default function History({
         );
       default:
         return (
-          <div className="flex h-8 w-8 items-center justify-center rounded-full bg-gray-100">
+          <div className="flex h-8 w-8 items-center justify-center rounded-full bg-[#f9f9f8] text-[#404944] border border-[#e8e8e7] shadow-sm">
             <svg
-              className="h-4 w-4 text-gray-600"
+              className="h-4 w-4"
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
@@ -97,7 +98,7 @@ export default function History({
   const formatFieldLabel = (field: string) => {
     switch (field) {
       case "Description":
-        return "updated the description";
+        return "updated description";
       case "Status":
         return "changed status";
       case "Reporter":
@@ -134,45 +135,45 @@ export default function History({
       .toUpperCase()
       .slice(0, 2);
   };
+
   return (
-    <div className="max-h-full space-y-4 overflow-auto">
+    <div className="max-h-full space-y-6 overflow-auto font-manrope">
       {activities?.map((activity, activityIndex) => (
         <div
           key={activity.id}
-          className={`relative flex space-x-3 ${
-            activityIndex !== activities.length - 1 ? "pb-4" : ""
-          }`}
+          className={`relative flex space-x-4 ${activityIndex !== activities.length - 1 ? "pb-6" : ""
+            }`}
         >
           {/* Timeline line */}
           {activityIndex !== activities.length - 1 && (
-            <div className="absolute top-8 left-4 h-full w-0.5 bg-gray-200" />
+            <div className="absolute top-10 left-4 h-full w-0.5 bg-[#e8e8e7]" />
           )}
 
           {/* Activity icon */}
-          <div className="relative flex-shrink-0">
+          <div className="relative shrink-0 z-10">
             {getActivityIcon(activity.action_type)}
           </div>
 
           {/* Activity content */}
           <div className="min-w-0 flex-1">
-            <div className="flex items-center space-x-2">
+            <div className="flex items-center space-x-3">
               {/* User avatar */}
-              <div className="flex h-6 w-6 items-center justify-center rounded-full bg-gray-300 text-xs font-medium text-gray-700">
+              <div className="flex h-7 w-7 items-center justify-center rounded-full bg-[#f9f9f8] border border-[#e8e8e7] text-[10px] font-bold text-[#064e3b]">
                 {getUserInitials(activity.user_name)}
               </div>
 
               {/* User name and action */}
-              <div className="flex items-center space-x-1 text-sm">
-                <span className="font-medium text-gray-900">
+              <div className="flex items-center space-x-1.5 text-xs">
+                <span className="font-bold text-[#064e3b]">
                   {activity.user_name}
                 </span>
-                <span className="text-gray-500">
+                <span className="text-[#404944] opacity-60">
                   {activity.action_type === "ISSUE_UPDATED"
                     ? "made changes"
-                    : "performed an action"}
+                    : "performed action"}
                 </span>
-                <span className="text-gray-400">•</span>
-                <span className="text-gray-500">
+                <span className="text-[#e8e8e7]">•</span>
+                <span className="text-[#404944] opacity-50 font-medium">
                   {formatRelativeTime(activity.created_at)}
                 </span>
               </div>
@@ -180,29 +181,29 @@ export default function History({
 
             {/* Changes */}
             {activity.changes && activity.changes.length > 0 && (
-              <div className="mt-2 space-y-2">
+              <div className="mt-3 space-y-3">
                 {activity.changes.map((change, index) => (
                   <div
                     key={index}
-                    className="rounded-lg border border-gray-200 bg-gray-50 p-3"
+                    className="rounded-xl border border-[#e8e8e7]/60 bg-[#f9f9f8]/30 px-4 py-3"
                   >
-                    <div className="flex items-center space-x-2 text-sm">
-                      <span className="text-base">
+                    <div className="flex items-center space-x-2.5 text-xs">
+                      <span className="text-sm">
                         {getFieldIcon(change.field)}
                       </span>
-                      <span className="font-medium text-gray-700">
+                      <span className="font-bold text-[#064e3b] uppercase tracking-wider text-[10px]">
                         {formatFieldLabel(change.field)}
                       </span>
                     </div>
 
-                    <div className="mt-2 flex items-center space-x-2 text-sm">
+                    <div className="mt-2.5 flex items-center space-x-3 text-xs">
                       {change.old_value && (
                         <>
-                          <div className="inline-flex max-w-[400px] items-center overflow-auto rounded-md bg-red-50 px-2 py-1 text-xs font-medium text-red-800 line-through">
+                          <div className="inline-flex items-center rounded-md bg-[#fef2f2] px-2 py-0.5 font-bold text-[#991b1b] line-through decoration-[#991b1b]/30">
                             {change.old_value}
                           </div>
                           <svg
-                            className="h-3 w-3 text-gray-400"
+                            className="h-3 w-3 text-[#064e3b] opacity-20"
                             fill="none"
                             stroke="currentColor"
                             viewBox="0 0 24 24"
@@ -210,13 +211,13 @@ export default function History({
                             <path
                               strokeLinecap="round"
                               strokeLinejoin="round"
-                              strokeWidth={2}
+                              strokeWidth={3}
                               d="M13 7l5 5m0 0l-5 5m5-5H6"
                             />
                           </svg>
                         </>
                       )}
-                      <div className="inline-flex max-w-[400px] items-center overflow-auto rounded-md bg-green-50 px-2 py-1 text-xs font-medium text-green-800">
+                      <div className="inline-flex items-center rounded-md bg-[#f0fdf4] px-2 py-0.5 font-bold text-[#064e3b]">
                         {change.new_value}
                       </div>
                     </div>
@@ -227,6 +228,13 @@ export default function History({
           </div>
         </div>
       ))}
+
+      {(!activities || activities.length === 0) && (
+        <div className="py-12 text-center text-xs font-medium text-[#404944] opacity-40 italic">
+          No activity recorded yet.
+        </div>
+      )}
     </div>
   );
 }
+
