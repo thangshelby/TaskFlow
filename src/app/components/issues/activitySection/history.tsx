@@ -112,6 +112,27 @@ export default function History({
     }
   };
 
+  // Extract plain text from ProseMirror/Tiptap JSON or return as-is
+  const formatDisplayValue = (field: string, value: string | null | undefined): string => {
+    if (!value) return "";
+    if (field === "Description") {
+      try {
+        const doc = JSON.parse(value);
+        const texts: string[] = [];
+        const extract = (node: any) => {
+          if (node.text) texts.push(node.text);
+          if (node.content) node.content.forEach(extract);
+        };
+        extract(doc);
+        const plain = texts.join(" ").trim();
+        return plain.length > 60 ? plain.slice(0, 60) + "…" : plain || "(empty)";
+      } catch {
+        return value.length > 60 ? value.slice(0, 60) + "…" : value;
+      }
+    }
+    return value;
+  };
+
   const formatRelativeTime = (dateString: string) => {
     const now = new Date();
     const date = new Date(dateString);
@@ -141,7 +162,7 @@ export default function History({
       {activities?.map((activity, activityIndex) => (
         <div
           key={activity.id}
-          className={`relative flex space-x-4 ${activityIndex !== activities.length - 1 ? "pb-6" : ""
+          className={`relative flex min-w-0 overflow-hidden space-x-4 ${activityIndex !== activities.length - 1 ? "pb-6" : ""
             }`}
         >
           {/* Timeline line */}
@@ -185,10 +206,10 @@ export default function History({
                 {activity.changes.map((change, index) => (
                   <div
                     key={index}
-                    className="rounded-xl border border-[#e8e8e7]/60 bg-[#f9f9f8]/30 px-4 py-3"
+                    className="min-w-0 overflow-hidden rounded-xl border border-[#e8e8e7]/60 bg-[#f9f9f8]/30 px-4 py-3"
                   >
                     <div className="flex items-center space-x-2.5 text-xs">
-                      <span className="text-sm">
+                      <span className="shrink-0 text-sm">
                         {getFieldIcon(change.field)}
                       </span>
                       <span className="font-bold text-[#064e3b] uppercase tracking-wider text-[10px]">
@@ -196,14 +217,19 @@ export default function History({
                       </span>
                     </div>
 
-                    <div className="mt-2.5 flex items-center space-x-3 text-xs">
+                    <div className="mt-2.5 flex min-w-0 flex-wrap items-center gap-2 text-xs">
                       {change.old_value && (
                         <>
-                          <div className="inline-flex items-center rounded-md bg-[#fef2f2] px-2 py-0.5 font-bold text-[#991b1b] line-through decoration-[#991b1b]/30">
-                            {change.old_value}
+                          <div
+                            className="inline-flex max-w-[160px] shrink-0 items-center overflow-hidden rounded-md bg-[#fef2f2] px-2 py-0.5 font-bold text-[#991b1b] line-through decoration-[#991b1b]/30"
+                            title={change.old_value}
+                          >
+                            <span className="block truncate">
+                              {formatDisplayValue(change.field, change.old_value)}
+                            </span>
                           </div>
                           <svg
-                            className="h-3 w-3 text-[#064e3b] opacity-20"
+                            className="h-3 w-3 shrink-0 text-[#064e3b] opacity-20"
                             fill="none"
                             stroke="currentColor"
                             viewBox="0 0 24 24"
@@ -217,8 +243,13 @@ export default function History({
                           </svg>
                         </>
                       )}
-                      <div className="inline-flex items-center rounded-md bg-[#f0fdf4] px-2 py-0.5 font-bold text-[#064e3b]">
-                        {change.new_value}
+                      <div
+                        className="inline-flex max-w-[160px] shrink-0 items-center overflow-hidden rounded-md bg-[#f0fdf4] px-2 py-0.5 font-bold text-[#064e3b]"
+                        title={change.new_value ?? ""}
+                      >
+                        <span className="block truncate">
+                          {formatDisplayValue(change.field, change.new_value)}
+                        </span>
                       </div>
                     </div>
                   </div>
