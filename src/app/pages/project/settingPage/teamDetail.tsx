@@ -6,6 +6,7 @@ import {
   Settings,
   LogOut,
   Trash2,
+  Loader2,
 } from "lucide-react";
 import PermissionsSettings from "../../../components/projects/settings/permissionSettings";
 import { useParams } from "react-router-dom";
@@ -15,6 +16,7 @@ import { useUpdateTeam } from "@libs/hooks/apis/useTeam";
 import AddProjectTeamMemberModal from "@libs/app/components/projects/modals/project/addProjectTeamMemberModal";
 import LoadingFallback from "@libs/app/components/general-components/loadingFallback";
 import { UI_COMMON_SIZES } from "@libs/app/components/general-components/constants/uiConfig";
+import { uploadFileToCloudinary } from "@libs/utils/file";
 
 import { PERMISSIONS_CONFIG } from "@libs/config/permissons.config";
 import PermissionButton from "@libs/app/components/general-components/pemissionButton";
@@ -30,6 +32,7 @@ const TeamDetailPage: React.FC = () => {
     projectId || "",
   );
   const [isAddPeopleOpen, setIsAddPeopleOpen] = useState(false);
+  const [isUploadingBanner, setIsUploadingBanner] = useState(false);
 
   const [newPermissionKeys, setNewPermissionKeys] = useState<Set<string>>(
     new Set(team?.permission_keys || []),
@@ -63,6 +66,27 @@ const TeamDetailPage: React.FC = () => {
 
   const memberIds = useMemo(() => team?.member_ids || [], [team]);
 
+  const handleBannerChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file || !team?.id) return;
+    setIsUploadingBanner(true);
+    try {
+      const avatarUrl = await uploadFileToCloudinary("", file);
+      if (avatarUrl) {
+        await updateTeam({
+          team_id: team.id,
+          avatar: avatarUrl,
+        });
+      }
+    } catch (err) {
+      console.error("Failed to upload team banner:", err);
+    } finally {
+      setIsUploadingBanner(false);
+      // Reset input so same file can be re-selected
+      if (inputRef.current) inputRef.current.value = "";
+    }
+  };
+
   const handleUpdateTeam = async () => {
     if (!team?.id) throw new Error("Missing team id");
     return updateTeam({
@@ -82,24 +106,43 @@ const TeamDetailPage: React.FC = () => {
             className="group relative flex h-48 w-full cursor-pointer items-center justify-center overflow-hidden shadow-2xl transition-all duration-500 hover:shadow-[#064e3b]/10"
             style={{ 
               borderRadius: UI_COMMON_SIZES.medium.borderRadius,
-              background: "linear-gradient(135deg, #2dd4bf 0%, #818cf8 50%, #c084fc 100%)" 
+              background: team?.avatar
+                ? undefined
+                : "linear-gradient(135deg, #2dd4bf 0%, #818cf8 50%, #c084fc 100%)",
             }}
           >
+            {/* Show avatar image as background if available */}
+            {team?.avatar && (
+              <img
+                src={team.avatar}
+                alt="Team banner"
+                className="absolute inset-0 h-full w-full object-cover"
+              />
+            )}
+
+            {/* Hover overlay */}
             <div
-              onClick={() => inputRef.current?.click()}
+              onClick={() => !isUploadingBanner && inputRef.current?.click()}
               className="absolute inset-0 flex items-center justify-center bg-[#064e3b]/20 opacity-0 backdrop-blur-[2px] transition-all duration-300 group-hover:opacity-100"
             >
               <div className="flex flex-col items-center gap-3">
                 <div className="rounded-full bg-white/20 p-4 shadow-xl ring-1 ring-white/50">
-                  <ImagePlus className="h-6 w-6 text-white" />
+                  {isUploadingBanner ? (
+                    <Loader2 className="h-6 w-6 animate-spin text-white" />
+                  ) : (
+                    <ImagePlus className="h-6 w-6 text-white" />
+                  )}
                 </div>
-                <span className="font-manrope text-[10px] font-black uppercase tracking-widest text-white">Update Cover</span>
+                <span className="font-manrope text-[10px] font-black uppercase tracking-widest text-white">
+                  {isUploadingBanner ? "Uploading..." : "Update Cover"}
+                </span>
               </div>
               <input
                 ref={inputRef}
                 type="file"
+                accept="image/*"
                 className="hidden"
-                onChange={(e) => console.log(e.target.files)}
+                onChange={handleBannerChange}
               />
             </div>
           </div>

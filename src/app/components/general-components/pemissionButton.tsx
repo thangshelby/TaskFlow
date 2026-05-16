@@ -29,14 +29,17 @@ export const PermissionButton = ({
       trigger={["hover"]}
       title={message || title}
     >
-      <button
-        disabled={!isAllow}
-        onClick={handleClick}
-        className={`${isAllow ? "cursor-pointer" : "cursor-not-allowed opacity-50"}`}
+      <span
+        onClick={isAllow ? handleClick : undefined}
+        className={`inline-flex ${isAllow ? "cursor-pointer" : "cursor-not-allowed opacity-50 pointer-events-none"}`}
         aria-label={title}
+        role="button"
+        aria-disabled={!isAllow}
+        tabIndex={isAllow ? 0 : -1}
+        onKeyDown={isAllow ? (e) => e.key === "Enter" && handleClick?.() : undefined}
       >
         {children}
-      </button>
+      </span>
     </Tooltip>
   );
 };

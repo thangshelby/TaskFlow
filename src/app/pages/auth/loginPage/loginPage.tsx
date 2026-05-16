@@ -7,6 +7,7 @@ import { useAuth } from "@libs/hooks/apis/useAuth";
 import Button from "@libs/app/components/general-components/button";
 import { Lock, Mail } from "lucide-react";
 import { AuthScaffold } from "@libs/app/components/auth/auth-scaffold";
+import { useAuthStore } from "@libs/store/useAuthStore";
 
 // Schema definition with Zod
 const loginSchema = z.object({
@@ -18,6 +19,7 @@ type LoginFormData = z.infer<typeof loginSchema>;
 
 const LoginPage: React.FC = () => {
   const { login } = useAuth();
+  const { error: serverError, setError: clearServerError } = useAuthStore();
   const isLoading = login.isPending;
   const {
     register,
@@ -32,11 +34,17 @@ const LoginPage: React.FC = () => {
   });
 
   const onSubmit = async (data: LoginFormData) => {
+    clearServerError(null);
     login.mutate({
       email: data.email,
       password: data.password,
     });
   };
+
+  // Parse comma-separated server errors into array
+  const serverErrors = serverError
+    ? serverError.split(",").map((msg) => msg.trim()).filter(Boolean)
+    : [];
 
   return (
     <AuthScaffold
@@ -111,14 +119,32 @@ const LoginPage: React.FC = () => {
                 type="password"
                 autoComplete="current-password"
                 placeholder="••••••••"
-                className={`w-full rounded-sm bg-white py-3 pl-10 pr-3 text-sm text-slate-900 shadow-sm ring-1 transition placeholder:text-slate-400 focus:outline-none focus:ring-2 ${errors.password
-                  ? "ring-red-300 focus:ring-red-400"
-                  : "ring-slate-200 focus:ring-emerald-500"
+                onChange={() => clearServerError(null)}
+                className={`w-full rounded-sm bg-white py-3 pl-10 pr-3 text-sm text-slate-900 shadow-sm ring-1 transition placeholder:text-slate-400 focus:outline-none focus:ring-2 ${
+                  errors.password || serverErrors.length > 0
+                    ? "ring-red-300 focus:ring-red-400"
+                    : "ring-slate-200 focus:ring-emerald-500"
                   }`}
               />
             </div>
             {errors.password && (
               <p className="text-sm text-red-500">{errors.password.message}</p>
+            )}
+            {/* Server error messages */}
+            {serverErrors.length > 0 && (
+              <div className="mt-2 rounded-sm border border-red-200 bg-red-50 px-3 py-2">
+                {serverErrors.length === 1 ? (
+                  <p className="text-sm text-red-600">{serverErrors[0]}</p>
+                ) : (
+                  <ul className="list-inside list-disc space-y-0.5">
+                    {serverErrors.map((msg, i) => (
+                      <li key={i} className="text-sm text-red-600">
+                        {msg}
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </div>
             )}
           </div>
         </div>

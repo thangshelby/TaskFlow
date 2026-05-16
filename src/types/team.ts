@@ -5,6 +5,7 @@ export interface ITeam {
   description: string;
   permission_keys: string[];
   member_ids: string[];
+  avatar: string;
   updated_at: string;
   created_at: string;
 }
@@ -27,6 +28,7 @@ export interface UpdateTeamParams {
   team_id: string;
   name?: string;
   description?: string;
+  avatar?: string;
   permission_keys?: string[];
   member_ids?: string[];
 }
