@@ -1,11 +1,12 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useParams } from "react-router-dom";
-import { Flag, MoreHorizontal, Info, Save, Calendar as CalendarIcon } from "lucide-react";
+import { Flag, MoreHorizontal, Info, Save, Calendar as CalendarIcon, ImagePlus, Loader2 } from "lucide-react";
 import { useProjectByID, useUpdateProject } from "@libs/hooks/apis/useProject";
 import UserAvatar from "@libs/app/components/general-components/user/userAvatar";
 import { toast } from "react-toastify";
 import LoadingFallback from "@libs/app/components/general-components/loadingFallback";
 import { UI_COMMON_SIZES } from "@libs/app/components/general-components/constants/uiConfig";
+import { uploadFileToCloudinary } from "@libs/utils/file";
 import DatePicker from "antd/lib/date-picker";
 import dayjs from "dayjs";
 
@@ -13,7 +14,7 @@ const ProjectDetailPage: React.FC = () => {
   const { projectId } = useParams<{ projectId: string }>();
   const { project, isLoading } = useProjectByID(projectId || "");
   const { updateProject, isLoading: isUpdating } = useUpdateProject({
-    onClose: () => toast.success("Project updated successfully!"),
+    onClose: () => {},
   });
 
   const [formData, setFormData] = useState({
@@ -24,9 +25,13 @@ const ProjectDetailPage: React.FC = () => {
     access: "Public",
     due_date_from: undefined as string | undefined,
     due_date_to: undefined as string | undefined,
+    background_img: "" as string | undefined,
+    owner_id: "",
   });
 
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const [isUploadingBanner, setIsUploadingBanner] = useState(false);
+  const bannerInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     if (project) {
@@ -38,9 +43,34 @@ const ProjectDetailPage: React.FC = () => {
         access: project.access || "Public",
         due_date_from: project.due_date_from,
         due_date_to: project.due_date_to,
+        background_img: project.background_img || "",
+        owner_id: project.owner_id || "",
       });
     }
   }, [project]);
+
+  const handleBannerChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file || !projectId) return;
+    setIsUploadingBanner(true);
+    try {
+      const bannerUrl = await uploadFileToCloudinary("", file);
+      if (bannerUrl) {
+        handleInputChange("background_img", bannerUrl);
+        // Optionally update immediately like in team detail
+        await updateProject({
+          id: projectId,
+          data: { ...formData, background_img: bannerUrl },
+        });
+      }
+    } catch (err) {
+      console.error("Failed to upload project banner:", err);
+      toast.error("Failed to upload banner image");
+    } finally {
+      setIsUploadingBanner(false);
+      if (bannerInputRef.current) bannerInputRef.current.value = "";
+    }
+  };
 
   const handleInputChange = (field: string, value: any) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
@@ -112,20 +142,58 @@ const ProjectDetailPage: React.FC = () => {
       </div>
 
       <div className="mx-auto w-full max-w-4xl">
-        {/* Project Icon Section */}
-        <div className="mb-8 flex flex-col items-center">
+        {/* Premium Banner Section */}
+        <div 
+          className="group relative mb-12 flex h-48 w-full cursor-pointer items-center justify-center overflow-hidden shadow-2xl transition-all duration-500 hover:shadow-[#064e3b]/10"
+          style={{ 
+            borderRadius: UI_COMMON_SIZES.medium.borderRadius,
+            background: formData.background_img
+              ? undefined
+              : "linear-gradient(135deg, #f59e0b 0%, #d97706 100%)",
+          }}
+        >
+          {formData.background_img && (
+            <img
+              src={formData.background_img}
+              alt="Project banner"
+              className="absolute inset-0 h-full w-full object-cover"
+            />
+          )}
+
+          {/* Hover overlay */}
           <div
-            className="mb-4 flex h-20 w-20 items-center justify-center shadow-lg ring-4 ring-white"
-            style={{
-              borderRadius: UI_COMMON_SIZES.medium.borderRadius,
-              background: "linear-gradient(135deg, #f59e0b 0%, #d97706 100%)",
-            }}
+            onClick={() => !isUploadingBanner && bannerInputRef.current?.click()}
+            className="absolute inset-0 flex items-center justify-center bg-[#064e3b]/20 opacity-0 backdrop-blur-[2px] transition-all duration-300 group-hover:opacity-100"
           >
-            <Flag size={40} className="text-white" />
+            <div className="flex flex-col items-center gap-3">
+              <div className="rounded-full bg-white/20 p-4 shadow-xl ring-1 ring-white/50">
+                {isUploadingBanner ? (
+                  <Loader2 className="h-6 w-6 animate-spin text-white" />
+                ) : (
+                  <ImagePlus className="h-6 w-6 text-white" />
+                )}
+              </div>
+              <span className="font-manrope text-[10px] font-black uppercase tracking-widest text-white">
+                {isUploadingBanner ? "Uploading..." : "Change Cover Image"}
+              </span>
+            </div>
+            <input
+              ref={bannerInputRef}
+              type="file"
+              accept="image/*"
+              className="hidden"
+              onChange={handleBannerChange}
+            />
           </div>
-          <button className="font-manrope text-[10px] font-black uppercase tracking-widest text-[#064e3b]/50 transition-colors hover:text-[#064e3b]">
-            Change Icon
-          </button>
+          
+          {!formData.background_img && !isUploadingBanner && (
+            <div className="flex flex-col items-center gap-2 pointer-events-none">
+              <Flag size={40} className="text-white/40" />
+              <span className="font-manrope text-[10px] font-black uppercase tracking-widest text-white/40">
+                Default Theme
+              </span>
+            </div>
+          )}
         </div>
 
         {/* Form Sections */}

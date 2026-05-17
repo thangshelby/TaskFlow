@@ -250,8 +250,15 @@ const ProjectNavbar: React.FC<ProjectNavbarProps> = ({
             <div
               className={`flex items-center min-w-0 ${isCollapsed ? "w-full justify-center" : "flex-1 gap-4"}`}
             >
-              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-[#064e3b] text-white shadow-sm hover:rotate-3 transition-transform duration-300">
-                <Compass size={20} strokeWidth={2.5} />
+              <div
+                className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg text-white shadow-sm hover:rotate-3 transition-transform duration-300 overflow-hidden"
+                style={{
+                  background: project?.background_img
+                    ? `url(${project.background_img}) center/cover no-repeat`
+                    : "#064e3b",
+                }}
+              >
+                {!project?.background_img && <Compass size={20} strokeWidth={2.5} />}
               </div>
               {!isCollapsed && (
                 <div className="flex flex-col min-w-0 overflow-hidden animate-slide-in-left">

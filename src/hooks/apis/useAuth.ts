@@ -34,7 +34,11 @@ export function useAuth() {
     },
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     onError: (error: any) => {
-      setError(error.response.data.message);
+      const message =
+        error.response?.data?.message ||
+        error.message ||
+        "Login failed. Please try again.";
+      setError(message);
     },
   });
 

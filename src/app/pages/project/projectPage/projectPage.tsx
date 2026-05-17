@@ -91,24 +91,27 @@ export default function ProjectPage() {
 
           {/* Controls */}
           <div className="mb-10 flex items-center gap-4">
-            <div className="relative flex-1 max-w-md">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-[#064e3b]/40" size={18} />
+            <div className="relative flex-1 max-w-md group">
+              <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-[#064e3b]/30 transition-colors group-focus-within:text-[#064e3b]" size={18} />
               <input
-                placeholder="Search for project..."
+                placeholder="Search for projects..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full h-11 rounded-xl border border-[#064e3b]/10 bg-white pl-10 pr-4 font-manrope text-sm transition-all focus:border-[#064e3b]/30 focus:outline-none focus:ring-4 focus:ring-[#064e3b]/5"
+                className="w-full h-12 rounded-2xl border border-[#064e3b]/10 bg-white pl-12 pr-4 font-manrope text-sm transition-all focus:border-[#064e3b]/30 focus:outline-none focus:ring-8 focus:ring-[#064e3b]/5 shadow-sm hover:shadow-md"
               />
             </div>
+
             <Dropdown
               menu={{
                 items: sortMenuItems,
                 onClick: ({ key }) => setSortBy(key),
               }}
               trigger={["click"]}
+              placement="bottomRight"
             >
-              <button className="flex h-11 items-center gap-2 rounded-xl bg-[#064e3b] px-5 font-manrope text-[11px] font-black uppercase tracking-widest text-white shadow-lg shadow-[#064e3b]/20 transition-all hover:bg-[#064e3b]/90 hover:-translate-y-0.5 active:translate-y-0">
-                {sortBy.toUpperCase()} <ChevronDown size={14} />
+              <button className="flex h-11 w-24 items-center justify-center gap-2 rounded-xl bg-[#064e3b] font-manrope text-xs font-black uppercase tracking-widest text-white shadow-lg shadow-[#064e3b]/20 transition-all hover:bg-[#064e3b]/90 hover:-translate-y-0.5 active:translate-y-0">
+                <span className="pl-1">{sortBy}</span>
+                <ChevronDown size={16} />
               </button>
             </Dropdown>
           </div>
@@ -118,83 +121,119 @@ export default function ProjectPage() {
               <div
                 key={project.id}
                 onClick={() => navigate(`/projects/${project.id}/summary`)}
-                style={{ borderRadius: UI_COMMON_SIZES.medium.borderRadius }}
-                className="group relative flex cursor-pointer flex-col overflow-hidden border border-[#064e3b]/5 bg-white p-6 shadow-sm ring-[#064e3b] transition-all hover:-translate-y-1 hover:shadow-xl hover:shadow-[#064e3b]/5"
+                style={{
+                  borderRadius: UI_COMMON_SIZES.medium.borderRadius,
+                }}
+                className="group relative flex cursor-pointer flex-col overflow-hidden border border-[#064e3b]/5 bg-white shadow-sm transition-all hover:-translate-y-1.5 hover:shadow-2xl hover:shadow-[#064e3b]/10"
               >
-                {/* Project Top Bar */}
-                <div className="mb-6 flex items-start justify-between">
+                {/* Project Banner Area */}
+                <div className="relative h-32 w-full overflow-hidden">
                   <div
-                    className="flex h-12 w-12 items-center justify-center font-manrope text-lg font-black text-white shadow-lg ring-4 ring-white"
+                    className="absolute inset-0 transition-transform duration-700 ease-out group-hover:scale-110"
                     style={{
-                      borderRadius: UI_COMMON_SIZES.medium.borderRadius,
                       background: project.background_img
-                        ? `url(${project.background_img})`
+                        ? `url(${project.background_img}) center/cover no-repeat`
                         : "linear-gradient(135deg, #064e3b 0%, #10b981 100%)",
-                      backgroundSize: "cover",
                     }}
-                  >
-                    {project.key}
-                  </div>
-                  <Dropdown menu={{ items: projectActionItems }} trigger={["click"]}>
-                    <button
-                      onClick={(e) => e.stopPropagation()}
-                      className="rounded-lg p-2 text-[#064e3b]/30 hover:bg-[#064e3b]/5 hover:text-[#064e3b]"
-                    >
-                      <MoreHorizontal size={20} />
-                    </button>
-                  </Dropdown>
-                </div>
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-b from-black/20 via-transparent to-black/10" />
 
-                <div className="mb-2 flex items-center gap-2">
-                  <span className="font-manrope text-[10px] font-black uppercase tracking-[0.2em] text-[#064e3b]/40">
-                    {project.type}
-                  </span>
-                  <div className="h-1 w-1 rounded-full bg-[#064e3b]/20" />
-                  <span className="font-manrope text-[10px] font-black uppercase tracking-[0.2em] text-[#064e3b]/40">
-                    {project.due_date_from ? new Date(project.due_date_from).toLocaleDateString() : "No due date"}
-                  </span>
-                </div>
-
-                <h3 className="mb-3 font-manrope text-xl font-black text-[#064e3b]">
-                  {project.name}
-                </h3>
-
-                <p className="mb-8 line-clamp-2 min-h-12 font-manrope text-sm leading-relaxed text-[#064e3b]/60">
-                  {project.description}
-                </p>
-
-                {/* Progress Visual */}
-                <div className="mb-8 rounded-2xl bg-[#064e3b]/2 p-4">
-                  <div className="mb-2 flex items-center justify-between">
-                    <span className="font-manrope text-[10px] font-black uppercase tracking-widest text-[#064e3b]/50">
-                      Project Completion
-                    </span>
-                    <span className="font-manrope text-xs font-black text-[#064e3b]">
-                      {project.issues_count}%
-                    </span>
-                  </div>
-                  <div className="h-1.5 w-full overflow-hidden rounded-full bg-[#064e3b]/10">
-                    <div
-                      className="h-full rounded-full bg-[#064e3b] transition-all duration-1000 ease-out"
-                      style={{ width: `${project.issues_count}%` }}
-                    />
+                  {/* Action Menu - Floating */}
+                  <div className="absolute right-3 top-3 z-20">
+                    <Dropdown menu={{ items: projectActionItems }} trigger={["click"]}>
+                      <button
+                        onClick={(e) => e.stopPropagation()}
+                        className="flex h-8 w-8 items-center justify-center rounded-full bg-white/20 backdrop-blur-md text-white transition-all hover:bg-white hover:text-[#064e3b]"
+                      >
+                        <MoreHorizontal size={18} />
+                      </button>
+                    </Dropdown>
                   </div>
                 </div>
 
-                {/* Footer Stats */}
-                <div className="flex items-center justify-between pt-6 border-t border-[#064e3b]/5">
-                  <div className="flex items-center gap-4">
-                    <div className="flex items-center gap-1.5 text-[#064e3b]/60">
-                      <Folder size={16} />
-                      <span className="font-manrope text-xs font-bold">{project.issues_count}</span>
-                    </div>
-                    <div className="flex items-center gap-1.5 text-[#064e3b]/60">
-                      <User size={16} />
-                      <span className="font-manrope text-xs font-bold">{project.members_count}</span>
+                {/* Project Content Area */}
+                <div className="relative flex flex-col p-6 pt-0">
+                  {/* Floating Icon Box */}
+                  <div className="-mt-10 mb-5 relative z-10">
+                    <div className="flex h-20 w-20 items-center justify-center rounded-2xl bg-white p-1.5 shadow-xl ring-1 ring-black/5">
+                      <div
+                        className="h-full w-full rounded-xl flex items-center justify-center font-manrope text-2xl font-black text-white shadow-inner"
+                        style={{
+                          background: project.background_img
+                            ? `url(${project.background_img}) center/cover no-repeat`
+                            : "linear-gradient(135deg, #064e3b 0%, #10b981 100%)",
+                        }}
+                      >
+                        {project.key}
+                      </div>
                     </div>
                   </div>
-                  <div className="rounded-full bg-emerald-50 px-3 py-1 text-[10px] font-black uppercase tracking-widest text-emerald-600">
-                    Active
+
+                  {/* Project Metadata */}
+                  <div className="mb-2 flex items-center gap-2">
+                    <div className="flex items-center rounded-full bg-[#064e3b]/5 px-2 py-0.5">
+                      <span className="font-manrope text-[9px] font-black uppercase tracking-widest text-[#064e3b]/60">
+                        {project.type}
+                      </span>
+                    </div>
+                    <div className="h-1 w-1 rounded-full bg-[#064e3b]/20" />
+                    <span className="font-manrope text-[10px] font-bold text-[#064e3b]/40">
+                      {project.due_date_from ? new Date(project.due_date_from).toLocaleDateString() : "No due date"}
+                    </span>
+                  </div>
+
+                  <h3 className="mb-2 font-manrope text-2xl font-black tracking-tight text-[#064e3b] transition-colors group-hover:text-emerald-700">
+                    {project.name}
+                  </h3>
+
+                  <p className="mb-8 line-clamp-2 min-h-[2.5rem] font-manrope text-sm leading-relaxed text-[#064e3b]/60">
+                    {project.description || "No description provided for this project."}
+                  </p>
+
+                  {/* Enhanced Progress Section */}
+                  <div className="mb-8 rounded-2xl bg-[#fcfcfb] border border-[#064e3b]/5 p-4 shadow-inner-sm">
+                    <div className="mb-3 flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <div className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                        <span className="font-manrope text-[10px] font-black uppercase tracking-widest text-[#064e3b]/40">
+                          Overall Progress
+                        </span>
+                      </div>
+                      <span className="font-manrope text-sm font-black text-[#064e3b]">
+                        {project.issues_count}%
+                      </span>
+                    </div>
+                    <div className="h-2 w-full overflow-hidden rounded-full bg-[#064e3b]/5">
+                      <div
+                        className="h-full rounded-full bg-gradient-to-r from-[#064e3b] to-emerald-400 transition-all duration-1000 ease-out"
+                        style={{ width: `${project.issues_count}%` }}
+                      />
+                    </div>
+                  </div>
+
+                  {/* Footer Stats - Cleaned up */}
+                  <div className="flex items-center justify-between pt-5 border-t border-[#064e3b]/5">
+                    <div className="flex items-center gap-5">
+                      <div className="flex items-center gap-2 group/stat">
+                        <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-[#064e3b]/5 text-[#064e3b]/40 transition-colors group-hover/stat:bg-[#064e3b] group-hover/stat:text-white">
+                          <Folder size={14} />
+                        </div>
+                        <span className="font-manrope text-xs font-bold text-[#064e3b]/70">{project.issues_count}</span>
+                      </div>
+                      <div className="flex items-center gap-2 group/stat">
+                        <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-[#064e3b]/5 text-[#064e3b]/40 transition-colors group-hover/stat:bg-[#064e3b] group-hover/stat:text-white">
+                          <User size={14} />
+                        </div>
+                        <span className="font-manrope text-xs font-bold text-[#064e3b]/70">{project.members_count}</span>
+                      </div>
+                    </div>
+
+                    <div className="flex items-center gap-2 rounded-full bg-emerald-50 px-3 py-1 border border-emerald-100">
+                      <div className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
+                      <span className="font-manrope text-[10px] font-black uppercase tracking-widest text-emerald-700">
+                        Active
+                      </span>
+                    </div>
                   </div>
                 </div>
               </div>
