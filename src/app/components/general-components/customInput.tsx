@@ -46,7 +46,7 @@ const CustomInput = ({
   }, [show]);
 
   return (
-    <div className={`relative w-full z-50 ${containerClassName}`}>
+    <div className={`relative w-full ${show ? "z-40" : ""} ${containerClassName}`}>
       {show ? (
         <input
           autoFocus

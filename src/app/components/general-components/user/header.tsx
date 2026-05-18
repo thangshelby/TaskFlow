@@ -37,7 +37,7 @@ export const Header = () => {
 
   return (
     <div className="w-full">
-      <header className="sticky top-0 z-50 w-full bg-[#f9f9f8]/80 backdrop-blur-xl shadow-sm border-b border-[#e8e8e7]">
+      <header className="sticky top-0 z-40 w-full bg-[#f9f9f8]/80 backdrop-blur-xl shadow-sm border-b border-[#e8e8e7]">
         <div className="flex justify-between items-center h-16 px-8 w-full">
           {/* Left section: Logo */}
           <div className="shrink-0">

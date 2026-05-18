@@ -13,6 +13,8 @@ import { TableRowSelection } from "antd/es/table/interface";
 import { useTableColumns } from "@libs/hooks/pages/useTableColumns";
 import TableFooter from "./listTable/tableFooter";
 import { useIssueStore } from "@libs/store/useIssueStore";
+import { IUser } from "@libs/types/user";
+import { ITeam } from "@libs/types/team";
 
 const CreateIssueModal = lazy(
   () => import("@libs/app/components/projects/modals/issue/createIssueModal"),
@@ -36,8 +38,8 @@ const MemoizedTableRow = React.memo(({
   rowProps
 }: {
   issue: IIssue;
-  user: any;
-  userTeams: any;
+  user: IUser;
+  userTeams: ITeam[];
   rowProps: any
 }) => {
   const permissionResult = usePermission({
@@ -94,6 +96,8 @@ const ListTable = ({
     selectedRowKeys,
     onChange: onSelectChange,
   };
+
+  // Add children to epic issues
   useEffect(() => {
     setDataSource(() => {
       return issues.map((issue: IIssue) => {
@@ -140,27 +144,39 @@ const ListTable = ({
     return response.data;
   };
 
+  const findIssueInTree = (tree: IIssue[], id: string): IIssue | undefined => {
+    for (const item of tree) {
+      if (item.id === id) return item;
+      if (item.children && item.children.length > 0) {
+        const found = findIssueInTree(item.children, id);
+        if (found) return found;
+      }
+    }
+    return undefined;
+  };
+
+
   const components = useMemo(() => ({
     body: {
       row: (props: any) => {
         const issueId = props["data-row-key"];
-        const issue = issues.find((i: IIssue) => i.id === issueId);
+        const issue = findIssueInTree(dataSource, issueId);
 
         if (!issue) return <tr {...props} />;
 
         return (
           <MemoizedTableRow
             issue={issue}
-            user={user}
-            userTeams={userTeams}
+            user={user!}
+            userTeams={userTeams!}
             rowProps={props}
           />
         );
       },
     },
-  }), [issues, user, userTeams]);
+  }), [issues, user, userTeams, dataSource]);
 
-  if (issues.length === 0 || dataSource.length === 0) {
+  if (dataSource.length === 0) {
     return null
   }
   return (

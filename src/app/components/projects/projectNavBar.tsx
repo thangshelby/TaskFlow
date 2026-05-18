@@ -124,6 +124,11 @@ const ProjectNavbar: React.FC<ProjectNavbarProps> = ({
   const { projectId } = useParams<{ projectId: string }>();
   const location = useLocation();
   const [isAddMemberModalOpen, setIsAddMemberModalOpen] = useState(false);
+
+  useEffect(() => {
+    setIsAddMemberModalOpen(false);
+  }, [location.pathname]);
+
   const { project } = useProjectByID(projectId || "");
 
   const getNavItems = (currentProjectId: string): NavItem[] => [

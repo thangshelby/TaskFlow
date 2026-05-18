@@ -1,4 +1,5 @@
 @import "tailwindcss";
+
 @theme {
   --font-manrope: "Manrope", sans-serif;
 }
@@ -6,6 +7,7 @@
 body {
   font-family: "Manrope", sans-serif;
 }
+
 /* Thanh cuộn chung */
 ::-webkit-scrollbar {
   width: 4px;
@@ -131,16 +133,16 @@ body {
   display: flex !important;
   align-items: center !important;
   justify-content: center !important;
+  margin-top: 16px !important;
+  margin-right: 4px !important
 }
 
 .ant-table-row-expand-icon-collapsed {
-  margin-top: 10px !important;
   margin-left: 8px !important;
   margin-right: 0px !important;
 }
 
 .ant-table-row-expand-icon-expanded {
-  margin-top: 10px !important;
   margin-left: 8px !important;
   margin-right: 0px !important;
 }

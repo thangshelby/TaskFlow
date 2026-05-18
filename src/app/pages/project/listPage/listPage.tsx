@@ -69,7 +69,7 @@ const ListPage = () => {
           setListMode={handleSetListMode}
         />
 
-        <div ref={listTableRef} className="h-full flex-1 flex-col">
+        <div ref={listTableRef} className="min-h-0 flex-1 flex flex-col overflow-hidden">
           {listMode === "list" ? (
             <ListTable
               maxHeightListTable={Math.max(maxHeightListTable - 100, 200)}

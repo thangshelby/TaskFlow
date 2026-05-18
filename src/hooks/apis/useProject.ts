@@ -149,6 +149,11 @@ export function useDeleteProject({ onClose }: { onClose?: () => void }) {
 
 export function useProjectByID(projectId: string) {
   const { user, setUser } = useAuthStore();
+  const { memberships, isLoading: isLoadingMemberships } = useUserMemberships(
+    user?.id || "",
+    true,
+  );
+  const member = memberships.find((m) => m.project_id === projectId);
   const {
     data: project,
     isLoading,
@@ -157,18 +162,16 @@ export function useProjectByID(projectId: string) {
     queryKey: ["project", projectId],
     queryFn: async () => {
       const { data } = await projects.getById(projectId);
-      data.data.project_members.forEach((member) => {
-        if (user?.id === member.user_id) {
-          setUser({
-            ...user,
-            projectRole: member.role,
-          });
-        }
-      });
+      if (member && user) {
+        setUser({
+          ...user,
+          projectRole: member.role,
+        });
+      }
 
       return data;
     },
-    enabled: !!projectId,
+    enabled: !!projectId && !isLoadingMemberships,
   });
 
   return {

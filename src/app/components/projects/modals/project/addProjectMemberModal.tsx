@@ -118,7 +118,7 @@ const AddProjectMemberModal: React.FC<AddProjectMemberModalProps> = ({
             <input
               type="text"
               {...register("email")}
-              className="w-full rounded-md border border-gray-300 px-3 py-2 focus:border-blue-500 focus:ring-2 focus:ring-blue-500 focus:outline-none"
+              className="w-full rounded-md border border-gray-300 bg-white px-3 py-2.5 text-sm text-gray-900 placeholder-gray-400 shadow-sm focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 focus:outline-none transition-colors duration-200"
               placeholder="Enter email address"
             />
             {errors.email && (
@@ -142,7 +142,7 @@ const AddProjectMemberModal: React.FC<AddProjectMemberModalProps> = ({
                     {menu}
                   </div>
                 )}
-                className="rounded-md! p-2!"
+                className="!rounded-md !p-2"
                 menu={{
                   style: {
                     padding: "12px 0px",
@@ -160,14 +160,14 @@ const AddProjectMemberModal: React.FC<AddProjectMemberModalProps> = ({
                       key: option.value,
                       label: (
                         <div
-                          className={`flex flex-col border-l-2 border-transparent px-2 py-1 leading-5 hover:border-l-emerald-500 hover:bg-emerald-50 ${role == option.value && "border-l-emerald-500 bg-emerald-50"}`}
+                          className={`flex flex-col border-l-2 border-transparent px-3 py-2 leading-5 hover:border-l-emerald-500 hover:bg-emerald-50 ${role == option.value && "border-l-emerald-500 bg-emerald-50"}`}
                         >
                           <p
-                            className={`text-md font-normal ${role == option.value && "text-emerald-500"}`}
+                            className={`text-sm font-semibold ${role == option.value ? "text-emerald-600" : "text-gray-700"}`}
                           >
                             {option.label}
                           </p>
-                          <p className="text-sm leading-4 font-normal text-gray-500">
+                          <p className="text-xs leading-4 font-normal text-gray-400">
                             {option.description}
                           </p>
                         </div>
@@ -183,11 +183,15 @@ const AddProjectMemberModal: React.FC<AddProjectMemberModalProps> = ({
                 onOpenChange={setIsOpenSelectOption}
               >
                 <div
-                  className={`relative w-full cursor-pointer rounded-xs p-2 text-sm font-normal text-gray-500 hover:bg-gray-100 ${isOpenSelectOption ? "border-2 border-emerald-500 bg-none" : "border border-gray-300"} `}
+                  className={`relative w-full cursor-pointer rounded-md border p-2.5 text-sm font-normal transition-all duration-200 ${
+                    isOpenSelectOption
+                      ? "border-emerald-500 bg-white text-gray-800 ring-1 ring-emerald-500 shadow-sm"
+                      : "border-gray-300 bg-white text-gray-600 hover:bg-gray-50 shadow-sm"
+                  }`}
                 >
-                  {role}
-                  <span className="absolute top-0 right-0 flex h-full items-center justify-center pr-2">
-                    <FaAngleDown />
+                  {MemberRoleOptions.find((o) => o.value === role)?.label || role}
+                  <span className="absolute inset-y-0 right-0 flex items-center pr-3 text-gray-400">
+                    <FaAngleDown className={`transition-transform duration-200 ${isOpenSelectOption ? "rotate-180 text-emerald-500" : ""}`} />
                   </span>
                 </div>
               </Dropdown>
