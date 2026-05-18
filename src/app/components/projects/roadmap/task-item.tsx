@@ -19,7 +19,7 @@ const TaskItem: React.FC<TaskItemProps> = ({ issue, isDragging }) => {
 
   return (
     <div
-      className={`group/task relative flex items-center gap-2.5 rounded-sm border p-2 transition-all duration-300 ${isOverdue
+      className={`group/task relative flex items-center gap-2 rounded-sm border p-1.5 transition-all duration-300 ${isOverdue
         ? "bg-[#fef2f2] border-red-100 hover:border-red-300"
         : isDone
           ? "bg-[#f0fdf4]/50 border-[#064e3b]/10 opacity-70"

@@ -67,7 +67,7 @@ const RoadmapPage: React.FC = () => {
                 minSize={60}
                 maxSize={100}
               >
-                <div className="flex h-full flex-col gap-6 pr-4 p-6 mr-2">
+                <div className="flex h-full flex-col gap-4 pr-4 p-5 mr-2">
                   <RoadmapFilter
                     initialFilters={filters}
                     setSearchParams={setFilters}

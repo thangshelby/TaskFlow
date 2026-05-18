@@ -26,15 +26,15 @@ const Roadmap: React.FC<RoadmapProps> = ({
           {/* Weekday Headers */}
           <div className="grid grid-cols-5 border-b border-[#e8e8e7] bg-[#f9f9f8]/50">
             {[
-              "Monday",
-              "Tuesday",
-              "Wednesday",
-              "Thursday",
-              "Friday",
+              "Mon",
+              "Tue",
+              "Wed",
+              "Thu",
+              "Fri",
             ].map((day) => (
               <div
                 key={day}
-                className="py-3 text-center text-[11px] font-bold text-[#064e3b]/70 font-manrope uppercase tracking-widest"
+                className="py-2 text-center text-[11px] font-bold text-[#064e3b]/70 font-manrope uppercase tracking-widest"
               >
                 {day}
               </div>
@@ -114,14 +114,14 @@ const DropableDate = ({
     <div ref={setNodeRef} className="h-full">
       <SortableContext items={issues.map((issue) => issue.id)}>
         <div
-          className={`h-44 min-h-[160px] border-r border-b border-[#e8e8e7] p-3 transition-all duration-200 group flex flex-col ${isToday(dateObj) ? "bg-[#f0fdf4]/30" : "bg-white/40"
+          className={`h-full min-h-[144px] border-r border-b border-[#e8e8e7] p-2 transition-all duration-200 group flex flex-col ${isToday(dateObj) ? "bg-[#f0fdf4]/30" : "bg-white/40"
             } ${isWeekend(dateObj) ? "hidden" : "hover:bg-[#f9f9f8]"} ${isActive ? "bg-[#f0fdf4] ring-2 ring-inset ring-[#064e3b]/20" : ""
             }`}
         >
-          <div className="flex items-center justify-between">
+          <div className="flex items-center justify-between mb-1">
             <span
-              className={`text-sm font-bold font-manrope ${isToday(dateObj)
-                ? "flex h-7 w-7 items-center justify-center rounded-full bg-[#064e3b] text-white shadow-lg"
+              className={`text-[12px] font-bold font-manrope ${isToday(dateObj)
+                ? "flex h-5 w-5 items-center justify-center rounded-full bg-[#064e3b] text-white shadow-sm"
                 : "text-[#064e3b]/70 group-hover:text-[#064e3b]"
                 }`}
             >
