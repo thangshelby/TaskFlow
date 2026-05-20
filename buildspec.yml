@@ -26,7 +26,7 @@ phases:
 
   build:
     commands:
-      - cp .env.prod .env
+      - aws s3 cp s3://taskflo-env/env.prod .env
       - pnpm run build
 
   post_build:
