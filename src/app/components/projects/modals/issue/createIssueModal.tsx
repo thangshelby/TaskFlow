@@ -1,5 +1,5 @@
 import React, { useState, useRef, useCallback } from "react";
-import { uploadFileToCloudinary } from "@libs/utils/file";
+import { useUpload } from "@libs/hooks/apis/useMetadata";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -132,6 +132,7 @@ const CreateIssueModal: React.FC<CreateIssueModalProps> = ({
     },
   });
 
+  const { upload } = useUpload();
   const isLoading = isCreating || isUpdating;
 
   // Attachments stored as JSON strings (same format as metadataSection)
@@ -258,12 +259,17 @@ const CreateIssueModal: React.FC<CreateIssueModalProps> = ({
     catch { return null; }
   };
 
-  // Upload file to Cloudinary and store as JSON string (same as metadataSection)
+  // Upload file to S3 and store as JSON string (same as metadataSection)
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
     try {
-      const url = await uploadFileToCloudinary(undefined, file);
+      const url = await upload({
+        project_id: selectedProjectId,
+        user_id: user?.id || "",
+        file,
+        upload_type: "attachment",
+      });
       const newAttachment = JSON.stringify({
         url,
         type: file.type,
@@ -711,7 +717,12 @@ const CreateIssueModal: React.FC<CreateIssueModalProps> = ({
                 const file = e.dataTransfer.files?.[0];
                 if (!file) return;
                 try {
-                  const url = await uploadFileToCloudinary(undefined, file);
+                  const url = await upload({
+                    project_id: selectedProjectId,
+                    user_id: user?.id || "",
+                    file,
+                    upload_type: "attachment",
+                  });
                   setAttachments((prev) => [...prev, JSON.stringify({
                     url,
                     type: file.type,

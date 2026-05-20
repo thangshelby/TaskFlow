@@ -16,7 +16,8 @@ import { useUpdateTeam } from "@libs/hooks/apis/useTeam";
 import AddProjectTeamMemberModal from "@libs/app/components/projects/modals/project/addProjectTeamMemberModal";
 import LoadingFallback from "@libs/app/components/general-components/loadingFallback";
 import { UI_COMMON_SIZES } from "@libs/app/components/general-components/constants/uiConfig";
-import { uploadFileToCloudinary } from "@libs/utils/file";
+import { useUpload } from "@libs/hooks/apis/useMetadata";
+import { useAuthStore } from "@libs/store/useAuthStore";
 
 import { PERMISSIONS_CONFIG } from "@libs/config/permissons.config";
 import PermissionButton from "@libs/app/components/general-components/pemissionButton";
@@ -31,6 +32,8 @@ const TeamDetailPage: React.FC = () => {
   const { updateTeam, isLoading: isUpdatingTeam } = useUpdateTeam(
     projectId || "",
   );
+  const { upload } = useUpload();
+  const userId = useAuthStore((state) => state.user?.id);
   const [isAddPeopleOpen, setIsAddPeopleOpen] = useState(false);
   const [isUploadingBanner, setIsUploadingBanner] = useState(false);
 
@@ -71,7 +74,12 @@ const TeamDetailPage: React.FC = () => {
     if (!file || !team?.id) return;
     setIsUploadingBanner(true);
     try {
-      const avatarUrl = await uploadFileToCloudinary("", file);
+      const avatarUrl = await upload({
+        project_id: projectId || "",
+        user_id: userId || "",
+        file,
+        upload_type: "avatar",
+      });
       if (avatarUrl) {
         await updateTeam({
           team_id: team.id,

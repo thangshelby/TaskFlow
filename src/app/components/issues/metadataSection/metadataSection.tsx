@@ -1,14 +1,15 @@
 import React, { lazy, useState, useTransition } from "react";
 import { IIssue } from "@libs/types/issue";
 import { FaPlus } from "react-icons/fa";
-// import { TbHexagon3D } from "react-icons/tb";
 import { BsThreeDots } from "react-icons/bs";
 import { useUpdateIssue } from "@libs/hooks/apis/useIssue";
-import { uploadFileToCloudinary } from "@libs/utils/file";
 import CustomInput from "../../general-components/customInput";
+import { useUpload } from "@libs/hooks/apis/useMetadata";
+import { useAuthStore } from "@libs/store/useAuthStore";
 
 const AttachmentCard = lazy(() => import("./attachmentCard"));
 const TextEditor = lazy(() => import("./textEditor"));
+
 const MetadataSection = ({
   selectedIssue,
   fileInputRef,
@@ -24,29 +25,44 @@ const MetadataSection = ({
     projectId: selectedIssue?.project_id || "",
   });
 
+  const userId = useAuthStore((state) => state.user?.id);
+  const { upload, isPending } = useUpload();
+
   const handleFileUpload = async (
     event: React.ChangeEvent<HTMLInputElement>,
   ) => {
     const file = event.target.files?.[0];
-    if (file?.type.includes("image")) {
-      const response = await uploadFileToCloudinary(undefined, file);
-      const newAttachment = {
-        url: response,
-        type: file.type,
-        uploadFrom: "attachment",
-        created_at: new Date().toISOString(),
-      };
-      await updateIssueAsync({
-        id: selectedIssue!.id,
-        data: {
-          attachments: [
-            ...selectedIssue!.attachments,
-            JSON.stringify(newAttachment),
-          ],
-        },
-      });
-    }
+    if (!file) return;
+
+    // Reset input để có thể upload cùng file lại nếu cần
+    event.target.value = "";
+
+    const fileUrl = await upload({
+      project_id: selectedIssue?.project_id || "",
+      user_id: userId || "",
+      file,
+    });
+
+    const newAttachment = {
+      url: fileUrl,
+      name: file.name,
+      type: file.type,
+      size: file.size,
+      uploadFrom: "attachment",
+      created_at: new Date().toISOString(),
+    };
+
+    await updateIssueAsync({
+      id: selectedIssue!.id,
+      data: {
+        attachments: [
+          ...selectedIssue!.attachments,
+          JSON.stringify(newAttachment),
+        ],
+      },
+    });
   };
+
   const handleDeleteAttachment = async (attachment: string) => {
     await updateIssueAsync({
       id: selectedIssue!.id,
@@ -92,7 +108,7 @@ const MetadataSection = ({
             />
           </div>
         ) : (
-          <div 
+          <div
             onClick={() => {
               startTransition(() => {
                 setIsShowingTextEditor(true);
@@ -100,7 +116,7 @@ const MetadataSection = ({
             }}
             className="w-full min-h-[100px] rounded-md border border-[#064e3b]/5 bg-[#fcfcfb]/50 p-4 text-[13px] text-[#064e3b]/90 font-medium cursor-pointer hover:bg-white hover:border-[#064e3b]/20 hover:shadow-sm transition-all group"
           >
-            {selectedIssue?.description && selectedIssue!.description[0] === "{" 
+            {selectedIssue?.description && selectedIssue!.description[0] === "{"
               ? JSON.parse(selectedIssue?.description || "{}")?.plainText || <span className="text-[#064e3b]/40 italic">Add a description...</span>
               : selectedIssue?.description || <span className="text-[#064e3b]/40 italic">Add a description...</span>
             }
@@ -124,15 +140,19 @@ const MetadataSection = ({
           <div className="flex flex-row items-center gap-1">
             <button
               title="Add attachment"
-              className="flex h-7 w-7 items-center justify-center rounded-lg text-[#064e3b]/60 hover:bg-[#064e3b]/5 hover:text-[#064e3b] transition-all border border-transparent hover:border-[#064e3b]/10 active:scale-90"
+              disabled={isPending}
+              className="flex h-7 w-7 items-center justify-center rounded-lg text-[#064e3b]/60 hover:bg-[#064e3b]/5 hover:text-[#064e3b] transition-all border border-transparent hover:border-[#064e3b]/10 active:scale-90 disabled:opacity-40 disabled:cursor-not-allowed"
               onClick={() => fileInputRef?.current?.click()}
             >
-              <FaPlus size={10} />
+              {isPending ? (
+                <span className="h-3 w-3 rounded-full border-2 border-[#064e3b]/40 border-t-[#064e3b] animate-spin" />
+              ) : (
+                <FaPlus size={10} />
+              )}
               <input
                 type="file"
                 onChange={handleFileUpload}
                 className="hidden"
-                multiple
                 ref={fileInputRef}
               />
             </button>
@@ -141,27 +161,28 @@ const MetadataSection = ({
             </button>
           </div>
         </div>
-        
+
         {selectedIssue!.attachments.length > 0 ? (
-          <div className="flex w-full flex-row gap-3 overflow-x-auto pb-2 custom-scrollbar">
+          <div className="flex w-full flex-row gap-3 overflow-x-auto pb-2 scrollbar-thin scrollbar-thumb-gray-200 scrollbar-track-transparent">
             {selectedIssue!.attachments.map((attachment, index) => (
-              <AttachmentCard
-                key={index}
-                attachment={JSON.parse(attachment)}
-                handleDeleteAttachment={handleDeleteAttachment}
-              />
+              <div key={index} className="flex-shrink-0">
+                <AttachmentCard
+                  attachment={JSON.parse(attachment)}
+                  handleDeleteAttachment={handleDeleteAttachment}
+                />
+              </div>
             ))}
           </div>
         ) : !isShowingTextEditor && (
-           <div 
-             onClick={() => fileInputRef?.current?.click()}
-             className="flex items-center gap-3 p-4 rounded-md border border-dashed border-[#064e3b]/20 bg-[#fcfcfb]/30 text-[#064e3b]/60 hover:bg-[#064e3b]/5 hover:border-[#064e3b]/30 cursor-pointer transition-all group"
-           >
-             <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-white shadow-sm border border-[#064e3b]/10 text-[#064e3b]/40 group-hover:text-[#064e3b] transition-colors">
-               <FaPlus size={12} />
-             </div>
-             <span className="text-xs font-bold font-manrope uppercase tracking-tight">Drop files or click to upload</span>
-           </div>
+          <div
+            onClick={() => fileInputRef?.current?.click()}
+            className="flex items-center gap-3 p-4 rounded-md border border-dashed border-[#064e3b]/20 bg-[#fcfcfb]/30 text-[#064e3b]/60 hover:bg-[#064e3b]/5 hover:border-[#064e3b]/30 cursor-pointer transition-all group"
+          >
+            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-white shadow-sm border border-[#064e3b]/10 text-[#064e3b]/40 group-hover:text-[#064e3b] transition-colors">
+              <FaPlus size={12} />
+            </div>
+            <span className="text-xs font-bold font-manrope uppercase tracking-tight">Drop files or click to upload</span>
+          </div>
         )}
       </div>
     </div>

@@ -6,7 +6,8 @@ import UserAvatar from "@libs/app/components/general-components/user/userAvatar"
 import { toast } from "react-toastify";
 import LoadingFallback from "@libs/app/components/general-components/loadingFallback";
 import { UI_COMMON_SIZES } from "@libs/app/components/general-components/constants/uiConfig";
-import { uploadFileToCloudinary } from "@libs/utils/file";
+import { useUpload } from "@libs/hooks/apis/useMetadata";
+import { useAuthStore } from "@libs/store/useAuthStore";
 import DatePicker from "antd/lib/date-picker";
 import dayjs from "dayjs";
 
@@ -16,6 +17,8 @@ const ProjectDetailPage: React.FC = () => {
   const { updateProject, isLoading: isUpdating } = useUpdateProject({
     onClose: () => {},
   });
+  const { upload } = useUpload();
+  const userId = useAuthStore((state) => state.user?.id);
 
   const [formData, setFormData] = useState({
     name: "",
@@ -54,7 +57,12 @@ const ProjectDetailPage: React.FC = () => {
     if (!file || !projectId) return;
     setIsUploadingBanner(true);
     try {
-      const bannerUrl = await uploadFileToCloudinary("", file);
+      const bannerUrl = await upload({
+        project_id: projectId || "",
+        user_id: userId || "",
+        file,
+        upload_type: "avatar",
+      });
       if (bannerUrl) {
         handleInputChange("background_img", bannerUrl);
         // Optionally update immediately like in team detail

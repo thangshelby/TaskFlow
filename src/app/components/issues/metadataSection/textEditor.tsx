@@ -1,7 +1,9 @@
 import { useEffect, useRef, useState, useCallback } from "react";
 import Quill, { Delta } from "quill";
 import "quill/dist/quill.snow.css";
-import { uploadFileToCloudinary } from "@libs/utils/file";
+import { convertBase64ToFile } from "@libs/utils/file";
+import { useUpload } from "@libs/hooks/apis/useMetadata";
+import { useAuthStore } from "@libs/store/useAuthStore";
 import { useUpdateIssue } from "@libs/hooks/apis/useIssue";
 import { useSpeechToText } from "@libs/hooks/common/useSpeechToText";
 import { FaMicrophone, FaStop } from "react-icons/fa";
@@ -27,6 +29,8 @@ export default function TextEditor({
   );
 
   const { updateIssueAsync } = useUpdateIssue({ projectId });
+  const { upload } = useUpload();
+  const userId = useAuthStore((state) => state.user?.id);
   const [isSaving, setIsSaving] = useState(false);
   const [previewImage, setPreviewImage] = useState("");
   const [previewOpen, setPreviewOpen] = useState(false);
@@ -152,13 +156,19 @@ export default function TextEditor({
       if (typeof op.insert === "object" && "image" in op.insert) {
         const image = op.insert as { image: string };
         if (!initialAttachmentsOps.includes(image.image)) {
-          // Upload new image to Cloudinary
-          const imageUrl = await uploadFileToCloudinary(image.image, undefined);
+          // Upload new image to S3
+          const file = convertBase64ToFile(image.image);
+          const imageUrl = await upload({
+            project_id: projectId || "",
+            user_id: userId || "",
+            file,
+            upload_type: "attachment",
+          });
           op.insert = { image: imageUrl };
           newAttachments.push(
             JSON.stringify({
               url: imageUrl,
-              type: "image",
+              type: file.type,
               uploadFrom: "description",
               created_at: new Date().toISOString(),
             }),
@@ -263,7 +273,7 @@ export default function TextEditor({
           Cancel
         </button>
       </div>
-      
+
       {/* Hidden Image for Preview */}
       {previewImage && (
         <div className="hidden">

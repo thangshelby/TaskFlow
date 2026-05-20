@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { uploadFileToCloudinary } from "@libs/utils/file";
+import { useUpload } from "@libs/hooks/apis/useMetadata";
 import { readFile } from "@libs/utils/cropImage";
 import { useImageCropContext } from "../../cropper/imageCropProvider";
 import Button from "../../general-components/button";
@@ -23,6 +23,7 @@ const UpdateAvatarModal = ({
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [isUploadLoading, setIsUploadLoading] = useState(false);
   const { mutateAsync: updateUserMutation, isPending } = useUpdateUser();
+  const { upload } = useUpload();
 
   useEffect(() => {
     if (user) {
@@ -42,14 +43,24 @@ const UpdateAvatarModal = ({
   const handleUpdateAvatar = async () => {
     setIsUploadLoading(true);
     if (!imageFile) return;
-    const imageUploadUrl = await uploadFileToCloudinary("", imageFile);
-    if (imageUploadUrl) {
-      await updateUserMutation({
+    try {
+      const imageUploadUrl = await upload({
+        project_id: "",
         user_id: user.id,
-        avatar: imageUploadUrl,
+        file: imageFile,
+        upload_type: "avatar",
       });
+      if (imageUploadUrl) {
+        await updateUserMutation({
+          user_id: user.id,
+          avatar: imageUploadUrl,
+        });
+        setIsUploadLoading(false);
+        onClose();
+      }
+    } catch (err) {
+      console.error("Failed to upload avatar:", err);
       setIsUploadLoading(false);
-      onClose();
     }
   };
   if (!isOpen) return null;
