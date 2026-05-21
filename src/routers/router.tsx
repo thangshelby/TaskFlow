@@ -59,9 +59,9 @@ const ProjectBoard = lazy(
 const Roadmap = lazy(
     () => import("@libs/app/pages/project/roadmapPage/roadmapPage"),
 );
-const DevelopmentPage = lazy(
-    () => import("@libs/app/pages/project/developmentPage/developmentPage"),
-);
+// const DevelopmentPage = lazy(
+//     () => import("@libs/app/pages/project/developmentPage/developmentPage"),
+// );
 
 const VerifyPage = lazy(
     () => import("@libs/app/pages/auth/verifyPage/verifyPage"),
@@ -131,7 +131,7 @@ const Router = (): React.ReactElement => {
                             <Route path="backlog/:selectedIssue" element={<BacklogPage />} />
                             <Route path="list" element={<ListPage />} />
                             <Route path="roadmap" element={<Roadmap />} />
-                            <Route path="development" element={<DevelopmentPage />} />
+                            {/* <Route path="development" element={<DevelopmentPage />} /> */}
                             <Route path="settings" element={<ProjectSettingsPage />}>
                                 <Route path="teams" element={<TeamManagementPage />} />
                                 <Route path="teams/:teamId" element={<TeamDetailPage />} />
