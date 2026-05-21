@@ -42,6 +42,23 @@ export function useAuth() {
     },
   });
 
+  const oauthLogin = useMutation({
+    mutationFn: auth.oauthLogin,
+    onSuccess: ({ data }) => {
+      setUser(data.data);
+      queryClient.setQueryData(["currentUser"], data.data);
+      navigate("/");
+    },
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    onError: (error: any) => {
+      const message =
+        error.response?.data?.message ||
+        error.message ||
+        "OAuth login failed. Please try again.";
+      setError(message);
+    },
+  });
+
   const register = useMutation({
     mutationFn: auth.register,
     onSuccess: (_, variables) => {
@@ -102,6 +119,7 @@ export function useAuth() {
     isLoading,
     error,
     login,
+    oauthLogin,
     register,
     logout,
     verifyOtp,
