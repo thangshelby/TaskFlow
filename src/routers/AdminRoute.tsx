@@ -1,30 +1,36 @@
 import React from "react";
 import { Navigate, Outlet, useLocation } from "react-router-dom";
-import { useSelector } from "react-redux";
-import { RootState } from "@libs/store";
-import { useAuth } from "@libs/hooks/apis/useAuth";
+
+const parseJwt = (token: string) => {
+  try {
+    return JSON.parse(atob(token.split(".")[1].replace(/-/g, "+").replace(/_/g, "/")));
+  } catch (e) {
+    return null;
+  }
+};
 
 const AdminRoute = (): React.ReactElement => {
-  const { isLoading } = useAuth();
-  const user = useSelector((state: RootState) => state.auth.user);
   const location = useLocation();
-
-  // Show loading state while checking auth
-  if (isLoading) {
-    return (
-      <div className="flex h-screen items-center justify-center">
-        Loading...
-      </div>
-    );
-  }
+  const adminToken = localStorage.getItem("admin_token");
 
   // Always redirect back to admin dashboard when path is just /admin
   if (location.pathname === "/admin") {
     return <Navigate to="/admin/dashboard" replace />;
   }
 
-  // Check for admin role after loading is complete
-  if (!user || user.role !== "Admin") {
+  if (!adminToken) {
+    return <Navigate to="/admin/login" replace />;
+  }
+
+  const payload = parseJwt(adminToken);
+  if (!payload) {
+    localStorage.removeItem("admin_token");
+    return <Navigate to="/admin/login" replace />;
+  }
+
+  const currentTime = Date.now() / 1000;
+  if (payload.exp && payload.exp < currentTime) {
+    localStorage.removeItem("admin_token");
     return <Navigate to="/admin/login" replace />;
   }
 

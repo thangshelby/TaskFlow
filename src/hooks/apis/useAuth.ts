@@ -20,7 +20,7 @@ export function useAuth() {
       return data.data;
     },
     retry: false,
-    enabled: true,
+    enabled: !window.location.pathname.startsWith("/admin"),
     refetchOnMount: false,
     refetchOnReconnect: false,
   });

@@ -107,6 +107,50 @@ export function useUpdateUser() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["me"] });
+      queryClient.invalidateQueries({ queryKey: ["admin-users"] });
+    },
+  });
+}
+
+/**
+ * Admin-specific hook: always fetches all users regardless of keyword.
+ * Used in the Admin Portal where we always want to see the full user list.
+ */
+export function useAdminListUsers(keyword: string = "") {
+  const { data, isLoading, error, refetch } = useQuery({
+    queryKey: ["admin-users", keyword],
+    queryFn: async () => {
+      const { data } = await users.list(keyword);
+      return data;
+    },
+    // Always enabled — admin always needs user data
+    enabled: true,
+    staleTime: 30_000, // 30s cache
+  });
+  return {
+    users: data?.data ?? [],
+    isLoading,
+    error,
+    refetch,
+  };
+}
+
+/**
+ * Admin delete user mutation placeholder.
+ * Wire up to actual API endpoint when backend supports it.
+ */
+export function useAdminDeleteUser() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (userId: string) => {
+      // TODO: replace with actual admin delete endpoint
+      // await api.delete(`/admin/users/${userId}`, { withCredentials: true });
+      console.log("[Admin] Soft-delete user:", userId);
+      return { userId };
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["admin-users"] });
     },
   });
 }

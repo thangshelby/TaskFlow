@@ -18,9 +18,6 @@ interface ListProjectsParams {
 
 const config = {
   withCredentials: true,
-  headers: {
-    Authorization: `Bearer ${localStorage.getItem("token")}`,
-  },
 };
 
 // Projects endpoints

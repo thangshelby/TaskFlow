@@ -1,110 +1,74 @@
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { z } from "zod";
-import { useAdminAuth } from "@libs/hooks/common/useAdminAuth";
-import { isAxiosError } from "axios";
+import React from "react";
+import { ShieldAlert, ArrowRight, Lock, Key } from "lucide-react";
 
-const adminLoginSchema = z.object({
-  email: z.string().email("Invalid email format"),
-  password: z.string().min(1, "Password is required"),
-});
+const AdminLoginPage: React.FC = () => {
+  const handleCognitoLogin = () => {
+    const cognitoDomain = import.meta.env.VITE_COGNITO_DOMAIN;
+    const clientId = import.meta.env.VITE_COGNITO_CLIENT_ID;
+    const redirectUri = window.location.origin + "/admin";
 
-type AdminLoginForm = z.infer<typeof adminLoginSchema>;
-
-const AdminLoginPage = () => {
-  const { login } = useAdminAuth();
-
-  const {
-    register,
-    handleSubmit,
-    setError: setFormError,
-    formState: { errors },
-  } = useForm<AdminLoginForm>({
-    resolver: zodResolver(adminLoginSchema),
-  });
-
-  const onSubmit = async (data: AdminLoginForm) => {
-    try {
-      await login.mutateAsync(data);
-    } catch (err) {
-      const errorMessage = isAxiosError(err)
-        ? err.response?.data?.message || "Login failed"
-        : err instanceof Error
-          ? err.message
-          : "Invalid credentials or insufficient permissions";
-
-      setFormError("root", {
-        type: "manual",
-        message: errorMessage,
-      });
+    if (!cognitoDomain || !clientId) {
+      alert(
+        "Missing AWS Cognito environment configurations.\nPlease ensure VITE_COGNITO_DOMAIN and VITE_COGNITO_CLIENT_ID are set in your .env file."
+      );
+      return;
     }
+
+    const authorizeUrl = `${cognitoDomain}/login/continue?client_id=63iptbpsld04aacm469jvlc8m9&redirect_uri=http%3A%2F%2Flocalhost%3A5173%2Fadmin&response_type=code&scope=email+openid+phone`;
+    window.location.href = authorizeUrl;
   };
 
-  const isLoading = login.status === "pending";
-
   return (
-    <div className="flex min-h-screen items-center justify-center bg-gray-50 px-4 py-12 sm:px-6 lg:px-8">
-      <div className="w-full max-w-md space-y-8">
-        <div>
-          <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
-            TaskFlow Admin
-          </h2>
-          <p className="mt-2 text-center text-sm text-gray-600">
-            Sign in to access admin dashboard
-          </p>
-        </div>
+    <div className="relative flex min-h-screen w-full items-center justify-center bg-stone-950 p-6 overflow-hidden">
+      {/* Dynamic Background Glows */}
+      <div className="absolute -top-40 -left-40 h-[500px] w-[500px] rounded-full bg-emerald-500/10 blur-[120px] animate-pulse duration-[8000ms]" />
+      <div className="absolute -bottom-40 -right-40 h-[500px] w-[500px] rounded-full bg-blue-500/10 blur-[120px] animate-pulse duration-[10000ms]" />
 
-        <form className="mt-8 space-y-6" onSubmit={handleSubmit(onSubmit)}>
-          <div className="space-y-4 rounded-md">
-            <div>
-              <label htmlFor="email" className="sr-only">
-                Email address
-              </label>
-              <input
-                {...register("email")}
-                type="email"
-                className="relative block w-full rounded-md border-0 p-2 text-gray-900 ring-1 ring-gray-300 ring-inset placeholder:text-gray-400 focus:ring-2 focus:ring-blue-600 focus:ring-inset sm:text-sm"
-                placeholder="Email address"
-              />
-              {errors.email && (
-                <p className="mt-1 text-sm text-red-600">
-                  {errors.email.message}
-                </p>
-              )}
+      <div className="relative w-full max-w-lg rounded-2xl border border-stone-800/80 bg-stone-900/40 p-10 shadow-2xl shadow-emerald-950/10 backdrop-blur-2xl transition-all duration-300">
+        {/* Top Accent Line */}
+        <div className="absolute top-0 left-0 right-0 h-[2px] bg-linear-to-r from-emerald-500 via-teal-500 to-blue-500" />
+
+        <div className="flex flex-col items-center text-center">
+          {/* Animated Shield Header */}
+          <div className="relative mb-8 flex h-16 w-16 items-center justify-center rounded-xl bg-linear-to-tr from-stone-900 to-stone-800 border border-stone-700/50 shadow-lg shadow-emerald-500/5">
+            <div className="absolute inset-0 rounded-xl bg-emerald-500/5 blur-md" />
+            <ShieldAlert className="h-8 w-8 text-emerald-400" />
+          </div>
+
+          <div className="space-y-3">
+            <h1 className="text-3xl font-black tracking-tight text-stone-50">
+              TaskFlow <span className="bg-linear-to-r from-emerald-400 via-teal-400 to-blue-400 bg-clip-text text-transparent">Admin Portal</span>
+            </h1>
+            <p className="text-sm text-stone-400 max-w-sm mx-auto">
+              Secured workspace management environment. Unauthorized access attempts are strictly monitored.
+            </p>
+          </div>
+
+          {/* Feature highlights */}
+          <div className="mt-8 w-full space-y-3 rounded-lg border border-stone-800/60 bg-stone-950/30 p-5 text-left">
+            <div className="flex items-center gap-3 text-stone-300 text-xs">
+              <Lock className="h-4 w-4 text-emerald-400 shrink-0" />
+              <span>Multi-Factor Authentication (MFA) Enabled</span>
             </div>
-
-            <div>
-              <label htmlFor="password" className="sr-only">
-                Password
-              </label>
-              <input
-                {...register("password")}
-                type="password"
-                className="relative block w-full rounded-md border-0 p-2 text-gray-900 ring-1 ring-gray-300 ring-inset placeholder:text-gray-400 focus:ring-2 focus:ring-blue-600 focus:ring-inset sm:text-sm"
-                placeholder="Password"
-              />
-              {errors.password && (
-                <p className="mt-1 text-sm text-red-600">
-                  {errors.password.message}
-                </p>
-              )}
+            <div className="flex items-center gap-3 text-stone-300 text-xs">
+              <Key className="h-4 w-4 text-emerald-400 shrink-0" />
+              <span>Single Sign-On (SSO) Federated identity</span>
             </div>
           </div>
 
-          {errors.root && (
-            <p className="text-center text-sm text-red-600">
-              {errors.root.message}
-            </p>
-          )}
-
+          {/* Action Button */}
           <button
-            type="submit"
-            disabled={isLoading}
-            className="group relative flex w-full justify-center rounded-md bg-blue-600 px-3 py-2 text-sm font-semibold text-white hover:bg-blue-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600 disabled:bg-blue-300"
+            onClick={handleCognitoLogin}
+            className="group relative mt-8 flex w-full items-center justify-center gap-3 overflow-hidden rounded-lg bg-emerald-500 px-6 py-4 text-sm font-bold uppercase tracking-wider text-stone-950 shadow-lg shadow-emerald-500/10 hover:bg-emerald-400 hover:shadow-emerald-400/25 active:scale-98 transition-all cursor-pointer"
           >
-            {isLoading ? "Signing in..." : "Sign in"}
+            <span>Sign In with AWS Cognito</span>
+            <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
           </button>
-        </form>
+
+          <span className="mt-6 text-2xs text-stone-500 tracking-widest uppercase">
+            Secured by AWS IAM & Cognito Services
+          </span>
+        </div>
       </div>
     </div>
   );

@@ -4,6 +4,7 @@ import ProtectedRoute from "./ProtectedRoute";
 import GuestRoute from "./GuestRoute";
 import ChatPage from "@libs/app/pages/chat/ChatPage";
 import LandingPage from "@libs/app/pages/auth/landingPage";
+
 // Lazy load pages
 const ProjectLayout = lazy(() => import("@libs/app/layouts/projectLayout"));
 import DefaultLayout from "@libs/app/layouts/defaultLayout";
@@ -45,10 +46,42 @@ const CallbackPage = lazy(
 const AdminLayout = lazy(() => import("@libs/app/layouts/adminLayout"));
 const AuthLayout = lazy(() => import("@libs/app/layouts/authLayout"));
 const AdminRoute = lazy(() => import("./AdminRoute"));
+const AdminCallbackPage = lazy(
+    () => import("@libs/app/pages/admin/callback/AdminCallbackPage"),
+);
+
+// Admin Pages
+const AdminOverviewPage = lazy(
+    () => import("@libs/app/pages/admin/dashboard/AdminOverviewPage"),
+);
 const UsersPage = lazy(() => import("@libs/app/pages/admin/users/UsersPage"));
 const ProjectsPage = lazy(
     () => import("@libs/app/pages/admin/projects/ProjectsPage"),
 );
+const RolesPage = lazy(() => import("@libs/app/pages/admin/roles/RolesPage"));
+const AuditLogsPage = lazy(
+    () => import("@libs/app/pages/admin/audit-logs/AuditLogsPage"),
+);
+const IssueTypesPage = lazy(
+    () => import("@libs/app/pages/admin/configuration/IssueTypesPage"),
+);
+const { PrioritiesPage, StatusesPage, WorkflowsPage } = {
+    PrioritiesPage: lazy(() =>
+        import("@libs/app/pages/admin/configuration/ComingSoonPages").then((m) => ({
+            default: m.PrioritiesPage,
+        }))
+    ),
+    StatusesPage: lazy(() =>
+        import("@libs/app/pages/admin/configuration/ComingSoonPages").then((m) => ({
+            default: m.StatusesPage,
+        }))
+    ),
+    WorkflowsPage: lazy(() =>
+        import("@libs/app/pages/admin/configuration/ComingSoonPages").then((m) => ({
+            default: m.WorkflowsPage,
+        }))
+    ),
+};
 
 const ProjectReport = lazy(
     () => import("@libs/app/pages/project/reportPage/reportPage"),
@@ -59,9 +92,6 @@ const ProjectBoard = lazy(
 const Roadmap = lazy(
     () => import("@libs/app/pages/project/roadmapPage/roadmapPage"),
 );
-// const DevelopmentPage = lazy(
-//     () => import("@libs/app/pages/project/developmentPage/developmentPage"),
-// );
 
 const VerifyPage = lazy(
     () => import("@libs/app/pages/auth/verifyPage/verifyPage"),
@@ -103,12 +133,39 @@ const Router = (): React.ReactElement => {
 
                 {/* Admin routes */}
                 <Route path="/admin">
+                    {/* OAuth callback lands here first (no token yet) */}
+                    <Route index element={<AdminCallbackPage />} />
                     <Route path="login" element={<AdminLoginPage />} />
+
+                    {/* Protected admin area */}
                     <Route element={<AdminRoute />}>
-                        <Route path="dashboard" element={<AdminLayout />}>
-                            <Route index element={<UsersPage />} />
+                        <Route element={<AdminLayout />}>
+                            {/* Dashboard */}
+                            <Route path="dashboard" element={<AdminOverviewPage />} />
+
+                            {/* Users */}
                             <Route path="users" element={<UsersPage />} />
+
+                            {/* Projects */}
                             <Route path="projects" element={<ProjectsPage />} />
+
+                            {/* Roles & Permissions */}
+                            <Route path="roles" element={<RolesPage />} />
+
+                            {/* Configuration sub-routes */}
+                            <Route path="configuration">
+                                <Route index element={<Navigate to="issue-types" replace />} />
+                                <Route path="issue-types" element={<IssueTypesPage />} />
+                                <Route path="priorities" element={<PrioritiesPage />} />
+                                <Route path="statuses" element={<StatusesPage />} />
+                                <Route path="workflows" element={<WorkflowsPage />} />
+                            </Route>
+
+                            {/* Audit Logs */}
+                            <Route path="audit-logs" element={<AuditLogsPage />} />
+
+                            {/* Fallback: redirect /admin/dashboard → /admin/dashboard */}
+                            <Route index element={<Navigate to="dashboard" replace />} />
                         </Route>
                     </Route>
                 </Route>
@@ -131,7 +188,6 @@ const Router = (): React.ReactElement => {
                             <Route path="backlog/:selectedIssue" element={<BacklogPage />} />
                             <Route path="list" element={<ListPage />} />
                             <Route path="roadmap" element={<Roadmap />} />
-                            {/* <Route path="development" element={<DevelopmentPage />} /> */}
                             <Route path="settings" element={<ProjectSettingsPage />}>
                                 <Route path="teams" element={<TeamManagementPage />} />
                                 <Route path="teams/:teamId" element={<TeamDetailPage />} />
